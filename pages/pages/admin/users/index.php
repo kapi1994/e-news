@@ -53,7 +53,7 @@ if (isset($_SESSION['users']) && $_SESSION['users']->roleName != "Admin") {
                                             <td><?= $user->created_at ?></td>
                                             <td><?= $user->updated_at ? $user->updated_at : '-' ?></td>
                                             <td><a href="index.php?page=action-user&id=<?= $user->id ?>" class="btn btn-sm btn-success">Update</a></td>
-                                            <td><button type="button" class="btn btn-sm btn-danger" data-id="<?= $user->id ?>">Delete</button></td>
+                                            <td><button type="button" class="btn btn-sm btn-danger delete-user" data-id="<?= $user->id ?>">Delete</button></td>
                                         </tr>
                                     <?php endforeach;
                                 else : ?>

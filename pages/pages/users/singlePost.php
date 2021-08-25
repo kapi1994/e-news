@@ -4,17 +4,12 @@
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
             $post = getDataWithFetch('posts', 'id', $id);
+            $category = getDataWithFetch('categories', 'id', $post->category_id);
             $tags = getPostTag($post->id);
             $comments = getComments($post->id);
+            var_dump($comments);
             $getWithoutThis = $conn->query("SELECT * FROM posts WHERE id!=$id  ORDER BY created_at LIMIT 3")->fetchAll();
         }
-
-
-        if (isset($_SESSION['users'])) {
-            var_dump($_SESSION['users']);
-        }
-
-
 
         ?>
         <div class="row my-3">
@@ -24,7 +19,7 @@
                         <picture>
                             <img src="assets/images/posts/normal/<?= $post->image_path ?>" alt="<?= $post->name ?>" class="img-fluid">
                         </picture>
-                        <p class="text-muted my-2"><?= date('H:i:s  d-m-Y', strtotime($post->created_at)) ?></p>
+                        <p class="text-uppercase text-danger fw-bold my-2"><?= $category->name ?><span class="ms-3 text-muted"><?= date('H:i:s  d-m-Y', strtotime($post->created_at)) ?></span></p>
                         <h1 class="mb-2 fs-2"><?= $post->name ?></h1>
                         <p class="fs-5"><?= $post->description ?></p>
                         <div class="row mb-3">
@@ -63,10 +58,10 @@
                                 <div class="card mb-2">
                                     <div class="card-header">
                                         <div class="float-start fw-bold"><?= $comment->firstName ?></div>
-                                        <div class="float-end fst-italic"><small class="text-muted"><?= date('d-m-Y H:i:s', strtotime($comment->comment_created_at)) ?></small></div>
+                                        <div class="float-end fst-italic"><small class="text-muted"><?= date('d-m-Y H:i:s', strtotime($comment->created_at)) ?></small></div>
                                     </div>
                                     <div class="card-body">
-                                        <p class="font-italic"><?= $comment->comment ?></p>
+                                        <p class="font-italic"><?= $comment->text ?></p>
                                         <div class="float-start">
                                             <button class="btn btn-transparent btn-like" <?php if (!isset($_SESSION['users'])) : ?> disabled<?php endif; ?>data-post="<?= $post->id ?>" data-comment="<?= $comment->id ?>"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-hand-thumbs-up-fill <?php if ($userLikes && $userLikes->user_id == $id) : ?>text-success<?php else : ?>text-dark<?php endif; ?>" viewBox="0 0 16 16">
                                                     <path d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a9.84 9.84 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.163 3.163 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16H8c-.605 0-1.07-.081-1.466-.218a4.82 4.82 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z" />
@@ -83,33 +78,35 @@
                                             <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#comment<?= $comment->id ?>" aria-expanded="false" aria-controls="comment<?= $comment->id ?>">
                                                 Read more
                                             </button>
-                                            <button class="btn btn-outline-primary btn-reply" type="button" data-id="<?= $comment->id ?>" data-id-post="<?= $post->id ?>" id="btnReply<?= $comment->id ?>
-                                            ">Reply</button>
+
+                                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#comment_reply<?= $comment->id ?>" aria-expanded="false" aria-controls="comment_reply<?= $comment->id ?>" data-id="<?= $comment->id ?>" data-id-post="<?= $post->id ?>">
+                                                Reply
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="card-reply d-none" id="<?= $comment->id ?>">
-
+                                <div class="collapse  my-2" id="comment_reply<?= $comment->id ?>">
                                     <div class="row">
                                         <div class="col-10 ms-auto">
-                                            <div class=" card mb-2  ">
-                                                <div class="card-header ">Reply to: <span class="fw-bold fst-italic"> @<?= $comment->firstName ?></span></div>
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    Reply to: <span class="fts-italic fw-bold">@<?= $comment->firstName ?></span>
+                                                </div>
                                                 <div class="card-body">
-                                                    <textarea cols="30" rows="3" class=" reply-comment form-control " id="reply_comment<?= $comment->id ?>"></textarea>
+                                                    <textarea name="" cols="30" rows="5" class="form-control" id="reply_comment<?= $comment->id ?>"></textarea>
                                                 </div>
                                                 <div class="card-footer">
-
                                                     <div class="float-end">
                                                         <button class="btn btn-outline-secondary cancel-comments" data-id=<?= $comment->id ?> data-post="<?= $post->id ?>" type="button">Cancel</button>
                                                         <button class="btn btn-outline-primary comment-reply" type="button" data-comment="<?= $comment->id ?>" data-post=" <?= $post->id ?>">Submit</button>
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="collapse  my-2" id="comment<?= $comment->id ?>">
                                     <div class="row d-flex justify-content-end">
                                         <div class="col-10">

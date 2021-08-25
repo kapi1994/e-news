@@ -1,4 +1,5 @@
 <section>
+
     <div class="container">
         <div class="row my-3">
             <div class="col-lg-6">
@@ -23,7 +24,7 @@
                                 </picture>
                             </div>
                             <div class="card-footer">
-                                <h2 class="fs-5"><a href="index.php?page=single&id=<?= $post->id ?>" class="nav-link text-dark text-uppercase"><?= $post->name ?></a></h2>
+                                <h2 class="fs-5"><a href="index.php?page=single-post&id=<?= $post->id ?>" class="nav-link text-dark text-uppercase"><?= $post->name ?></a></h2>
                             </div>
                         </div>
                     </div>
