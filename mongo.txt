@@ -1,0 +1,153 @@
+mongod => moramo se pozicionirati na direktorijum gde je mongo instaliran, nesmemo prekidati server
+mongo => komanda da bi se mongo shell izvrsavao
+sintaksa za jezike => se reazlikuje u odnosnu na drajvere
+show dbs => sluzi za prikazivanje baza, 
+use nazivTabele => krieramo bazu, ali ona nece biti prikazana, zato sto je prazna   
+db.nazivKolekcije.insertOne({}) => kreiranje kolekcije i unosenje jednog ready, sadrazj se unosi kao objekat
+// primer za unos
+db.nazivKolekcije.insertOne({
+    name:"Naziv 1", => unosi se kao key => value pairs
+    age: 19,
+    mature: true
+// ostali tipovi podataka, njihove vrednosti se nestavljaju izmedju znaka navoda
+})
+// prilikom kriranja objekata mongo krieira _id
+
+db.nazivKolekcije.find().pretty() => find sluzi za prikazivanje podataka,
+dok pretty sluzi da prikaze u lepsem formaty, tj u formi objekta
+
+
+// crud operacije
+** Create  => insertOne ili insertMany(data, options)
+** Read => find() ili findOne(filter, options) => filter je kao where klauzula
+// find ili findOne cita sve ili samo jedan
+** Update updateOne, updateMany, replaceOne (filter, data, options) => 
+ izmena podataka, jednog ili vise, dok replaceOne menja ceo objekat
+ ** Delete (filter, options) => deleteOne ili deleteMany jedan ili vise
+
+ // **** DELETE ****
+ db.nazivKolekcije.deleteOne({nazivKolone:"Nemanja"}) ili 
+ db.nazivKolekcije.deleteMany({nazivKoline:""}) => ako je tip podatka string
+ db.nazivKolekcije.deleteOne({_id:"Neki kljuc"})
+
+ // **** Update ****
+ db.nazivKolekcije.updateOne({distance:12000}, {$set:{makert:'delete'}})
+ db.navivKolekcije.updateMany()
+ // $set je rezervisana rec koja ukazuje ako postoji izmenice,  ukoliko nepostoji dodace
+// kada koristimo db.nazivKolekcije.updateMany({}, {$set{}}) znaci da azuriramo sve
+ // **** INSERT ****
+ db.nazivKolekcije.insertMany([{},{}])
+
+ // **** READ ****
+ db.nazivKolekcije.find({name:"Max"}).pretty()
+ db.nazivKolekcije.find({distance:{$gt : 12000}}).pretty() => $gt je operator koji oznacava da li je veci
+ ukoliko koristimo da izmenimo ceo obj koristimo resplaceOne, za izmenu par stvari koristimo replaceOne ili replaceMany
+ kada koristimo find dobijamo cursor za vise podatka, findOne ne mozemo koristit pretty()
+
+ // **** PROJECKCIJA *****
+ db.nazivKolekcije.find({}, {nazivKolone:broj}).pretty() => 1 kada zelimo neke kolone da ujkljucime
+ // 0 kada zelimo da ih iskljucimo, na primer kao _id jer je on podifoltu iskljucen
+
+
+
+ // **** Ugnjezdeni elementi ****
+ db.nazivKolekcije.updateMany({}, {$set:{status:{description: 'on-time', last=updated:'1 hour agos'}}})
+
+ // $lookup nam pomaze da prikazemo povezane podatke
+ db.nazivKolekcije.aggregate([{
+     $lookup:{
+         from: iz koje druge kolekcije,
+         localField:'authors' => niz od objekata author_ids
+         foreignFiled:"_id" => vezuje se za primarni kljuc iz druge tabele,
+         as : "creators" => na ovaj nacin smo povezali dve kolekcije, kreirali relaciju,
+         i kreirali alijas za tu relaciju
+     }
+ }])
+
+ // **** relacije **** 
+  // relacije 1:1, ovaj tip relacije se moze kreirati na dva nacina, u dve tabele ili ugnjezdena
+  struktura, sa tim sto se razlikuje od situacije u kojoj se koristimo
+  // 1:m moze se koristiti pomocu dva razlicita tipa, pomocu relacije iil ugnjezdena struktura
+   gde relaciona struktura je prestavljena pomocu niza
+  // **** DODATI M:N
+  
+
+  // **** VALIDACiJA SEME ZA KREIANJE BAZE ****
+  db.createCollection('naziv', {validator:{}}) => za kreirnje kolekcije
+  validator:{
+      $jsonSchema: {
+          bsonType:"object" => koji tip podatka treba da ocekuje,
+          required: ['title', 'string'] => ovim smo obavezali da ova polja su obavezna,
+          properties:{
+              title: {
+                  bsonType:"string" => koji tip jedino prihvatljiv za string,
+                  description: "must be a string"
+              },
+              creator:{
+                  bsonType:"objectId" => referenca ka drugom objektu,
+                  description: "must be required"
+              },
+              comments:{
+                  bsonType:"array",
+                  description:"",
+                  items:{ => svojstva
+                      bsonType:"object"
+                      required:["text","author"]
+                      properties:{
+                          text:{
+                              type:'string',
+                              description:"must be type of string"
+                          }
+                      }
+                  }
+              }
+          }
+      }
+  }
+  // kraj validacione seme
+  db.runCommand({callMod:'posts',{ validacija}, validationAction:"warn" })
+  // runCommand => da izvrsimo odredjene komande za rad sa bazom
+  // collMod => da nad odredjenom kolekcijom dodamo odredjene opcije
+  // validationAction => kada se desi greska prilikom validacije da se prekine ili samo upozori
+
+  // mongo se moze detaljno konfigurisati, odnsono folder za logove i tabele
+  // potraziti kako kreirati konfiguracion fajlove i putanjes za logove i druge stvari
+
+  // **** dublje upoznavanje sa CREATE methodom ****
+  db.dropDatabase() sluzi da izbacimo db
+
+  sto se tice id mora da pocinje sa _id
+  // ordered insert => oznacava ako jedan element prilikom unosa ne moze da se upise u kolekciju, prekida se sa unosom,
+  a oni redovi koji su uneseni ostaju u bazi
+    db.nazivKolekcije.insertMany([{},{}],{ordered:false}) => da se neizvrsavaju po redu
+    db.nazivKolekcije.insertMany({},{writeConcern:{w:0}}) => da li server odobrava, da se podatak unese
+    w:1 => da dopustamo, j:false, j=> oznacava da je sacuvano u datoteci koja predstavlja zurnal
+    wtimeout: odredjujemo na koje vreme ce biti odlozemo opearciju
+// atomicity => ukoliko prilikom unosa dodje do neke greske ceo podatak se vraca nazad tj. sprecava unos u bazu,
+ako prodje sacuvava se u celosti
+
+mongoimport ucitavanje spoljsnjeg fajla --drop ukoliko posoji izbacice bazu
+da bi smo izvrsavali mongo potrebno je da prekinemo komandu mongo, ako je u nekom drugom fajlu potrebno 
+je navesti punu putanju
+
+// **** READ ****
+db.nazivKolekcije.find({runtime:{$nt:60}}).pretty() => filteri se mogu koristiti na findOne i find()// $lt => lessthen, nt => notEqual => operatori poredjenja idu prvi blok
+db.movies.find({'rating.avarage':{$gt:7}}).pretty() => dohvataje Ugnjezdenih elemeneata i filtriranje na osnovu // $gt => greaterthan
+'rating.avarage' => ugnjezdeni elementi
+db.movies.find({genres:["Drama"]]}).pretty() => da trazimo samo nizove gde se sadrzi ovaj element
+// $lte lowerthanequal // manje ili jednako
+$in or $nin $in:[3,15], $nin:[3,15]
+$or ili $nor => db.nazivKolekcije.find(($or:[{jedanUslov},{drugiUslov}]))
+// $nor => znaci da ce vratiti sve uslove gde nijedan uslov nije zadovoljan
+$and => $and:[{},{}]
+$not:{$eq:60}
+
+// **** ELEMENT operator ****
+// $ne => notEqual, $exists => ima dve vrednosti true ili false
+$exists => proverava da kolona postoji  db.nazivKolekcije.find({age:{$exists:true, $ne:null}}).pretty()
+// phone : {$type:"number"} => dohvatice sve telefone gde je tip number,db.nazivKolekcije.find({phone:{$type:['number', 'string']}}).pretty()
+// $regex : db.nazivKolekcije.find({summary:{$regex: /music/ }}) => vratice sve tekstove gde je pronadjena ova rec
+
+db.nazivKolekcije.find({$expr:{}})
+
+//
