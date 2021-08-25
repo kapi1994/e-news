@@ -8,7 +8,7 @@ function getHeadingsWithCategories()
 function getComments($post_id)
 {
     global $conn;
-    $query = $conn->query("SELECT c.*, p.id as postId, u.first_name as firstName, u.last_name as lastName FROM comments c JOIN users u ON c.id_user=u.id LEFT JOIN posts p ON c.id_post=p.id WHERE p.id='$post_id'")->fetchAll();
+    $query = $conn->query("SELECT c.*, p.id as postId, u.first_name as firstName, u.last_name as lastName FROM comments c JOIN users u ON c.id_user=u.id LEFT JOIN posts p ON c.id_post=p.id WHERE p.id='$post_id' AND parent_id = 0")->fetchAll();
     return $query;
 }
 function getAll($table)
@@ -337,11 +337,12 @@ function updatePosts($table1, $table2, $postName, $postDesc, $image = "", $categ
 }
 
 
-function insertNewComment($table, $id_post, $id_user, $comment, $parent_comment)
+function insertNewComment($table, $id_post, $id_user, $text, $parent_comment, $date)
 {
     global $conn;
-    $query = $conn->prepare("INSERT INTO $table (id_post, id_user, comment, parent_comment) VALUES(?,?,?,?)");
-    $query->execute([$id_post, $id_user, $comment, $parent_comment]);
+    //echo json_encode($text);
+    $query = $conn->prepare("INSERT INTO $table (id_post, id_user, text, parent_id,created_at) VALUES(?,?,?,?,?)");
+    $query->execute([$id_post, $id_user, $text, $parent_comment, $date]);
     return $query;
 }
 
