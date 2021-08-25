@@ -1,23 +1,21 @@
 $(document).ready(function () {
-    $('.btn-reply').click(function (e) {
-        e.preventDefault()
-        let data_id = $(this).data("id")
-        console.log(data_id)
-        // if ($(this).hasClass('d-none')) {
-        //     console.log('izmena')
-        // } else {
-        //     console.log('povratak na prvobitno stanje')
-        // }
-        if ($(`#${data_id}`).hasClass('d-none')) {
-            $(`#${data_id}`).addClass('d-block').removeClass('d-none');
-            $(this).html('Cancel reply')
-        } else {
-            $(`#${data_id}`).removeClass('d-block').addClass('d-none');
-            $(this).html('Reply')
-        }
-        // $(this).addClass('d-none')
-        // $('.cancel-comment').data('comment_id', data_id)
+    $('#btnSubmit').click(function (e) {
+        e.preventDefault();
+        let text = document.querySelector('.textarea-commnet').value
+        // let comment_id = $(this).data("id")
+        let post_id = $(this).data("post")
+        $.ajax({
+            method: "POST",
+            url: 'models/comments/insert.php',
+            data: { text: text, post_id: post_id },
+            dataType: "json",
+            success: function (data, statusTxt, jqXHR) { },
+            error: function (jqXHR, statusTxt, xhr) {
+                console.log(jqXHR.response)
+            }
+        })
     });
+
     $('.submitComment').click(function (e) {
         e.preventDefault();
         console.log('izmena')
@@ -28,8 +26,10 @@ $(document).ready(function () {
     $(document).on('click', '.comment-reply', function (e) {
         e.preventDefault();
         let comment_id = $(this).data('comment')
+        console.log(comment_id)
         let post_id = $(this).data('post')
         let text = $(`#reply_comment${comment_id}`).val()
+        console.log(text)
         if (text != "") {
             $.ajax({
                 method: 'post',

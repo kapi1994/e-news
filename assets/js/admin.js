@@ -155,7 +155,7 @@ $(document).ready(function () {
         let id = $(this).data('id')
         $.ajax({
             method: 'post',
-            url: 'models/users/getAll.php',
+            url: 'models/users/delete.php',
             data: { id: id },
             dataType: 'json',
             success: function (data, statusTxt, xhr) {
