@@ -5,10 +5,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $comment_id = isset($_POST['comment_id']) ? $_POST['comment_id'] : 0;
     $post_id  = $_POST['post_id'];
     $text = $_POST['text'];
-    // echo json_encode($text);
+
     $user_id = isset($_SESSION['users']) ? $_SESSION['users']->id : '';
     $date = date("Y-m-d H:i:s");
-    // var_dump($comment_id, $post_id, $user_id, $text);
+
     try {
         require_once '../../config/connection.php';
         require_once '../functions.php';
