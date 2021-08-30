@@ -1,14 +1,12 @@
 <?php
+session_start();
 header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     require_once '../../config/connection.php';
     require_once '../functions.php';
     $post_id = $_GET['id'];
-    $getAllComents = getComments($post_id);
-    if (isset($_SESSION['users'])) {
-    }
-    var_dump($countLikes);
-    echo json_encode($getAllComents);
+    $comments = getComments($post_id);
+    echo json_encode($comments);
 } else {
     http_response_code(404);
 }

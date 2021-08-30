@@ -474,31 +474,3 @@ function postFilter($text, $categories, $headings, $pagination, $date)
         $baseQuery, $queryA
     ];
 }
-
-function userLikes($comment, $user_id)
-{
-    global $conn;
-    $rez = $conn->query("SELECT user_id FROM reactions WHERE comment_id = $comment   AND user_id = $user_id  AND likes != 0")->fetch();
-
-    return $rez;
-}
-function userDisslikes($comment, $id)
-{
-    global $conn;
-    $rez = $conn->query("SELECT user_id FROM reactions WHERE comment_id = $comment AND user_id = $id AND disslikes > 0")->fetch();
-
-    return $rez;
-}
-
-function countLikes($commnet_id)
-{
-    global $conn;
-    $rez = $conn->query("SELECT COUNT(likes) as likes FROM reactions WHERE comment_id = $commnet_id AND likes > 0 LIMIT 1")->fetch();
-    return $rez;
-}
-function countDisslikes($comment_id)
-{
-    global $conn;
-    $rez = $conn->query("SELECT COUNT(disslikes) as disslike FROM reactions WHERE comment_id = $comment_id AND disslikes > 0 LIMIT 1")->fetch();
-    return $rez;
-}
