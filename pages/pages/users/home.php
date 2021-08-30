@@ -1,22 +1,15 @@
 <section>
 
     <div class="container">
+
         <div class="row my-3">
-            <div class="col-lg-6">
-                <div class="d-grid"><button class="btn btn-primary">Jedan</button></div>
-            </div>
-            <div class="col-lg-6">
-                <div class="d-grid"><button class="btn btn-primary">Dva</button></div>
-            </div>
-        </div>
-        <div class="row">
             <?php
-            $posts = $conn->query("SELECT * FROM posts ORDER BY created_at LIMIT 4")->fetchAll();
+            $posts = getAll('posts');
             ?>
-            <h1 class="my-2 fs-3">By category</h1>
+
             <div class="row">
                 <?php foreach ($posts as $post) : ?>
-                    <div class="col-lg-3 d-flex align-items-stretch">
+                    <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-2">
                         <div class="card">
                             <div class="card-body">
                                 <picture>

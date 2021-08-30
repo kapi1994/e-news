@@ -107,7 +107,7 @@ $posts = postPagination();
                     </div>
 
                 </div>
-                <?php if (count($posts) > 5) : ?>
+                <?php if (count($posts) >= 5) : ?>
                     <div class="row">
                         <div class="col-4 mx-auto">
                             <nav aria-label="...">

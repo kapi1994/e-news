@@ -10,7 +10,7 @@ if (isset($_SESSION['users']) && $_SESSION['users']->roleName != "Admin") {
 <section>
     <div class="container">
         <div class="row my-3">
-            <div class="col-6 col-lg-3">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-3 mb-2">
                 <div class="card">
                     <div class="card-body">
                         <h1 class="fs-5" id="viewsTotal"></h1>
@@ -45,7 +45,7 @@ if (isset($_SESSION['users']) && $_SESSION['users']->roleName != "Admin") {
                         </h1>
                     </div>
                     <div class="card-body">
-                        <h2 class="fts-bold fs-1 text-center" id="registeredUsers">6</h2>
+                        <h2 class="fts-bold fs-1 text-center" id="registeredUsers"></h2>
                     </div>
                 </div>
 
@@ -58,7 +58,7 @@ if (isset($_SESSION['users']) && $_SESSION['users']->roleName != "Admin") {
                         </h1>
                     </div>
                     <div class="card-body">
-                        <h2 class="fts-bold fs-1 text-center" id="todayLogins">12</h2>
+                        <h2 class="fts-bold fs-1 text-center" id="todayLogins"></h2>
                     </div>
                 </div>
             </div>

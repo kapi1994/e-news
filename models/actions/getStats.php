@@ -40,7 +40,6 @@ foreach ($rows as $row) {
 }
 $logins = loggedInToday();
 $registeredUsers = registeredusers();
-// $totalOrders = totalOrders();
 $stats = ["overallViews" => $mainPages, "todayViews" => $mainPages24, "todayLogin" =>
 $logins, "registeredUsers" => $registeredUsers];
 echo json_encode($stats);

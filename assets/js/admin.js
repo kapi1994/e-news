@@ -386,7 +386,7 @@ $(document).ready(function () {
     const validationHeading = () => {
         const name = document.querySelector('#headingName').value
         const categoryId = document.querySelector('#headingCategory').value
-        const reName = /^[A-Z][a-z]{3,15}$/
+        const reName = /^[A-Z][a-z]{2,15}(\s)?([A-Z][a-z]{2,15})*$/
         const errors = []
         if (!reName.test(name)) {
             errors.push(name)
@@ -449,7 +449,7 @@ $(document).ready(function () {
     }
     const validationTags = () => {
         const name = document.querySelector('#tagName').value
-        const reNameTag = /^[A-Z][a-z]{3,15}(\s[A-Z][a-z]{3,15})?$/
+        const reNameTag = /^[A-Z][a-z]{1,15}(\s[A-Z][a-z]{3,15})?$/
         const errors = []
         if (!reNameTag.test(name)) {
             errors.push(name)
@@ -708,10 +708,12 @@ $(document).ready(function () {
                 <th scope="row">${rb}</th>
                 <td>${post.name}</td>
                 <td>${post.categoryName}</td>
+                <td>${post.headingName}</td>
                 <td>${post.created_at}</td>
                 <td>${post.updated_at ? post.updated_at : '-'}</td>
                 <td><a href="index.php?page=action_post&id=${post.id}" class="btn btn-sm btn-success">Update</a></td>
                 <td><button type="button" class="btn btn-sm btn-danger" data-id="${post.id}">Delete</button></td>
+                <td><a href="index.php?page=post_details&id=${post.id}" class="btn btn-info btn-sm">Details</a></td>
                 <td></td>
             </tr>
         `

@@ -4,8 +4,8 @@
 ?>
 <section>
     <div class="container">
-        <div class="row my-3">
-            <div class="col-6 mx-auto">
+        <div class="row my-5">
+            <div class="col-6 mx-auto my-5">
                 <div id="registerResponseErrorMessage"></div>
                 <form action="#" method="#">
                     <div class="mb-3">

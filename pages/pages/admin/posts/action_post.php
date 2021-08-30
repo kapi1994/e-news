@@ -73,11 +73,13 @@ $tags = getAll('tags');
                         <?php
                         foreach ($tags as $tag) :
                         ?>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="<?= $tag->id ?>" id="tag_<?= $tag->id ?>" name="postTags" <?php if (isset($tags) && isset($tag_arr) && in_array($tag->id, $tag_arr)) : ?> checked <?php endif ?>>
-                                <label class="form-check-label" for="tag_<?= $tag->id ?>">
-                                    <?= $tag->name ?>
-                                </label>
+                            <div class="col-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="<?= $tag->id ?>" id="tag_<?= $tag->id ?>" name="postTags" <?php if (isset($tags) && isset($tag_arr) && in_array($tag->id, $tag_arr)) : ?> checked <?php endif ?>>
+                                    <label class="form-check-label" for="tag_<?= $tag->id ?>">
+                                        <?= $tag->name ?>
+                                    </label>
+                                </div>
                             </div>
                         <?php
                         endforeach;

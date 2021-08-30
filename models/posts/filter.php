@@ -9,61 +9,14 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 
 
     require_once '../../config/connection.php';
-    // echo json_encode($pagination);
-    $query = '';
-    define("OFFSET", 5);
-    $queryA = "SELECT COUNT(*) AS numOfPosts FROM posts ";
-    $baseQuery = "SELECT * FROM posts ";
-    if ($text) {
-        $query .= " WHERE";
-        $query .= " name LIKE '%$text%'";
-    }
-    if ($categories) {
-        $query .= " WHERE";
-        if ($text) {
-            $query .= " AND category_id IN (" . implode(',', $categories) . ")";
-        } else {
-            $query .= " category_id IN (" . implode(',', $categories) . ")";
-        }
-    }
-    if ($headings) {
+    require_once '../functions.php';
 
-        if ($text || $categories) {
-            $query .= " AND heading_id IN (" . implode(',', $headings) . ")";
-        } else {
-            $query .= "  heading_id IN (" . implode(',', $headings) . ")";
-        }
-    }
+    $f = postFilter($text, $categories, $headings, $pagination, $date);
+    $rez = $conn->query($f[0])->fetchAll();
 
-    $queryA = $queryA . $query;
-
-
-    if ($date != 0) {
-        if ($date == 1) {
-            $query .= " ORDER BY created_at DESC ";
-        } else {
-            $query .= " ORDER BY created_at ASC";
-        }
-    }
-
-
-    if ($pagination && $pagination > 0) {
-        $limit = ((int)$_GET['limit']) * OFFSET;
-        $offset = OFFSET;
-        $query .= " LIMIT $limit, $offset";
-    } else if ($pagination == 0 || !$pagination) {
-        $limit = 0;
-        $offset = OFFSET;
-        $query .= " LIMIT $limit, $offset";
-    }
-    $baseQuery = $baseQuery . $query;
-    //echo json_encode($baseQuery);
-    $rez = $conn->query($baseQuery)->fetchAll();
-    //echo json_encode($baseQuery);
-    $res = $conn->query($queryA)->fetch(PDO::FETCH_ASSOC);
-    // echo json_encode($baseQuery);
-    $numOfPages = ceil($res['numOfPosts'] / OFFSET);
-
+    $res = $conn->query($f[1])->fetch(PDO::FETCH_ASSOC);
+    $numOfPages = ceil($res['NumOfPost'] / 5);
+    // ech ojsoN
     echo json_encode([
         'posts' => $rez,
         'pages' => $numOfPages

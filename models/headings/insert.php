@@ -1,7 +1,7 @@
 <?php
 header("content-type:application/json");
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-    $reName = "/^[A-Z][a-z]{4,15}$/";
+    $reName = "/^[A-Z][a-z]{2,15}(\s)?([A-Z][a-z]{2,15})*$/";
     $errors = [];
     if (!preg_match($reName, $_POST['name'])) {
         array_push($errors, "Name of the headings isn't ok!");

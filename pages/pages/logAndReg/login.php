@@ -5,8 +5,8 @@ if (isset($_SESSION['users'])) {
 ?>
 <section>
     <div class="container">
-        <div class="row my-3">
-            <div class="col-6 mx-auto">
+        <div class="row my-5">
+            <div class="col-6 mx-auto my-5">
                 <?php
                 if (isset($_SESSION['errors'])) :
                 ?>

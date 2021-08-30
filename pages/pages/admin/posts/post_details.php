@@ -31,7 +31,7 @@ if (isset($_SESSION['users']) && $_SESSION['users']->roleName != "Admin") {
                             <?php
                             foreach ($post_tag as $tag) :
                             ?>
-                                <div class="col-3">
+                                <div class="col-4">
                                     <div class="d-grid"><button type="button" class="btn btn-dark btn-sm py-3"><?= $tag->name ?></button></div>
                                 </div>
                             <?php endforeach; ?>
@@ -39,26 +39,31 @@ if (isset($_SESSION['users']) && $_SESSION['users']->roleName != "Admin") {
                     </div>
                     <div class="col-lg-6">
                         <?php
-                        $getComments = $conn->query("SELECT * FROM comments c JOIN users u ON c.id_user = u.id WHERE id_post = $post->id")->fetchAll();
-                        foreach ($getComments as $comment) :
+                        $getComments = getComments($post->id);
+                        if (count($getComments) > 0) :
+                            foreach ($getComments as $comment) :
                         ?>
-                            <div class="card mt-1">
-                                <div class="card-body">
-                                    <h5 class="card-title"><?= $comment->first_name . ' ' . $comment->last_name ?></h5>
-                                    <p class="fs-6 text-muted"><?= date("H:i:s d-m-Y", strtotime($comment->created_at)) ?></p>
-                                    <p class="card-text"><?= $comment->comment ?></p>
-                                </div>
-                                <div class="card-footer">
-                                    <div class="float-end">
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                            Launch static backdrop modal
-                                        </button>
-                                        <!-- <button class="btn btn-danger btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">View disslikes</button> -->
+                                <div class="card mt-1">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><?= $comment->first_name . ' ' . $comment->last_name ?></h5>
+                                        <p class="fs-6 text-muted"><?= date("H:i:s d-m-Y", strtotime($comment->created_at)) ?></p>
+                                        <p class="card-text"><?= $comment->comment ?></p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="float-end">
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                                Launch static backdrop modal
+                                            </button>
+                                            <!-- <button class="btn btn-danger btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">View disslikes</button> -->
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                        <?php endforeach; ?>
+                            <?php endforeach;
+                        else :
+                            ?>
+                            <p class="text-center fw-bolder fs-3">We dont have any comment at this time!</p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

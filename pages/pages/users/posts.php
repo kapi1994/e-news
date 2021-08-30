@@ -3,11 +3,10 @@ if (isset($_GET['categoryName'])) {
     $name = $_GET['categoryName'];
     $getCategory = getDataWithFetch('categories', 'name', $name);
     $posts = getDataWithFetch('posts', 'category_id', $getCategory->id);
-    var_dump($posts);
 }
-if (isset($_GET['tag_id'])) {
-    // $posts = getDataWithFetch()
-}
+// if (isset($_GET['tag_id'])) {
+//     $posts = getDataWithFetch('posts')
+// }
 ?>
 <section>
     <div class="container">
@@ -25,7 +24,7 @@ if (isset($_GET['tag_id'])) {
                                 <div class=" ">
                                     <img src="assets/images/posts/normal/<?= $post->image_path ?>" class="card-img-top" alt="...">
                                     <div class="card-body">
-                                        <h5 class="card-title"><a href="index.php?page=single-post&id=<?= $post->id ?>" class="nav-link"><?= $post->name ?></a></h5>
+                                        <h5 class="card-title"><a href="index.php?page=single-post&id=<?= $post->id ?>" class="nav-link text-dark"><?= $post->name ?></a></h5>
                                     </div>
                                 </div>
                             </div>

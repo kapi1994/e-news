@@ -8,6 +8,28 @@ $page = '';
 if (isset($_GET['page'])) {
     $page = $_GET['page'];
     switch ($page) {
+        case 'login':
+            include 'pages/pages/logAndReg/login.php';
+            break;
+        case 'register':
+            include 'pages/pages/logAndReg/register.php';
+            break;
+        case 'admin_home':
+            include 'pages/pages/admin/home.php';
+            break;
+        case 'news':
+            include 'pages/pages/users/posts.php';
+            break;
+        case 'single-post':
+            include 'pages/pages/users/singlePost.php';
+            break;
+        case 'author':
+            include 'pages/pages/users/author.php';
+            break;
+        case 'home':
+            include 'pages/pages/users/home.php';
+            break;
+
         case 'categories':
             include 'pages/pages/admin/categories/index.php';
             break;
@@ -41,30 +63,8 @@ if (isset($_GET['page'])) {
         case 'action-user':
             include 'pages/pages/admin/users/action-user.php';
             break;
-        case 'login':
-            include 'pages/pages/logAndReg/login.php';
-            break;
-        case 'register':
-            include 'pages/pages/logAndReg/register.php';
-            break;
-        case 'admin_home':
-            include 'pages/pages/admin/home.php';
-            break;
-        case 'news':
-            include 'pages/pages/users/posts.php';
-            break;
-        case 'single-post':
-            include 'pages/pages/users/singlePost.php';
-            break;
-        case 'author':
-            include 'pages/pages/users/author.php';
-            break;
-        case 'home':
-            include 'pages/pages/users/home.php';
-            break;
         default:
             include 'pages/pages/users/home.php';
-            break;
     }
 }
 include 'pages/fixed/footer.php';

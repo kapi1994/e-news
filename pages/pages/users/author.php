@@ -1,8 +1,8 @@
 <section>
     <div class="container">
-        <div class="row my-5">
-            <div class="col-lg-6">
-                <img src="" alt="" class="img-fluid">
+        <div class="row my-5 mx-auto">
+            <div class="col-lg-4">
+                <img src="assets/images/author/a.jpg" alt="Nemanja Jovicic">
             </div>
             <div class="col-lg-6">
                 <h1 class="fs-2 text-center">Nemanja Jovičić</h1>

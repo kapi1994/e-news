@@ -220,9 +220,12 @@ function loggedInToday()
         $action = $data[1];
         $date = date("d m y", strtotime($data[2]));
         $today = date("d m y");
+        //echo json_encode($date);
+        // echo json_encode($today);
         if ($action == "Login" && $today == $date)
             $br++;
     }
+    // echo json_encode($br);
     return $br;
 }
 function registeredusers()
@@ -414,4 +417,88 @@ function getReactions($post_id, $user_id)
     global $conn;
     $query = $conn->query("SELECT * FROM reactions WHERE post_id=  $post_id AND user_id = $user_id")->fetchAll();
     return $query;
+}
+
+function postFilter($text, $categories, $headings, $pagination, $date)
+{
+    $query = '';
+
+    $queryA = "SELECT COUNT(p.id) as NumOfPost FROM posts p JOIN categories c ON p.category_id = c.id JOIN headings h ON p.heading_id = h.id ";
+    $baseQuery = "SELECT p.*, h.name as headingName, c.name as categoryName FROM posts p JOIN categories c ON p.category_id = c.id JOIN headings h ON p.heading_id = h.id ";
+    if ($text) {
+        $query .= " WHERE";
+        $query .= " p.name LIKE '%$text%'";
+    }
+    if ($categories) {
+        if ($text == "") {
+            $query .= " WHERE  p.category_id IN (" . implode(',', $categories) . ")";
+        }
+        $query .= " AND p.category_id IN (" . implode(',', $categories) . ")";
+    }
+    if ($headings) {
+        if ($text && $categories) {
+            $query .= " AND  p.heading_id IN (" . implode(',', $headings) . ")";
+        } else if ($text) {
+            $query .= " AND  p.heading_id IN (" . implode(',', $headings) . ")";
+        } else if ($categories) {
+            $query .= " AND  p.heading_id IN (" . implode(',', $headings) . ")";
+        } else {
+            $query .= " WHERE  p.heading_id IN (" . implode(',', $headings) . ")";
+        }
+    }
+
+    $queryA = $queryA . $query;
+
+
+    if ($date != 0) {
+        if ($date == 1) {
+            $query .= " ORDER BY created_at DESC ";
+        } else {
+            $query .= " ORDER BY created_at ASC";
+        }
+    }
+
+
+    if ($pagination && $pagination > 0) {
+        $limit = ((int)$_GET['limit']) * OFFSET;
+        $offset = OFFSET;
+        $query .= " LIMIT $limit, $offset";
+    } else if ($pagination == 0 || !$pagination) {
+        $limit = 0;
+        $offset = OFFSET;
+        $query .= " LIMIT $limit, $offset";
+    }
+    $baseQuery = $baseQuery . $query;
+    // echo json_encode($baseQuery);
+    return [
+        $baseQuery, $queryA
+    ];
+}
+
+function userLikes($comment, $user_id)
+{
+    global $conn;
+    $rez = $conn->query("SELECT user_id FROM reactions WHERE comment_id = $comment   AND user_id = $user_id  AND likes != 0")->fetch();
+
+    return $rez;
+}
+function userDisslikes($comment, $id)
+{
+    global $conn;
+    $rez = $conn->query("SELECT user_id FROM reactions WHERE comment_id = $comment AND user_id = $id AND disslikes > 0")->fetch();
+
+    return $rez;
+}
+
+function countLikes($commnet_id)
+{
+    global $conn;
+    $rez = $conn->query("SELECT COUNT(likes) as likes FROM reactions WHERE comment_id = $commnet_id AND likes > 0 LIMIT 1")->fetch();
+    return $rez;
+}
+function countDisslikes($comment_id)
+{
+    global $conn;
+    $rez = $conn->query("SELECT COUNT(disslikes) as disslike FROM reactions WHERE comment_id = $comment_id AND disslikes > 0 LIMIT 1")->fetch();
+    return $rez;
 }

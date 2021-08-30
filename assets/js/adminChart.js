@@ -6,13 +6,14 @@ $(document).ready(function () {
             method: "GET",
             dataType: "JSON",
             success: function (data) {
+                console.log(data)
                 // console.log(data)
                 newPie('viewsTotal', 'Total', data.overallViews)
                 newPie('views24H', '24h', data.todayViews)
 
 
-                $('#registeredUsers').html(data.registeredUsers)
-                $('#registeredUsers').html(data.todayLogin)
+                $('#registeredUsers').html(data.registeredUsers.users)
+                $('#todayLogins').html(data.todayLogin)
             }
         })
     }
