@@ -6,16 +6,16 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a href="#" class="nav-link">Categories</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Headings</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Tags</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Users</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Posts</a></li>
+                <li class="nav-item"><a href="index.php?page=categories" class="nav-link">Categories</a></li>
+                <li class="nav-item"><a href="index.php?page=headings" class="nav-link">Headings</a></li>
+                <li class="nav-item"><a href="index.php?page=tags" class="nav-link">Tags</a></li>
+                <li class="nav-item"><a href="index.php?page=users" class="nav-link">Users</a></li>
+                <li class="nav-item"><a href="index.php?page=posts" class="nav-link">Posts</a></li>
             </ul>
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                <li class="nav-item"><a href="index.php?page=login" class="nav-link">Login</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Register</a></li>
+            </ul>
         </div>
     </div>
 </nav>
