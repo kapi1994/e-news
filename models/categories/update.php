@@ -1,42 +1,34 @@
 <?php
 header("Content-type:application/json");
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $rename  = '/^[A-Z][a-z]{3,15}$/';
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    $name = $_POST['name'];
+    $reName = "/^[A-Z][a-z]{3,15}$/";
     $errors = [];
-    if (!preg_match($rename, $_POST['name'])) {
-        array_push($errors, "Category isn't good");
+
+    if (!preg_match($reName, $name)) {
+        array_push($errors,  "Category name isn't ok!");
     }
-    if (count($errors) == 0) {
+    if (count($errors) > 0) {
+        foreach ($errors as $error) {
+            echo json_encode($error);
+            http_response_code(422);
+        }
+    } else {
         require_once '../../config/connection.php';
-        require_once '../functions.php';
-        $date = date("Y-m-d H:i:s");
-        $checkName = getOneWithoutFetch('categories', 'name', $_POST['name']);
-        if ($checkName->rowCount() > 0) {
-            $category = getDataWithFetch('categories', 'name', $_POST['name']);
-            if ($category->name == $_POST['name'] && $category->id == $_POST['id']) {
-                try {
-                    updateCategory('categories', $_POST['name'], $date, $_POST['id']);
-                } catch (PDOException $th) {
-                    echo json_encode($th->getMessage());
-                    http_response_code(500);
-                }
-            } else {
-                echo json_encode("This data is already in use! Choose another name.");
-                http_response_code(409);
-            }
+        require_once '../function.php';
+        $check = getOneFetchAndCheckData('categories', 'name', $name, "check");
+        if ($check > 0) {
+            echo json_encode("That name is already taken");
+            http_response_code(409);
         } else {
             try {
-                updateCategory('categories', $_POST['name'], $date, $_POST['id']);
+                $date = date("Y-m-d H:i:s");
+                updateCategory($name, $date, $_POST['id']);
                 http_response_code(204);
             } catch (PDOException $th) {
                 echo json_encode($th->getMessage());
                 http_response_code(500);
             }
-        }
-    } else {
-        foreach ($errors as $error) {
-            echo json_encode("Error: " . $error);
-            http_response_code(422);
         }
     }
 } else {
