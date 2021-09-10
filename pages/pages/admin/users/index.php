@@ -1,6 +1,11 @@
 <section>
     <div class="container">
-        <div class="row my-5">
+        <div class="row my-3">
+            <div class="col-lg-3">
+                <div class="d-grid"><a href="index.php?page=user_action" class="btn btn-primary">Create new user</a></div>
+            </div>
+        </div>
+        <div class="row mb-5">
             <div class="col-lg-3">
                 <div class="mb-2">
                     <input type="text" name="" id="" placeholder="Search users" class="form-control">
@@ -24,7 +29,9 @@
                         <tbody>
                             <?php
                             $rb = 1;
-                            $users = $conn->query("SELECT *, r.name as roleName FROM users u JOIN roles r ON u.role_id = r.id where r.name !='Admin'")->fetchAll();
+
+                            $users = getAllUsers();
+
                             foreach ($users as $user) :
                             ?>
                                 <tr>
@@ -34,7 +41,7 @@
                                     <td><?= $user->roleName ?></td>
                                     <td><?= date("H:i:s d/m/Y", strtotime($user->created_at)) ?></td>
                                     <td><?= $user->updated_at != null ? date("H:i:s d/m/Y", strtotime($user->updated_at)) : '/' ?></td>
-                                    <td><a href="#" class="btn btn-sm btn-success">Update</a></td>
+                                    <td><a href="index.php?page=user_action&id=<?= $user->id ?>" class="btn btn-sm btn-success">Update</a></td>
                                     <td><button type="button" class="btn btn-danger btn-sm" data-id="<?= $user->id ?>">Delete</button></td>
                                 </tr>
                             <?php endforeach; ?>

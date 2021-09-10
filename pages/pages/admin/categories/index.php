@@ -11,6 +11,7 @@
         </div>
         <div class="row mb-3">
             <div class="col-xs-12">
+                <div id="categoryResponseMessages"></div>
                 <div class="table-responsive-sm table-responsive-md">
                     <table class="table text-center align-middle">
                         <thead class="table-dark">
@@ -23,7 +24,7 @@
                                 <th scope="col">Izbrisi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id='categories'>
                             <?php
                             $categories = getAll('categories');
                             $rb = 1;
@@ -37,7 +38,7 @@
                                     <td><?= date("H:i:s d/m/Y", strtotime($category->created_at)) ?></td>
                                     <td><?= $category->updated_at != null ? date("H:i:s d/m/Y", strtotime($category->updated_at)) : "/" ?></td>
                                     <td><a href="index.php?page=category_action&id=<?= $category->id ?>" class="btn btn-success btn-sm">Update</a></td>
-                                    <td><button type="button" class="btn btn-sm btn-danger " data-id="<?= $category->id ?>">Delete</button></td>
+                                    <td><button type="button" class="btn btn-sm btn-danger delete-category" data-id="<?= $category->id ?>">Delete</button></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

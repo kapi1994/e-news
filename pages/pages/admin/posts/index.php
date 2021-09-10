@@ -1,6 +1,11 @@
 <section>
     <div class="container">
-        <div class="row my-5">
+        <div class="row my-3">
+            <div class="col-lg-3">
+                <div class="d-grid"><a href="index.php?page=post_action" class="btn btn-primary">Create new post</a></div>
+            </div>
+        </div>
+        <div class="row mb-5">
             <div class="col-lg-3">
                 <div class="mb-3">
                     <input type="text" name="" id="" placeholder="searchPosts" class="form-control">
@@ -25,7 +30,7 @@
                         <tbody>
                             <?php
                             $rb  = 1;
-                            $posts = $conn->query("SELECT p.*, c.name as categoryName, h.name as headingName FROM posts p JOIN categories c ON p.category_id = c.id JOIN headings h ON p.heading_id = h.id")->fetchAll();
+                            $posts = getAllPosts();
                             foreach ($posts as $post) :
                             ?>
                                 <tr>
@@ -35,7 +40,7 @@
                                     <td><?= $post->headingName ?></td>
                                     <td><?= date("H:i:s d/m/Y", strtotime($post->created_at)) ?></td>
                                     <td><?= $post->updated_at != null ? date("H:i:s d/m/Y", strtotime($post->updated_at)) : "/" ?></td>
-                                    <td><a href="" class="btn btn-sm btn-success">Update</a></td>
+                                    <td><a href="index.php?page=post_action&id=<?= $post->id ?>" class="btn btn-sm btn-success">Update</a></td>
                                     <td><button type="button" class="btn btn-sm btn-danger" data-id="">Delete</button></td>
                                     <td><a href="" class="btn btn-sm btn-info">Details</a></td>
                                 </tr>
