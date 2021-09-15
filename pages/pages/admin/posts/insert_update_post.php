@@ -1,3 +1,13 @@
+<?php
+if (isset($_SESSION['user'])) {
+    if ($_SESSION['user']->roleName == "Korisnik") {
+        header("Location:index.php?page=login");
+    }
+} else {
+    header("Location:index.php?page=status");
+}
+
+?>
 <section>
     <div class="container">
         <?php
@@ -62,8 +72,8 @@
                             ?>
                                 <div class="col-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                                        <label class="form-check-label" for="defaultCheck1">
+                                        <input class="form-check-input" type="checkbox" value="<?= $tag->id ?>" id="tag<?= $tag->id ?>" name="postTags">
+                                        <label class="form-check-label" for="tag<?= $tag->id ?>">
                                             <?= $tag->name ?>
                                         </label>
                                     </div>
@@ -78,7 +88,7 @@
                     ?>
                         <img src="assets/images/posts/normal/<?= $post->image_path ?>" alt="<?= $post->name ?>" class="img-fluid mb-3">
                     <?php endif; ?>
-                    <div class="d-grid"><button class="btn btn-primary" type="button" id=""><?php if (isset($_GET['id'])) : ?> Update<?php else : ?> Save<?php endif; ?> </button></div>
+                    <div class="d-grid"><button class="btn btn-primary" type="button" id="submitPost"><?php if (isset($_GET['id'])) : ?> Update<?php else : ?> Save<?php endif; ?> </button></div>
                 </form>
             </div>
         </div>

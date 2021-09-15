@@ -1,58 +1,40 @@
 <?php
 session_start();
 require_once 'config/connection.php';
-include 'models/functions.php';
+include 'models/function.php';
 include 'pages/fixed/head.php';
 include 'pages/fixed/navigation.php';
 $page = '';
 if (isset($_GET['page'])) {
-    $page = $_GET['page'];
+    $page =  $_GET['page'];
     switch ($page) {
-        case 'login':
-            include 'pages/pages/logAndReg/login.php';
-            break;
-        case 'register':
-            include 'pages/pages/logAndReg/register.php';
-            break;
-        case 'admin_home':
-            include 'pages/pages/admin/home.php';
-            break;
-        case 'news':
-            include 'pages/pages/users/posts.php';
-            break;
-        case 'single-post':
-            include 'pages/pages/users/singlePost.php';
-            break;
-        case 'author':
-            include 'pages/pages/users/author.php';
-            break;
-        case 'home':
-            include 'pages/pages/users/home.php';
-            break;
-
         case 'categories':
             include 'pages/pages/admin/categories/index.php';
             break;
-        case 'action-categories':
-            include 'pages/pages/admin/categories/create_update.php';
+        case 'category_action':
+            include 'pages/pages/admin/categories/insert_update_category.php';
             break;
+
         case 'headings':
-            include 'pages/pages/admin/headings/index.php';
+            include "pages/pages/admin/headings/index.php";
             break;
-        case 'action-heading':
-            include 'pages/pages/admin/headings/action_heading.php';
+        case 'heading_action':
+            include 'pages/pages/admin/headings/insert_update_heading.php';
             break;
+
         case 'tags':
             include 'pages/pages/admin/tags/index.php';
             break;
-        case 'action-tag':
-            include 'pages/pages/admin/tags/action_tag.php';
+        case 'tag_action':
+            include 'pages/pages/admin/tags/insert_update_category.php';
             break;
+
+
         case 'posts':
             include 'pages/pages/admin/posts/index.php';
             break;
-        case 'action-post':
-            include 'pages/pages/admin/posts/action_post.php';
+        case 'post_action':
+            include 'pages/pages/admin/posts/insert_update_post.php';
             break;
         case 'post_details':
             include 'pages/pages/admin/posts/post_details.php';
@@ -60,11 +42,31 @@ if (isset($_GET['page'])) {
         case 'users':
             include 'pages/pages/admin/users/index.php';
             break;
-        case 'action-user':
-            include 'pages/pages/admin/users/action-user.php';
+        case 'user_action':
+            include 'pages/pages/admin/users/insert_update_action_user.php';
             break;
-        default:
-            include 'pages/pages/users/home.php';
+
+        case 'home':
+            include 'pages/pages/user/index.php';
+            break;
+
+        case 'admin_home':
+            include 'pages/pages/admin/index.php';
+            break;
+
+        case 'login':
+            include 'pages/pages/logAndReg/login.php';
+            break;
+        case 'register':
+            include 'pages/pages/logAndReg/register.php';
+            break;
+
+        case 'news':
+            include 'pages/pages/user/news.php';
+            break;
+        case 'singleNews':
+            include 'pages/pages/user/singleNews.php';
+            break;
     }
 }
 include 'pages/fixed/footer.php';

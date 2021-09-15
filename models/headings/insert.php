@@ -1,30 +1,37 @@
 <?php
-header("content-type:application/json");
+header("Content-type:application/json");
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
-    $reName = "/^[A-Z][a-z]{2,15}(\s)?([A-Z][a-z]{2,15})*$/";
+    $name = $_POST['name'];
+    $categoryId = $_POST['categoryId'];
+    $reName = '/^[A-Z][a-z]{2,15}(\s)?([A-Z][a-z]{2,15})*$/';
     $errors = [];
-    if (!preg_match($reName, $_POST['name'])) {
-        array_push($errors, "Name of the headings isn't ok!");
+
+    if (!preg_match($reName, $name)) {
+        array_push($errors, "Name of the heading isn't ok!");
     }
-    if ($_POST['categoryId'] == 0) {
-        array_push($errors, "You must choose heading");
+
+    if ($categoryId == 0) {
+        array_push($errors, "You must choose category");
     }
+
     if (count($errors) > 0) {
         foreach ($errors as $error) {
-            echo json_encode("Error: " . $error);
-            http_response_code(500);
+            echo json_encode($error);
+            http_response_code(422);
         }
     } else {
-        require_once '../../config/connection.php';
-        require_once '../functions.php';
-        $checkName = getOneWithoutFetch('headings', 'name', $_POST['name']);
-        if ($checkName->rowCount() > 0) {
-            echo json_encode("That name is already taken!");
+        require_once "../../config/connection.php";
+        require_once '../function.php';
+        $check = getOneFetchAndCheckData("headings", 'name', $_POST['name'], 'check');
+        if ($check > 0) {
+            echo json_encode("That name is already taken");
             http_response_code(409);
         } else {
             try {
-                insertNewHeading('headings', $_POST['name'], $_POST['categoryId']);
-                echo json_encode("Heading is successfull created");
+                require_once '../../config/connection.php';
+                require_once '../function.php';
+                insertHeading($name, $categoryId);
+                echo json_encode("Heading is successfully created");
                 http_response_code(201);
             } catch (PDOException $th) {
                 echo json_encode($th->getMessage());
@@ -33,5 +40,5 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         }
     }
 } else {
-    http_response_code(404);
+    http_response_code(409);
 }

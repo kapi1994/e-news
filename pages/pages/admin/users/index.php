@@ -1,3 +1,12 @@
+<?php
+if (isset($_SESSION['user'])) {
+    if ($_SESSION['user']->roleName != "Admin") {
+        header("Locatition: ../../index.php?page=401");
+    }
+} else {
+    header("Location:../../index.php?page=401");
+}
+?>
 <section>
     <div class="container">
         <div class="row my-3">

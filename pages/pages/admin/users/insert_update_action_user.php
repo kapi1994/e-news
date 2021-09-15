@@ -1,3 +1,12 @@
+<?php
+if (isset($_SESSION['user'])) {
+    if ($_SESSION['user']->roleName != "Admin") {
+        header("Location:index.php?page=401");
+    }
+} else {
+    header("Location:../../index.php?page=401");
+}
+?>
 <section>
     <div class="container">
         <?php
@@ -7,7 +16,9 @@
         ?>
         <div class="row my-5">
             <div class="col-lg-6 mx-auto">
+                <div id="crudUserErrorMessage"></div>
                 <form method="POST">
+                    <input type="hidden" name="userId" id="userId" value="<?= isset($_GET['id']) ? $user->id : '' ?>">
                     <div class="mb-3">
                         <label for="" class="mb-1">First name:</label>
                         <input type="text" name="userFirstName" id="userFirstName" class="form-control" value="<?= isset($_GET['id']) ? $user->first_name : '' ?>">
@@ -43,8 +54,9 @@
                                 </label>
                             </div>
                         <?php endforeach; ?>
+                        <em id="userRoleErrorMessage"></em>
                     </div>
-                    <div class="d-grid"><button class="btn btn-primary"><?php if (isset($_GET['id'])) : ?>Update<?php else : ?> Save<?php endif; ?></button></div>
+                    <div class="d-grid"><button class="btn btn-primary" id="btnSumbitUser"><?php if (isset($_GET['id'])) : ?>Update<?php else : ?> Save<?php endif; ?></button></div>
                 </form>
             </div>
         </div>

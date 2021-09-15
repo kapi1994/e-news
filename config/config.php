@@ -1,5 +1,5 @@
 <?php
-define("BASE_URL", $_SERVER['DOCUMENT_ROOT'] . "/e-news-master/");
+define("BASE_URL", $_SERVER['DOCUMENT_ROOT'] . "/e-news-master");
 define("ENV_FILE", BASE_URL . '/config/.env');
 define("LOG_FILE", BASE_URL . '/data/logs.txt');
 

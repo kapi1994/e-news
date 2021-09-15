@@ -17,8 +17,7 @@ function pageAccess()
     $file = fopen(LOG_FILE, "a");
     if ($file) {
         $date = date('d-m-Y H:i:s');
-        //promenljiva koja ce cuvati sesiju i onda ako je nema onda je 0 kao
-        // unregistered korisnik, ako ima onda njegov id
+
         fwrite(
             $file,
             "{$_SERVER['PHP_SELF']}?{$_SERVER['QUERY_STRING']}\t{$date}\t{$_SERVER['REMOTE_ADDR']}\t\n"

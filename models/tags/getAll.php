@@ -1,10 +1,10 @@
 <?php
-header("Contnet-type:application/json");
+header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    require_once '../../config/connection.php';
-    require_once '../functions.php';
-    $getAll = getAll('tags');
-    echo json_encode($getAll);
+    require_once '../../config/config.php';
+    require_once "../function.php";
+    $tags = getAll('tags');
+    echo json_encode($tags);
 } else {
-    http_response_code(500);
+    http_response_code(404);
 }

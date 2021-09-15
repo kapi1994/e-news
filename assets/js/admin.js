@@ -7,6 +7,7 @@ $(document).ready(function () {
     $(document).on('click', '.delete-category', function (e) {
         e.preventDefault()
         let id = $(this).data('id')
+
         $.ajax({
             method: 'post',
             url: 'models/categories/delete.php',
@@ -40,7 +41,7 @@ $(document).ready(function () {
                 }
             },
             error: function (jqXHR, statusTxt, xhr) {
-                printResponseMessages(jqXHR.code, jqXHR.responseJSON, '#showResponseErrorMessages', 'warning,danger')
+                printResponseMessages(jqXHR.status, jqXHR.responseJSON, '#headingResponseMessages', 'warning,danger')
             }
         })
     })
@@ -190,7 +191,7 @@ $(document).ready(function () {
     const filterAndSortUsers = (limit) => {
         let text = document.querySelector('#searchUser').value
         let date = document.querySelector('#sortByDateUsers').value
-        console.log(date)
+
         $.ajax({
 
             method: 'get',
@@ -201,7 +202,7 @@ $(document).ready(function () {
                 limit: limit
             }, dataType: 'json',
             success: function (data) {
-                console.log(data.users)
+
                 printAllUsers(data.users, limit)
                 printPagination(data.pages, '#userPagination', limit, 'user-pagination')
             },
@@ -293,12 +294,13 @@ $(document).ready(function () {
     }
 
     const printCategory = (category, rb) => {
+        prittierDateFormat(category.created_at)
         return `
             <tr>
                 <th scope='row'>${rb++}</th>
                 <td>${category.name}</td>
-                <td>${category.created_at}</td>
-                <td>${category.updated_at ? category.updated_at : '-'}</td>
+                <td>${prittierDateFormat(category.created_at)}</td>
+                <td>${category.updated_at ? prittierDateFormat(category.updated_at) : '-'}</td>
                 <td><a href="index.php?page=action-categories&id=${category.id}" class="btn btn-sm btn-success">Update</a></td>
                 <td><button type="button" class="btn btn-sm btn-danger delete-category" data-id="${category.id}">Delete</button></td>
             </tr>
@@ -336,8 +338,8 @@ $(document).ready(function () {
                 <th scope='row'>${rb}</th>
                 <td>${heading.name}</td>
                 <td>${heading.categoryName}s</td>
-                <td>${heading.created_at}</td>
-                <td>${heading.updated_at ? heading.updated_at : '-'}</td>
+                <td>${prittierDateFormat(heading.created_at)}</td>
+                <td>${heading.updated_at ? prittierDateFormat(heading.updated_at) : '-'}</td>
                 <td><a href="index.php?page=action-heading" class="btn btn-sm btn-success">Update</a></td>
                 <td><button type="button" class="btn btn-sm btn-danger" data-id="${heading.id}">Delete</button></td>
             </tr>
@@ -386,6 +388,7 @@ $(document).ready(function () {
     const validationHeading = () => {
         const name = document.querySelector('#headingName').value
         const categoryId = document.querySelector('#headingCategory').value
+        console.log(categoryId)
         const reName = /^[A-Z][a-z]{2,15}(\s)?([A-Z][a-z]{2,15})*$/
         const errors = []
         if (!reName.test(name)) {
@@ -409,7 +412,7 @@ $(document).ready(function () {
     const tagsFormValidationAndRequest = () => {
         const name = document.querySelector("#tagName").value
         const id = document.querySelector('#tagId').value
-        console.log(id)
+
         if (id == " ") {
 
             if (validationTags().length == 0) {
@@ -495,8 +498,8 @@ $(document).ready(function () {
             <tr>
                 <th scope='row'>${rB}</th>
                 <td>${tag.name}</td>
-                <td>${tag.created_at}</td>
-                <td>${tag.updated_at ? tag.updated_at : '-'}</td>
+                <td>${prittierDateFormat(tag.created_at)}</td>
+                <td>${tag.updated_at ? prittierDateFormat(tag.updated_at) : '-'}</td>
                 <td><a href="index.php?page=action-tag&id=${tag.id}" class="btn btn-sm btn-success">Update</a></td>
                 <td><button type="button" class="btn btn-sm btn-danger delete-tag" data-id="${tag.id}">Delete</button></td>
             </tr>
@@ -541,7 +544,7 @@ $(document).ready(function () {
         })
     }
     const printAllUsers = (users) => {
-        console.log(users)
+
         ispis = '', rb = 1
         if (users.length > 0) {
             users.forEach(user => {
@@ -689,7 +692,7 @@ $(document).ready(function () {
         })
     }
     const printAllPost = (posts, limit) => {
-        console.log(posts)
+
         let ispis = '', rb = 1
         if (posts.length > 0) {
             posts.forEach(post => {
@@ -801,16 +804,16 @@ $(document).ready(function () {
         const errors = []
         if (name == '') {
             errors.push(name)
-            createValidationErrorMessage('#postNameErrrorMessage', 'text-danger', "Post name isn't ok!")
+            createValidationErrorMessage('#postNameErrorMessage', 'text-danger', "Post name isn't ok!")
         } else {
-            removeValidationErrrorMessage("#postNameErrrorMessage", 'text-danger')
+            removeValidationErrrorMessage("#postNameErrorMessage", 'text-danger')
         }
         if (postDesc == '') {
             errors.push(postDesc)
             createValidationErrorMessage('#postDescErrorMessage', 'text-danger', "Description can't be empty")
         }
         else {
-            removeValidationErrrorMessage('#postNameErrrorMessage', 'text-danger')
+            removeValidationErrrorMessage('#postDescErrorMessage', 'text-danger')
         }
         if (id == "") {
             if (postImage.length == 0) {
@@ -887,7 +890,7 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function (data) {
-                console.log(data)
+
                 printAllPost(data.posts, limit)
                 printPagination(data.pages, '#postPagination', limit, 'post-pagination')
             },
@@ -895,7 +898,7 @@ $(document).ready(function () {
         })
     }
     const printPostHeadings = (headings) => {
-        console.log(headings)
+
         let ispis = ''
         ispis += "<option value='0'>Choose</option>"
         if (headings.length > 1) {
@@ -919,10 +922,11 @@ $(document).ready(function () {
         el.classList.remove(cls)
     }
     const printResponseMessages = (statusCode, message, whereToPlace, colors) => {
-
+        console.log(statusCode)
         const color = colors.split(',')
         const colorYellow = color[0]
         const colorDanger = color[1]
+        console.log(color)
         switch (statusCode) {
             case 404:
                 printMessage(message, whereToPlace, colorDanger)
@@ -943,7 +947,7 @@ $(document).ready(function () {
 
         let ispis = ''
         ispis += `
-            <div class="alert alert-${color} alert-dismissible fade show" role="alert">
+            <div class="alert alert-${color} alert-dismissible fade show fw-bold" role="alert">
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -969,5 +973,15 @@ $(document).ready(function () {
 
         }
         $(whereToPlace).html(ispis)
+    }
+
+    const prittierDateFormat = (datetime) => {
+        const dateTime = datetime.split(' ')
+        const time = dateTime[1]
+        const date = dateTime[0].split('-')
+        console.log(time)
+        console.log(date)
+        const finalDate = time + " " + date[2] + "/" + date[1] + "/" + date[0]
+        return finalDate
     }
 })

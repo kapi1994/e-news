@@ -15,35 +15,7 @@ $(document).ready(function () {
             error: function (jqXHR, statusTxt, xhr) { }
         })
     })
-    $(document).on('click', '.btn-thumbs-up', function (e) {
-        let comment = $(this).data('comment')
-        let post = $(this).data('post')
 
-        $.ajax({
-            method: "post",
-            url: "models/comments/vote.php",
-            data: { action: "like", comment: comment, post: post },
-            dataType: 'json',
-            success: function (data) {
-                console.log(data)
-            }
-        })
-    })
-    $(document).on('click', '.btn-thumbs-down', function (e) {
-        e.preventDefault();
-        console.log('izmena')
-        let post = $(this).data('post')
-        let comment = $(this).data('comment')
-        $.ajax({
-            method: 'post',
-            url: 'models/comments/vote.php',
-            data: { action: 'disslike', post: post, comment: comment },
-            dataType: 'json',
-            success: function (data) {
-                console.log(data)
-            }
-        })
-    })
     const getComments = (post_id) => {
         $.ajax({
             method: "get",
