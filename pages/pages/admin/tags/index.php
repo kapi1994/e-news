@@ -1,7 +1,7 @@
 <?php
 if (isset($_SESSION['user'])) {
-    if ($_SESSION['user']->roleName != "Admin" || $_SESSION['user']->roleName != "Urednik") {
-        header("Location:index.php?page=401");
+    if ($_SESSION['user']->roleName == "User") {
+        header("Location:index.php?page=status");
     }
 } else {
     header("Location:index.php?page=401");

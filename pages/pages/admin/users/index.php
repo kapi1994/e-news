@@ -19,6 +19,20 @@ if (isset($_SESSION['user'])) {
                 <div class="mb-2">
                     <input type="text" name="" id="" placeholder="Search users" class="form-control">
                 </div>
+                <div class="mb-2">
+                    <label for="">Roles:</label>
+                    <?php
+                    $roles = $conn->query("SELECT * FROM roles WHERE name != 'Admin'")->fetchAll();
+                    foreach ($roles as $role) :
+                    ?>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="<?= $role->id ?>" id="role<?= $role->id ?> " name="roles">
+                            <label class="form-check-label" for="role<?= $role->id ?>">
+                                <?= $role->name ?>
+                            </label>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
             <div class="col-xs-12 col-lg-9">
                 <div class="table-responsive-sm table-responsive-md">
