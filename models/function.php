@@ -144,17 +144,25 @@ function updateUser($firstName, $lastName, $email, $role_id, $date)
 }
 
 
-function getComments($postId)
+function getComments($postId, $parent_comment = null)
 {
     global $conn;
     $res = '';
-    $query = $conn->query("SELECT c.*, u.first_name as firstName, u.last_name as lastName FROM comments c JOIN posts p ON c.id_post = p.id JOIN users u ON c.id_user = u.id WHERE c.id_post = '$postId' ");
-    if ($query->rowCount() == 1) {
-        $res = $query->fetch();
+    if ($parent_comment == null) {
+        $query = $conn->query("SELECT c.*, u.first_name as firstName, u.last_name as lastName FROM comments c JOIN posts p ON c.id_post = p.id JOIN users u ON c.id_user = u.id WHERE c.id_post = '$postId' ");
+        if ($query->rowCount() > 1) {
+            $res = $query->fetchAll();
+        } else {
+            $res = $query->fetch();
+        }
     } else {
-        $res = $query->fetchAll();
+        $query = $conn->query("SELECT c.*, u.first_name as firstName, u.last_name as lastName FROM comments c JOIN posts p ON c.id_post = p.id JOIN users u ON c.id_user = u.id WHERE c.id_post = '$postId' AND c.parent_id = $parent_comment ");
+        if ($query->rowCount() > 1) {
+            $res = $query->fetchAll();
+        } else {
+            $res = $query->fetch();
+        }
     }
-
     return $res;
 }
 
@@ -223,8 +231,48 @@ function insertPost($name, $description, $image_path, $category_id, $heading_id,
 function loginUser($email, $password)
 {
     global $conn;
-    $res = $conn->prepare("SELECT u.*, r.name as roleName FROM users u JOIN roles r WHERE email=? AND password = ?");
+    $res = $conn->prepare("SELECT u.*, r.name as roleName FROM users u JOIN roles r ON u.role_id = r.id WHERE email=? AND password = ?");
     $res->execute([$email, md5($password)]);
     $user = $res->fetch();
     return $user;
+}
+function insertComment($table, $user_id, $comment_id = null, $post_id, $text)
+{
+    global $conn;
+    $queryInsert = "";
+    if ($comment_id == null) {
+        $queryInsert  = $conn->prepare("INSERT INTO $table (text,id_user, id_post) VALUES(?,?,?)");
+        $queryInsert->execute([$text, $user_id, $post_id]);
+    } else {
+        $queryInsert  = $conn->prepare("INSERT INTO $table (text,id_user, id_post,parent_id) VALUES(?,?,?,?)");
+        $queryInsert->execute([$text, $user_id, $post_id, $comment_id]);
+    }
+}
+
+function countVotes($comment_id, $action)
+{
+    global $conn;
+    $res = '';
+    if ($action == 'like') {
+        $res = $conn->query("SELECT COUNT(likes) as likes FROM reactions WHERE likes > 0 AND comment_id='$comment_id'")->fetch();
+    } else {
+        $res = $conn->query("SELECT COUNT(disslikes) as disslikes  FROM reactions WHERE disslikes > 0 AND comment_id='$comment_id'")->fetch();
+    }
+
+    return $res;
+}
+
+function getUserVotes($user, $post, $comment)
+{
+}
+
+
+function insertVote($comment, $user, $column, $value)
+{
+    global $conn;
+    $res = '';
+    if ($column == 'likes') {
+        $res = $conn->prepare("INSERT INTO reactions () VALUES()");
+    } else {
+    }
 }
