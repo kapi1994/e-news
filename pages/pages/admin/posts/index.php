@@ -1,6 +1,6 @@
 <?php
 if (isset($_SESSION['user'])) {
-    var_dump($_SESSION['user']);
+    // var_dump($_SESSION['user']);
     if ($_SESSION['user']->roleName == "Korisnik") {
         header("Location:index.php?page=401");
     }
@@ -24,6 +24,42 @@ if ($_SESSION['user']->roleName == "Admin") {
             <div class="col-lg-3">
                 <div class="mb-3">
                     <input type="text" name="" id="" placeholder="searchPosts" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <p>Serach by category:</p>
+                    <?php
+                    $categories = getAll("categories");
+                    foreach ($categories as $category) :
+                    ?>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                <?= $category->name ?>
+                            </label>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="mb-3">
+                    <p>Search by headings:</p>
+                    <?php
+                    $headings = getAll('headings');
+                    foreach ($headings as $heading) :
+                    ?>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                <?= $heading->name ?>
+                            </label>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="mb-3">
+                    <p>Filter by creation date:</p>
+                    <select name="filterPostByDate" id="filterByDate" class="form-select">
+                        <option value="0">Izaberite</option>
+                        <option value="1">Opadajuce</option>
+                        <option value="2">Rastucem</option>
+                    </select>
                 </div>
             </div>
             <div class="col-lg-9">
