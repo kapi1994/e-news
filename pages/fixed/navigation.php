@@ -7,7 +7,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <?php
-                if (!isset($_SESSION['user']) || (isset($_SESSION['user']) && $_SESSION['user']->roleName == "Korisnik")) :
+                if (!isset($_SESSION['user']) || (isset($_SESSION['user']) && $_SESSION['user']->roleName == "User")) :
                     $userMenus = getAll('categories');
                     foreach ($userMenus as $meni) :
                 ?>
