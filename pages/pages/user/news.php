@@ -8,7 +8,7 @@
             foreach ($posts as $post) :
 
             ?>
-                <div class="col-lg-3">
+                <div class="col-lg-3 my-2">
                     <div class="card">
                         <img src="assets/images/posts/normal/<?= $post->image_path ?>" class="card-img-top" alt="<?= $post->name ?>">
                         <div class="card-body">
