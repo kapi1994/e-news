@@ -2,7 +2,7 @@
     <?php
     if (isset($_GET['id'])) {
         $post = getAllPosts($_GET['id']);
-        $comments = getComments($post->id);
+        $comments = getComments($post->id, "");
     }
     ?>
     <div class="container">
@@ -23,11 +23,17 @@
 
                 foreach ($comments as $comment) :
                 ?>
-                    <div class="card">
-                        <div class="card-title">
-                            <div class="float-start">
-
+                    <div class="card my-1">
+                        <div class="card-header">
+                            <div class="ms-2 float-start">
+                                <?= $comment->firstName . ' ' . $comment->lastName ?>
                             </div>
+                            <div class="float-end me-2 text-muted fst-italic">
+                                <?= date("H:i:s d/m/Y", strtotime($comment->created_at)) ?>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <?= $comment->text ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
