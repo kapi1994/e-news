@@ -1,59 +1,59 @@
+
+
 $(document).ready(function () {
-    $(document).on('click', '#btnSubmit', function (e) {
+    $(document).on('click', '#btnComment', function (e) {
         e.preventDefault();
-        let text = document.querySelector('.textarea-commnet').value
-        let post_id = $(this).data('post')
+        let post = $(this).data("post")
+        let text = document.querySelector('#comment').value
         $.ajax({
             method: "POST",
-            url: "models/comments/insert.php",
-            data: { text: text, post_id: post_id },
-            dataType: 'json',
-            success: function () {
-                getComments(post_id)
-                document.querySelector('.textarea-commnet').value = " "
+            url: "models/comments/insertComment.php",
+            data: {
+                post: post,
+                text: text
             },
-            error: function (jqXHR, statusTxt, xhr) { }
+            dataType: "json",
+            success: function () {
+                console.log(success)
+            },
+            error: function (err) {
+                console.log(err)
+            }
         })
     })
 
-    const getComments = (post_id) => {
+    $(document).on('click', '.read-more', function (e) {
+        e.preventDefault()
+        let post = $(this).data('post')
+        let comment = $(this).data("comment")
         $.ajax({
-            method: "get",
-            url: "models/comments/getComments.php",
-            dataType: 'json',
-            data: { id: post_id },
-            success: function (data) {
-                printComments(data)
-
-            }
+            method: 'get',
+            url: 'models/comments/getComments.php',
+            data: {
+                post: post,
+                comment: comment
+            }, dataType: "json",
+            success: function (data) { },
+            error: function (err) { }
         })
-    }
+    })
 
-    const printComments = (comments) => {
-        let ispis = ''
-        if (comments.length == 1) {
-            ispis += printComment(comments)
-        } else {
-            comments.forEach(comment => {
-                console.log(comment)
-                ispis += printComment(comment)
-            })
-        }
-        $('#comments').html(ispis)
-    }
-
-    const printComment = (comment) => {
+    $(document).on('click', '.vote-action', function (e) {
+        e.preventDefault();
+        let post = $(this).data('post')
+        let comment = $(this).data('comment')
+        let action = $(this).data("action")
         console.log(comment)
-        return `
-        <div class="card mb-1">
-            <div class="card-header">
-                <em class="float-start fts-italic text-uppercase">${comment.firstName + ' ' + comment.lastName}</em>
-                <em class="float-end fts-italic text-uppercase text-muted fw-bold">${comment.created_at}</em>
-            </div>
-            <div class="card-body">
-                <p class="fts-italic">${comment.text}</p>
-            </div>
-        </div>
-        `
-    }
-});
+        $.ajax({
+            method: "POST",
+            url: "models/comments/vote.php",
+            data: {
+                post: post,
+                comment: comment,
+                action: action
+            }, dataType: "json",
+            success: function (data) { },
+            error: function (err) { }
+        })
+    })
+})
