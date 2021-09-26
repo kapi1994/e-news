@@ -267,12 +267,81 @@ function getUserVotes($user, $post, $comment)
 }
 
 
-function insertVote($comment, $user, $column, $value)
+function insertVote($action, $comment, $user, $reaction)
+{
+    global $conn;
+    $queryInsert  = $conn->prepare("INSERT INTO reactions (comment_id, user_id, $action) VALUES(?,?,?)");
+    $queryInsert->execute([$comment, $user, $reaction]);
+
+    return $queryInsert;
+}
+
+function getReactions($user_id, $comment, $action)
 {
     global $conn;
     $res = '';
-    if ($column == 'likes') {
-        $res = $conn->prepare("INSERT INTO reactions () VALUES()");
+    // echo json_encode($action);
+    $baseQuery = $conn->query("SELECT * FROM reactions WHERE user_id = '$user_id'  AND comment_id = '$comment'");
+    if ($action === "rowCount") {
+        $res = $baseQuery->rowCount();
     } else {
+        $res = $baseQuery->fetch();
     }
+    return $res;
+}
+
+function updateStatusVote($user_id, $comment, $action, $react_on, $react_off)
+{
+    $actionChange = switchActionVote($action);
+    $reaction = getReactions($user_id, $comment, 'fetch');
+    // echo json_encode($reaction);
+    // echo json_encode($action);
+    if ($action == 'likes') {
+        if ($reaction->likes == 1) {
+            deleteVote($comment, $user_id);
+        } else {
+            updateVote($user_id, $comment, $action, $react_on, $actionChange, $react_off);
+        }
+    } else {
+        if ($reaction->disslikes == 1) {
+            deleteVote($comment, $user_id);
+        } else {
+            updateVote($user_id, $comment, $action, $react_on, $actionChange, $react_off);
+        }
+    }
+}
+function updateVote($user, $comment, $action, $valueOne, $actionTwo = null, $valueTwo = null)
+{
+    global $conn;
+    echo json_encode($actionTwo . " " . $action);
+    $query = '';
+
+
+    if ($actionTwo == null && $valueTwo == null) {
+        $query = $conn->prepare("UPDATE reactions SET $action =? WHERE user_id=? AND comment_id=?");
+        $query->execute([$valueOne, $user, $comment]);
+    } else {
+        $query = $conn->prepare("UPDATE reactions SET $action =?, $actionTwo =? WHERE user_id=? AND comment_id =?");
+        $query->execute([$valueOne, $valueTwo, $user, $comment]);
+    }
+    return $query;
+}
+
+function switchActionVote($action)
+{
+    $column = '';
+    if ($action == 'likes') {
+        $column = 'disslikes';
+    } else {
+        $column = 'likes';
+    }
+    return $column;
+}
+
+function deleteVote($comment, $user)
+{
+    global $conn;
+    $q = $conn->prepare("DELETE FROM reactions WHERE user_id =? AND comment_id = ?");
+    $q->execute([$user, $comment]);
+    return $q;
 }
