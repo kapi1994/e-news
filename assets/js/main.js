@@ -1,6 +1,7 @@
 
 
 $(document).ready(function () {
+    let br = 0
     $(document).on('click', '#btnComment', function (e) {
         e.preventDefault();
         let post = $(this).data("post")
@@ -26,18 +27,27 @@ $(document).ready(function () {
         e.preventDefault()
         let post = $(this).data('post')
         let comment = $(this).data("comment")
+
+        br++
+        if (br % 2 != 0) {
+            console.log(br)
+            getComments(comment, post)
+
+        }
+
+    })
+
+    function getComments(comment_id = 0, post) {
+        // console.log(comment_id)
         $.ajax({
-            method: 'get',
+            method: "get",
             url: 'models/comments/getComments.php',
-            data: {
-                post: post,
-                comment: comment
-            }, dataType: "json",
+            data: { comment: comment_id, post: post },
+            dataType: 'json',
             success: function (data) { },
             error: function (err) { }
         })
-    })
-
+    }
     $(document).on('click', '.vote-action', function (e) {
         e.preventDefault();
         let post = $(this).data('post')
