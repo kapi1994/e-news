@@ -9,6 +9,7 @@
                 <?php
                 if (!isset($_SESSION['user']) || (isset($_SESSION['user']) && $_SESSION['user']->roleName == "User")) :
                     $userMenus = getAll('categories');
+
                     foreach ($userMenus as $meni) :
                 ?>
                         <li class="nav-item"><a href="index.php?page=news&id=<?= $meni->id ?>" class="nav-link"><?= $meni->name ?></a></li>

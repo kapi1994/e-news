@@ -17,7 +17,14 @@ if (isset($_SESSION['user'])) {
                     </div>
                 </div>
                 <div class="mb-3">
-                    <input type="text" name="" id="" placeholder="Search tags" class="form-control">
+                    <input type="text" name="searchTags" id="searchTags" placeholder="Search tags" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="">Order by:</label>
+                    <select name="orderTags" id="orderTags" class="form-select">
+                        <option value="0">Opadajuce</option>
+                        <option value="1">Rastuce</option>
+                    </select>
                 </div>
             </div>
             <div class="col-xs-12 col-lg-9">
@@ -33,10 +40,10 @@ if (isset($_SESSION['user'])) {
                                 <th scope="row">Delete</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id='tags'>
                             <?php
                             $rb = 1;
-                            $tags = getAll('tags');
+                            $tags = getAll('tags', true, 'created_at');
                             foreach ($tags as $tag) :
                             ?>
                                 <tr>

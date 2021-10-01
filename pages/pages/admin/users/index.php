@@ -17,21 +17,26 @@ if (isset($_SESSION['user'])) {
         <div class="row mb-5">
             <div class="col-lg-3">
                 <div class="mb-2">
-                    <input type="text" name="" id="" placeholder="Search users" class="form-control">
+                    <input type="text" name="searchUser" id="searchUser" placeholder="Search users" class="form-control">
+                </div>
+                <div class="mb-2">
+                    <label for="">Order by:</label>
+                    <select name="orderUserByDate" id="orderUserByDate" class="form-select">
+                        <option value="0">Opadajucem</option>
+                        <option value="1">Rastucem</option>
+                    </select>
                 </div>
                 <div class="mb-2">
                     <label for="">Roles:</label>
-                    <?php
-                    $roles = $conn->query("SELECT * FROM roles WHERE name != 'Admin'")->fetchAll();
-                    foreach ($roles as $role) :
-                    ?>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="<?= $role->id ?>" id="role<?= $role->id ?> " name="roles">
-                            <label class="form-check-label" for="role<?= $role->id ?>">
-                                <?= $role->name ?>
-                            </label>
-                        </div>
-                    <?php endforeach; ?>
+                    <select name="filterByRole" id="filterByRole" class="form-select">
+                        <option value="0">Izaberite</option>
+                        <?php
+                        $roles = $conn->query('SELECT * FROM roles WHERE name !="Admin" ')->fetchAll();
+                        foreach ($roles as $role) :
+                        ?>
+                            <option value="<?= $role->id ?>"><?= $role->name ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
             </div>
             <div class="col-xs-12 col-lg-9">
@@ -49,7 +54,7 @@ if (isset($_SESSION['user'])) {
                                 <th scope="row">Delete</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="users">
                             <?php
                             $rb = 1;
 

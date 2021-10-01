@@ -23,7 +23,7 @@ if ($_SESSION['user']->roleName == "Admin") {
         <div class="row mb-5">
             <div class="col-lg-3">
                 <div class="mb-3">
-                    <input type="text" name="" id="" placeholder="searchPosts" class="form-control">
+                    <input type="text" name="searchPosts" id="searchPosts" placeholder="searchPosts" class="form-control">
                 </div>
                 <div class="mb-3">
                     <p>Serach by category:</p>
@@ -32,8 +32,8 @@ if ($_SESSION['user']->roleName == "Admin") {
                     foreach ($categories as $category) :
                     ?>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                            <label class="form-check-label" for="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="<?= $category->id ?>" id="category<?= $category->id ?>" name="categories">
+                            <label class="form-check-label" for="category<?= $category->id ?>">
                                 <?= $category->name ?>
                             </label>
                         </div>
@@ -46,8 +46,8 @@ if ($_SESSION['user']->roleName == "Admin") {
                     foreach ($headings as $heading) :
                     ?>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                            <label class="form-check-label" for="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="<?= $heading->id ?>" id="heading<?= $heading->id ?>" name='headings'>
+                            <label class="form-check-label" for="heading<?= $heading->id ?>">
                                 <?= $heading->name ?>
                             </label>
                         </div>
@@ -56,9 +56,8 @@ if ($_SESSION['user']->roleName == "Admin") {
                 <div class="mb-3">
                     <p>Filter by creation date:</p>
                     <select name="filterPostByDate" id="filterByDate" class="form-select">
-                        <option value="0">Izaberite</option>
-                        <option value="1">Opadajuce</option>
-                        <option value="2">Rastucem</option>
+                        <option value="0">Opadujecem</option>
+                        <option value="1">Rastucem</option>
                     </select>
                 </div>
             </div>
@@ -78,7 +77,7 @@ if ($_SESSION['user']->roleName == "Admin") {
                                 <th scope="row">Details</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="posts">
                             <?php
                             $rb  = 1;
 

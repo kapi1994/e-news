@@ -94,3 +94,7 @@ if (isset($_SESSION['user'])) {
         </div>
     </div>
 </section>
+
+<script>
+
+</script>

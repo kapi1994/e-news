@@ -2,9 +2,15 @@
     <div class="container">
         <div class="row my-3">
             <div class="flex-start">
-                <div class="col-lg-3">
-                    <div class="d-grid">
-                        <a href="index.php?page=category_action" class="btn btn-primary">Add new category</a>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="d-grid">
+                            <a href="index.php?page=category_action" class="btn btn-primary">Add new category</a>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="d-grid"><a href="models/action/exportData.php?action=excel" class="btn btn-danger my-sm- my-md-2 my-lg-0">Export to excel</a></div>
                     </div>
                 </div>
             </div>

@@ -2,11 +2,30 @@
     <div class="container">
         <div class="row my-3">
             <div class="col-lg-3">
-                <div class="d-grid"><a href="index.php?page=heading_action" class="btn btn-primary">Heading</a></div>
+                <div class="d-grid"><a href="index.php?page=heading_action" class="btn btn-primary">Add new heading</a></div>
             </div>
         </div>
         <div class="row mb-5">
-            <div class="col-xs-12">
+            <div class="col-lg-3">
+                <div class="d-none  d-lg-block">
+                    <div class="mb-3">
+                        <input type="text" name="searchHeadings" id="searchHeadings" class="form-control" placeholder="Search headings">
+                    </div>
+                    <div class="mb-3">
+                        <label for="">Sort by date:</label>
+                        <select name="sortHeading" id="sortHeading" class="form-select">
+                            <option value="0">Opadajucem</option>
+                            <option value="1">Rastucem</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="d-grid">
+                        <button class="btn btn-primary d-lg-none d-mb-2">Filters</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-xs-12">
                 <div id="headingResponseMessages"></div>
                 <div class="table-responsive-sm table-responsive-md">
                     <table class="table text-center align-middle">
@@ -21,7 +40,7 @@
                                 <th scope="col">Delete</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="headings">
                             <?php
                             $rb  = 1;
                             $headings = getHeadingWithCategory();
