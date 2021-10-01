@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             http_response_code(409);
         } else {
             try {
-                insertUser($_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['password'], $_POST['role_id']);
+                insertUser($_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['password'], $_POST['role']);
                 echo json_encode("User is successfully created");
                 http_response_code(201);
             } catch (PDOException $th) {
