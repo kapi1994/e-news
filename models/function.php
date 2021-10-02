@@ -1,7 +1,11 @@
 <?php
-function getAll($table)
+function getAll($table, $ordering = null, $param = null)
 {
     global $conn;
+    if ($ordering != null) {
+
+        $rez  = $conn->query("SELECT * FROM $table ORDER BY $param DESC")->fetchAll();
+    }
     $rez  = $conn->query("SELECT * FROM $table")->fetchAll();
     return $rez;
 }
@@ -68,7 +72,7 @@ function getHeadingWithCategory()
 {
     global $conn;
     $res = '';
-    $query = $conn->query("SELECT h.*, c.name as categoryName FROM headings h JOIN categories c ON h.category_id = c.id");
+    $query = $conn->query("SELECT h.*, c.name as categoryName FROM headings h JOIN categories c ON h.category_id = c.id ORDER BY h.created_at DESC");
     if ($query->rowCount() == 1) {
         $res = $query->fetch();
     } else {
@@ -119,7 +123,7 @@ function getAllUsers()
 {
     global $conn;
     $res = '';
-    $query = $conn->query("SELECT u.*, r.name as roleName FROM users u JOIN roles r ON u.role_id = r.id WHERE r.name != 'Admin'");
+    $query = $conn->query("SELECT u.*, r.name as roleName FROM users u JOIN roles r ON u.role_id = r.id WHERE r.name != 'Admin' ORDER BY u.created_at DESC");
 
     if ($query->rowCount() == 1) {
         $res = $query->fetch();
@@ -129,11 +133,11 @@ function getAllUsers()
     return $res;
 }
 
-function insertUser($firstName, $lastName, $email, $password, $role_id)
+function insertUser($firstName, $lastName, $email, $password, $role)
 {
     global $conn;
-    $res = $conn->prepare("INSERT INTO users (first_name,last_name, email, password, role_id");
-    $res->execute([$firstName, $lastName, $email, md5($password), $role_id]);
+    $res = $conn->prepare("INSERT INTO users (first_name,last_name, email, password, role_id) VALUES(?,?,?,?,?)");
+    $res->execute([$firstName, $lastName, $email, md5($password), $role]);
     return $res;
 }
 
@@ -150,17 +154,21 @@ function getComments($postId, $parent_comment = null)
     $res = '';
     if ($parent_comment == null) {
         $query = $conn->query("SELECT c.*, u.first_name as firstName, u.last_name as lastName FROM comments c JOIN posts p ON c.id_post = p.id JOIN users u ON c.id_user = u.id WHERE c.id_post = '$postId' ");
-        if ($query->rowCount() > 1) {
-            $res = $query->fetchAll();
-        } else {
+        if ($query->rowCount() == 0) {
+            $res = $query->rowCount();
+        } else if ($query->rowCount() == 1) {
             $res = $query->fetch();
+        } else {
+            $res = $query->fetchAll();
         }
     } else {
         $query = $conn->query("SELECT c.*, u.first_name as firstName, u.last_name as lastName FROM comments c JOIN posts p ON c.id_post = p.id JOIN users u ON c.id_user = u.id WHERE c.id_post = '$postId' AND c.parent_id = $parent_comment ");
-        if ($query->rowCount() > 1) {
-            $res = $query->fetchAll();
-        } else {
+        if ($query->rowCount() == 0) {
+            $res = $query->rowCount();
+        } else if ($query->rowCount() == 1) {
             $res = $query->fetch();
+        } else {
+            $res = $query->fetchAll();
         }
     }
     return $res;
@@ -345,3 +353,22 @@ function deleteVote($comment, $user)
     $q->execute([$user, $comment]);
     return $q;
 }
+
+
+function countRows($column, $name, $table, $condition, $value)
+{
+    global $conn;
+    $query = $conn->query("SELECT COUNT('$column') as '$name' FROM '$table' WHERE '$condition' = '$value'")->fetchAll();
+    return $query;
+}
+
+function getColumnsTable()
+{
+    global $conn;
+    $q = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = Database() AND TABLE_NAME = 'categories'";
+    $query = $conn->query($q)->fetchAll();
+    return $query;
+}
+
+
+// PAGINACIJA
