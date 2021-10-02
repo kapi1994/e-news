@@ -174,6 +174,15 @@ function getComments($postId, $parent_comment = null)
     return $res;
 }
 
+function getCommentsWithReaction($post_id, $comment_id)
+{
+    $comments = getComments($post_id, $comment_id);
+    foreach ($comments as $comment) {
+        $comment->likes = countVotes($comment->id, 'like');
+        $comment->disslikes = countVotes($comment->id, 'disslikes');
+    }
+    return $comments;
+}
 function getLastFive($postId)
 {
     global $conn;
@@ -262,9 +271,9 @@ function countVotes($comment_id, $action)
     global $conn;
     $res = '';
     if ($action == 'like') {
-        $res = $conn->query("SELECT COUNT(likes) as likes FROM reactions WHERE likes > 0 AND comment_id='$comment_id'")->fetch();
+        $res = $conn->query("SELECT user_id as UserId,  COUNT(likes) as likes FROM reactions WHERE likes > 0 AND comment_id='$comment_id'")->fetch();
     } else {
-        $res = $conn->query("SELECT COUNT(disslikes) as disslikes  FROM reactions WHERE disslikes > 0 AND comment_id='$comment_id'")->fetch();
+        $res = $conn->query("SELECT user_id as UserId, COUNT(disslikes) as disslikes  FROM reactions WHERE disslikes > 0 AND comment_id='$comment_id'")->fetch();
     }
 
     return $res;
@@ -372,3 +381,4 @@ function getColumnsTable()
 
 
 // PAGINACIJA
+define("ELEMENTS_OFFSET", 5);
