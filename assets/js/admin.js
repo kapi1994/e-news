@@ -50,6 +50,39 @@ $(document).ready(function () {
         headingFromRequestAndValidation()
     })
 
+    $(document).on('keyup', '#searchHeadings', function (e) {
+        e.preventDefault()
+        let text = $(this).val()
+        filterHeading()
+    })
+
+    $(document).on('change', '#sortHeading', function (e) {
+        e.preventDefault()
+        let id = $(this).val()
+        filterHeading(id)
+    })
+
+    const filterHeading = (data) => {
+        filterHeadings(data)
+    }
+
+    const filterHeadings = (d) => {
+        let text = $('#searchHeadings').val()
+        let ordering = $('#sortHeading').val()
+
+        $.ajax({
+            method: "GET",
+            url: 'models/headings/filter.php',
+            data: { text: text, order: ordering },
+            dataType: 'json',
+            success: function (data) {
+                printAllHeadings(data)
+            }, error: function (err) {
+                console.log(err)
+            }
+        })
+    }
+
 
     // tags 
 
@@ -75,20 +108,47 @@ $(document).ready(function () {
         e.preventDefault()
         tagsFormValidationAndRequest()
     })
+    // $(document).on('keyup', '#searchTags', function (e) {
+    //     e.preventDefault()
+    //     filterTags()
+    // })
+    // $(document).on('change', '#sortByDateTag', function (e) {
+    //     e.preventDefault()
+    //     filterTags()
+    // })
+    // $(document).on("click", '.tag-pagination', function () {
+    //     let limit = $(this).data('limit')
+    //     filterTags(limit)
+    // })
     $(document).on('keyup', '#searchTags', function (e) {
         e.preventDefault()
+        let text = $(this).val()
         filterTags()
     })
-    $(document).on('change', '#sortByDateTag', function (e) {
+    $(document).on("change", '#orderTags', function (e) {
         e.preventDefault()
+        let tags = $(this).val()
         filterTags()
     })
-    $(document).on("click", '.tag-pagination', function () {
-        let limit = $(this).data('limit')
-        filterTags(limit)
-    })
 
-
+    const filterTags = () => {
+        filterTag()
+    }
+    const filterTag = () => {
+        let text = $('#searchTags').val()
+        let tagOrder = $('#orderTags').val()
+        $.ajax({
+            method: 'get',
+            url: 'models/tags/filter.php',
+            data: {
+                text: text,
+                order: tagOrder
+            },
+            success: function (data) {
+                printAllTags(data)
+            }, error: function (err) { }
+        })
+    }
     // posts 
     $(document).on('click', '.delete-post', function (e) {
         e.preventDefault()
@@ -111,21 +171,12 @@ $(document).ready(function () {
         e.preventDefault()
         postFormVaildationAndRequest()
     })
-    $(document).on('keyup', '#searchPost', function () {
-        // e.preventDefault(
-        filterPosts()
-    })
-    $(document).on('change', '.categories', function (e) {
-        e.preventDefault()
-        setCategories()
-    })
-    $(document).on('change', '.headings', function (e) {
-        e.preventDefault()
-        setHeadings()
-    })
+
+
     $(document).on('change', '#postCategory', function (e) {
         e.preventDefault()
         let id = $(this).val()
+        console.log(id)
         $.ajax({
             method: "GET",
             url: "models/posts/getHeadingsByCategory.php",
@@ -143,13 +194,64 @@ $(document).ready(function () {
         e.preventDefault()
         filterPosts()
     })
-    $(document).on('click', '.post-pagination', function () {
 
-        let limit = $(this).data('limit')
-        filterPosts(limit)
+    $(document).on('keyup', '#searchPosts', function (e) {
+        e.preventDefault()
+        filterPosts()
     })
 
+    $(document).on('change', 'input[name="categories"]', function (e) {
+        e.preventDefault()
+        filterPosts()
+    })
 
+    $(document).on('change', 'input[name="headings"]', function (e) {
+        e.preventDefault()
+        filterPosts()
+    })
+
+    $(document).on('change', '#filterByDate', function (e) {
+        e.preventDefault()
+        filterPosts()
+    })
+    const filterPosts = () => {
+        filterPost()
+    }
+
+    const filterPost = () => {
+        let text = document.querySelector("#searchPosts").value
+        let kategorije = $('input[name="categories"]:checked')
+        let headings = $('input[name="headings"]:checked')
+        let order = document.querySelector('#filterByDate').value
+        let selectedKategorije = []
+        for (let kategorija of kategorije) {
+            selectedKategorije.push(kategorija.value)
+        }
+
+        let selectedHeadings = []
+        for (let heading of headings) {
+            selectedHeadings.push(heading.value)
+        }
+
+
+        $.ajax({
+            method: 'get',
+            url: 'models/posts/filter.php',
+            data: {
+                text: text,
+                categories: selectedKategorije,
+                headings: selectedHeadings,
+                order: order
+            },
+            dataType: 'json',
+            success: function (data) {
+                printAllPost(data)
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        })
+    }
     // users 
     $(document).on('click', '.delete-user', function (e) {
         e.preventDefault()
@@ -175,42 +277,41 @@ $(document).ready(function () {
     })
     $(document).on('keyup', '#searchUser', function (e) {
         e.preventDefault()
-        filterUser()
+        let text = $(this).val()
+        filterUsers()
     })
-    $(document).on('change', '#sortByDateUsers', function (e) {
+    $(document).on('change', '#orderUserByDate', function (e) {
         e.preventDefault()
+        filterUsers()
+    })
+    $(document).on('change', '#filterByRole', function (e) {
+        e.preventDefault()
+        filterUsers()
+    })
+    const filterUsers = () => {
         filterUser()
-    })
-    $(document).on("click", '.user-pagination', function () {
-        let limit = $(this).data('limit')
-        filterUser(limit)
-    })
-    const filterUser = (limit) => {
-        filterAndSortUsers(limit)
     }
-    const filterAndSortUsers = (limit) => {
-        let text = document.querySelector('#searchUser').value
-        let date = document.querySelector('#sortByDateUsers').value
 
+    const filterUser = () => {
+        let text = document.querySelector("#searchUser").value
+        let orderUser = document.querySelector('#orderUserByDate').value
+        let role = document.querySelector('#filterByRole').value
+        // console.log(role);
         $.ajax({
-
             method: 'get',
             url: 'models/users/filter.php',
             data: {
                 text: text,
-                date: date,
-                limit: limit
-            }, dataType: 'json',
-            success: function (data) {
-
-                printAllUsers(data.users, limit)
-                printPagination(data.pages, '#userPagination', limit, 'user-pagination')
+                order: orderUser,
+                role: role
             },
-            error: function (jqXHR, statusTxt, xhr) { }
-
+            dataType: "json",
+            success: function (data) {
+                printAllUsers(data)
+            },
+            error: function (err) { }
         })
     }
-
 
     // category functions   
     const getAllCategories = () => {
@@ -337,10 +438,10 @@ $(document).ready(function () {
             <tr>
                 <th scope='row'>${rb}</th>
                 <td>${heading.name}</td>
-                <td>${heading.categoryName}s</td>
+                <td>${heading.categoryName}</td>
                 <td>${prittierDateFormat(heading.created_at)}</td>
                 <td>${heading.updated_at ? prittierDateFormat(heading.updated_at) : '-'}</td>
-                <td><a href="index.php?page=action-heading" class="btn btn-sm btn-success">Update</a></td>
+                <td><a href="index.php?page=heading_action&id=${heading.id}" class="btn btn-sm btn-success">Update</a></td>
                 <td><button type="button" class="btn btn-sm btn-danger" data-id="${heading.id}">Delete</button></td>
             </tr>
         `
@@ -473,18 +574,13 @@ $(document).ready(function () {
             }
         })
     }
-    const printAllTags = (tags, limit) => {
-
+    const printAllTags = (tags) => {
         let ispis = ''
-        let rB = ''
-        if (!limit) {
-            rB += 1
-        } else {
-            rB += limit * 5 + 1
-        }
+        let rB = 1
+
         if (tags.length > 0) {
             tags.forEach(tag => {
-                ispis += printTag(tag, rB, limit)
+                ispis += printTag(tag, rB)
                 rB++
             })
         } else {
@@ -504,31 +600,6 @@ $(document).ready(function () {
                 <td><button type="button" class="btn btn-sm btn-danger delete-tag" data-id="${tag.id}">Delete</button></td>
             </tr>
         `
-    }
-    const filterTags = (limit) => {
-        filterAndSortByTags(limit)
-    }
-    const filterAndSortByTags = (limit) => {
-        let text = document.querySelector("#searchTags").value
-        let sortByDate = document.querySelector('#sortByDateTag').value
-        $.ajax({
-            method: 'get',
-            url: 'models/tags/filter.php',
-            data: {
-                text: text,
-                sortByDate: sortByDate,
-                limit: limit
-            },
-            dataType: 'json',
-            success: function (data) {
-
-                printAllTags(data.tags, limit)
-                data.pages > 1 ? printPagination(data.pages, '#tagPagination', limit, 'tag-pagination') : document.querySelector("#tagPagination").innerHTML = ""
-
-
-            },
-            error: function (jqXHR, statusTxt, xhr) { }
-        })
     }
 
 
@@ -562,8 +633,9 @@ $(document).ready(function () {
                 <th>${rb}</th>
                 <td>${user.first_name + ' ' + user.last_name}</td>
                 <td>${user.email}</td>
-                <td>${user.created_at}</td>
-                <td>${user.updated_at ? user.updated_at : '-'}</td>
+                <td>${user.roleName}</td>
+                <td>${prittierDateFormat(user.created_at)}</td>
+                <td>${user.updated_at ? prittierDateFormat(user.updated_at) : '-'}</td>
                 <td><a href="index.php?page=action-user&id=${user.id}" class="btn btn-success btn-sm">Update</a></td>
                 <td><button type="button" class="btn btn-danger delete-user btn-sm" data-id="${user.id}">Delete</button></td>
             </tr>
@@ -577,7 +649,7 @@ $(document).ready(function () {
 
         const password = id == "" ? document.querySelector("#userPassword").value : ""
         const role = $('input[name="userRole"]:checked').val()
-
+        // console.log(role)
         if (id == "") {
             if (validationUserForm().length == 0) {
                 $.ajax({
@@ -714,7 +786,7 @@ $(document).ready(function () {
                 <td>${post.headingName}</td>
                 <td>${post.created_at}</td>
                 <td>${post.updated_at ? post.updated_at : '-'}</td>
-                <td><a href="index.php?page=action_post&id=${post.id}" class="btn btn-sm btn-success">Update</a></td>
+                <td><a href="index.php?page=post_action&id=${post.id}" class="btn btn-sm btn-success">Update</a></td>
                 <td><button type="button" class="btn btn-sm btn-danger" data-id="${post.id}">Delete</button></td>
                 <td><a href="index.php?page=post_details&id=${post.id}" class="btn btn-info btn-sm">Details</a></td>
                 <td></td>
@@ -843,60 +915,60 @@ $(document).ready(function () {
         }
         return errors
     }
-    const setCategories = () => {
-        let selectedCategories = []
-        let categories = $('input[name="product_categories"]:checked')
-        for (var category of categories) {
-            selectedCategories.push(category.value)
-        }
-        filterPosts()
-    }
-    const setHeadings = () => {
-        let selectedHeadings = []
-        let headings = $('input[name="product_heading"]:checked')
-        for (let heading of headings) {
-            selectedHeadings.push(heading.value)
-        }
-        filterPosts()
-    }
-    const filterPosts = (limit) => {
-        filterAndSortPosts(limit)
-    }
-    const filterAndSortPosts = (limit) => {
-        let search = document.querySelector('#searchPost').value
+    // const setCategories = () => {
+    //     let selectedCategories = []
+    //     let categories = $('input[name="product_categories"]:checked')
+    //     for (var category of categories) {
+    //         selectedCategories.push(category.value)
+    //     }
+    //     filterPosts()
+    // }
+    // const setHeadings = () => {
+    //     let selectedHeadings = []
+    //     let headings = $('input[name="product_heading"]:checked')
+    //     for (let heading of headings) {
+    //         selectedHeadings.push(heading.value)
+    //     }
+    //     filterPosts()
+    // }
+    // const filterPosts = (limit) => {
+    //     filterAndSortPosts(limit)
+    // }
+    // const filterAndSortPosts = (limit) => {
+    //     let search = document.querySelector('#searchPost').value
 
-        let selectedCategories = []
-        let categories = $('input[name="product_categories"]:checked')
-        for (var category of categories) {
-            selectedCategories.push(category.value)
-        }
+    //     let selectedCategories = []
+    //     let categories = $('input[name="product_categories"]:checked')
+    //     for (var category of categories) {
+    //         selectedCategories.push(category.value)
+    //     }
 
-        let selectedHeadings = []
-        let headings = $('input[name="product_heading"]:checked')
-        for (let heading of headings) {
-            selectedHeadings.push(heading.value)
-        }
+    //     let selectedHeadings = []
+    //     let headings = $('input[name="product_heading"]:checked')
+    //     for (let heading of headings) {
+    //         selectedHeadings.push(heading.value)
+    //     }
 
-        let date = document.querySelector('#sortByDatePost').value
-        $.ajax({
-            method: 'get',
-            url: 'models/posts/filter.php',
-            data: {
-                text: search,
-                categories: selectedCategories,
-                headings: selectedHeadings,
-                limit: limit,
-                date: date,
-            },
-            dataType: 'json',
-            success: function (data) {
+    //     let date = document.querySelector('#sortByDatePost').value
+    //     $.ajax({
+    //         method: 'get',
+    //         url: 'models/posts/filter.php',
+    //         data: {
+    //             text: search,
+    //             categories: selectedCategories,
+    //             headings: selectedHeadings,
+    //             limit: limit,
+    //             date: date,
+    //         },
+    //         dataType: 'json',
+    //         success: function (data) {
 
-                printAllPost(data.posts, limit)
-                printPagination(data.pages, '#postPagination', limit, 'post-pagination')
-            },
+    //             printAllPost(data.posts, limit)
+    //             printPagination(data.pages, '#postPagination', limit, 'post-pagination')
+    //         },
 
-        })
-    }
+    //     })
+    // }
     const printPostHeadings = (headings) => {
 
         let ispis = ''
