@@ -6,15 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     require_once '../../config/connection.php';
     require_once '../function.php';
 
-    $comments = getComments($post, $parent_comment);
-    $comment_like_count = [];
-    var_dump($comments);
-
-    // echo json_encode([
-    //     'comments' => $comments,
-    //     'comment_like' => $comment_like_count
-    // ]);
-    // echo json_encode($comments);
+    $comments = getCommentsWithReaction($post, $parent_comment);
 } else {
     http_response_code(404);
 }
