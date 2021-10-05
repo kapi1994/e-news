@@ -13,6 +13,11 @@ if (isset($_SESSION['user'])) {
         <?php
         if (isset($_GET['id'])) {
             $post = getOneFetchAndCheckData('posts', 'id', $_GET['id'], "fetch");
+            $selectedTags = getSelectedTags($post->id);
+            $tagsArr = [];
+            foreach ($selectedTags as $tagElement) {
+                array_push($tagsArr, $tagElement->id);
+            }
         }
         ?>
         <div class="row my-5">
@@ -72,7 +77,7 @@ if (isset($_SESSION['user'])) {
                             ?>
                                 <div class="col-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="<?= $tag->id ?>" id="tag<?= $tag->id ?>" name="postTags">
+                                        <input class="form-check-input" type="checkbox" value="<?= $tag->id ?>" id="tag<?= $tag->id ?>" name="postTags" <?php if (isset($tags) && isset($tagsArr) && in_array($tag->id, $tagsArr)) : ?> checked <?php endif ?>>
                                         <label class="form-check-label" for="tag<?= $tag->id ?>">
                                             <?= $tag->name ?>
                                         </label>
