@@ -177,10 +177,17 @@ function getComments($postId, $parent_comment = null)
 function getCommentsWithReaction($post_id, $comment_id)
 {
     $comments = getComments($post_id, $comment_id);
-    foreach ($comments as $comment) {
-        $comment->likes = countVotes($comment->id, 'like');
-        $comment->disslikes = countVotes($comment->id, 'disslikes');
+    // var_dump($comments);
+    if (is_array($comments)) {
+        foreach ($comments as $comment) {
+            $comment->likes = countVotes($comment->id, 'like');
+            $comment->disslikes = countVotes($comment->id, 'disslikes');
+        }
+    } else {
+        $comments->likes = countVotes($comments->id, 'like');
+        $comments->disslikes = countVotes($comments->id, 'disslikes');
     }
+
     return $comments;
 }
 function getLastFive($postId)
@@ -379,6 +386,16 @@ function getColumnsTable()
     return $query;
 }
 
+function getSelectedTags($post_id)
+{
+    global $conn;
+    $query = "SELECT * FROM tags WHERE id IN ";
+    $query .= "(SELECT tag_id FROM post_tag WHERE post_id = ?)";
+    $result = $conn->prepare($query);
+    $result->execute([$post_id]);
+    $data = $result->fetchAll();
+    return $data;
+}
 
 // PAGINACIJA
 define("ELEMENTS_OFFSET", 5);
