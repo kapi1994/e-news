@@ -24,6 +24,7 @@
                         <button class="btn btn-primary d-lg-none d-mb-2" data-bs-toggle="modal" data-bs-target="" ">Filters</button>
                     </div>
                 </div>
+            
             </div>
             <div class=" col-lg-9 col-xs-12">
                             <div id="headingResponseMessages"></div>

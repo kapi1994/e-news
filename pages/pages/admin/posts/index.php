@@ -8,7 +8,7 @@ if (isset($_SESSION['user'])) {
     header("Location:index.php?page=status");
 }
 if ($_SESSION['user']->roleName == "Admin") {
-    $posts = getAllPosts();
+    $posts = postPagination();
 } else {
     $posts = getOneFetchAndCheckData('posts', 'user_id', $_SESSION['user']->id, 'fetch');
 }
@@ -98,6 +98,35 @@ if ($_SESSION['user']->roleName == "Admin") {
                         </tbody>
                     </table>
                 </div>
+                <?php
+                $postsCount = getNumOfPosts();
+                if ($postsCount->numberOfPosts > 5) :
+                ?>
+                    <div class="row mt-3">
+                        <div class="col-4 mx-auto">
+                            <nav aria-label="...">
+                                <ul class="pagination" id="postPagination">
+                                    <?php
+                                    $postPagination = postNumOfPages();
+                                    for ($i = 0; $i < $postPagination; $i++) :
+                                        if ($i == 0) :
+                                    ?>
+                                            <li class="page-item active"><a class="page-link post-pagination" href="#" data-limit="<?= $i ?>"><?= ($i + 1) ?></a></li>
+                                        <?php
+                                        endif;
+                                        if ($i != 0) :
+                                        ?>
+                                            <li class="page-item"><a class="page-link post-pagination" href="#" data-limit="<?= $i ?>"><?= ($i + 1) ?></a></li>
+                                    <?php
+                                        endif;
+                                    endfor;
+                                    ?>
+
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
