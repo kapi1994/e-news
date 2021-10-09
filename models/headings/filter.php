@@ -12,6 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $offset = OFFSET;
     require_once '../../config/connection.php';
     require_once '../function.php';
+    // $query = ''
     $baseQueryA = "SELECT COUNT(*) as headingElementsCount FROM headings h JOIN categories c ON h.category_id = c.id";
     $baseQueryB = "SELECT h.*, c.name as categoryName FROM headings h JOIN categories c ON h.category_id = c.id";
     if ($text) {
