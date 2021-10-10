@@ -7,9 +7,7 @@ if (isset($_POST['btnSubmit'])) {
 
     $rePassword = '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/';
     $errors = [];
-    if ($email == "") {
-        array_push($errors, "Your email isn't ok");
-    }
+
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         array_push($errors, "Your email isn't ok");
     }
