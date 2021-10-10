@@ -61,7 +61,11 @@ $(document).ready(function () {
         let id = $(this).val()
         filterHeading(id)
     })
-
+    $(document).on('click', '.heading-pagination', function (e) {
+        e.preventDefault()
+        let limit = $(this).data('limit')
+        filterHeading(limit)
+    })
     const filterHeading = (data) => {
         filterHeadings(data)
     }
@@ -69,14 +73,21 @@ $(document).ready(function () {
     const filterHeadings = (d) => {
         let text = $('#searchHeadings').val()
         let ordering = $('#sortHeading').val()
-
+        console.log(d)
         $.ajax({
             method: "GET",
             url: 'models/headings/filter.php',
-            data: { text: text, order: ordering },
+            data: {
+                text: text,
+                order: ordering,
+                limit: d
+            },
             dataType: 'json',
             success: function (data) {
-                printAllHeadings(data)
+                console.log(data)
+                printAllHeadings(data.headings, data.limit)
+                // printPagination(data.pages, data.limit)
+                printPagination(data.pages, '#headingPagination', data.limit, 'heading-pagination')
             }, error: function (err) {
                 console.log(err)
             }
@@ -108,18 +119,7 @@ $(document).ready(function () {
         e.preventDefault()
         tagsFormValidationAndRequest()
     })
-    // $(document).on('keyup', '#searchTags', function (e) {
-    //     e.preventDefault()
-    //     filterTags()
-    // })
-    // $(document).on('change', '#sortByDateTag', function (e) {
-    //     e.preventDefault()
-    //     filterTags()
-    // })
-    // $(document).on("click", '.tag-pagination', function () {
-    //     let limit = $(this).data('limit')
-    //     filterTags(limit)
-    // })
+
     $(document).on('keyup', '#searchTags', function (e) {
         e.preventDefault()
         let text = $(this).val()
@@ -130,11 +130,17 @@ $(document).ready(function () {
         let tags = $(this).val()
         filterTags()
     })
+    $(document).on('click', '.tag-pagination', function (e) {
+        e.preventDefault()
+        let limit = $(this).data('limit')
+        filterTags(limit)
+    })
+    const filterTags = (d) => {
 
-    const filterTags = () => {
-        filterTag()
+        filterTag(d)
     }
-    const filterTag = () => {
+    const filterTag = (lim) => {
+
         let text = $('#searchTags').val()
         let tagOrder = $('#orderTags').val()
         $.ajax({
@@ -142,10 +148,13 @@ $(document).ready(function () {
             url: 'models/tags/filter.php',
             data: {
                 text: text,
-                order: tagOrder
+                order: tagOrder,
+                limit: lim
             },
             success: function (data) {
-                printAllTags(data)
+
+                printAllTags(data.tags, data.limit)
+                printPagination(data.pages, '#tagPagination', data.limit, 'tag-pagination')
             }, error: function (err) { }
         })
     }
@@ -212,13 +221,19 @@ $(document).ready(function () {
 
     $(document).on('change', '#filterByDate', function (e) {
         e.preventDefault()
-        filterPosts()
+        let id = $(this).val()
+        filterPosts(id)
     })
-    const filterPosts = () => {
-        filterPost()
+    $(document).on('click', '.post-pagination', function (e) {
+        e.preventDefault()
+        let limit = $(this).data('limit')
+        filterPosts(limit)
+    })
+    const filterPosts = (page) => {
+        filterPost(page)
     }
 
-    const filterPost = () => {
+    const filterPost = (d) => {
         let text = document.querySelector("#searchPosts").value
         let kategorije = $('input[name="categories"]:checked')
         let headings = $('input[name="headings"]:checked')
@@ -232,7 +247,8 @@ $(document).ready(function () {
         for (let heading of headings) {
             selectedHeadings.push(heading.value)
         }
-
+        // console.log(d)
+        // console.log(order)
 
         $.ajax({
             method: 'get',
@@ -241,11 +257,14 @@ $(document).ready(function () {
                 text: text,
                 categories: selectedKategorije,
                 headings: selectedHeadings,
-                order: order
+                order: order,
+                limit: d
             },
             dataType: 'json',
             success: function (data) {
-                printAllPost(data)
+                console.log(data)
+                printAllPost(data.posts, data.limit)
+                printPagination(data.pages, '#postPagination', data.limit, 'post-pagination')
             },
             error: function (err) {
                 console.log(err)
@@ -421,12 +440,14 @@ $(document).ready(function () {
             error: function () { }
         })
     }
-    const printAllHeadings = (headings) => {
+    const printAllHeadings = (headings, limit) => {
         let ispis = '', rb = 1
+        let lim = parseInt(limit)
+        let redniBroj = (5 * lim) + 1
         if (headings.length > 0) {
             headings.forEach(heading => {
-                ispis += printHeading(heading, rb)
-                rb++
+                ispis += printHeading(heading, redniBroj)
+                redniBroj++
             })
         } else {
             ispis += NoContent('No headings at the moment', '7')
@@ -574,9 +595,10 @@ $(document).ready(function () {
             }
         })
     }
-    const printAllTags = (tags) => {
+    const printAllTags = (tags, limit) => {
+        console.log(limit)
         let ispis = ''
-        let rB = 1
+        let rB = (parseInt(limit) * 5) + 1
 
         if (tags.length > 0) {
             tags.forEach(tag => {
@@ -765,7 +787,9 @@ $(document).ready(function () {
     }
     const printAllPost = (posts, limit) => {
 
-        let ispis = '', rb = 1
+        let ispis = ''
+        let rb = (5 * limit) + 1
+        console.log(limit)
         if (posts.length > 0) {
             posts.forEach(post => {
                 ispis += printPost(post, rb)
@@ -785,7 +809,7 @@ $(document).ready(function () {
                 <td>${post.categoryName}</td>
                 <td>${post.headingName}</td>
                 <td>${post.created_at}</td>
-                <td>${post.updated_at ? post.updated_at : '-'}</td>
+                <td>${post.updated_at ? post.updated_at : '/'}</td>
                 <td><a href="index.php?page=post_action&id=${post.id}" class="btn btn-sm btn-success">Update</a></td>
                 <td><button type="button" class="btn btn-sm btn-danger" data-id="${post.id}">Delete</button></td>
                 <td><a href="index.php?page=post_details&id=${post.id}" class="btn btn-info btn-sm">Details</a></td>
@@ -915,60 +939,6 @@ $(document).ready(function () {
         }
         return errors
     }
-    // const setCategories = () => {
-    //     let selectedCategories = []
-    //     let categories = $('input[name="product_categories"]:checked')
-    //     for (var category of categories) {
-    //         selectedCategories.push(category.value)
-    //     }
-    //     filterPosts()
-    // }
-    // const setHeadings = () => {
-    //     let selectedHeadings = []
-    //     let headings = $('input[name="product_heading"]:checked')
-    //     for (let heading of headings) {
-    //         selectedHeadings.push(heading.value)
-    //     }
-    //     filterPosts()
-    // }
-    // const filterPosts = (limit) => {
-    //     filterAndSortPosts(limit)
-    // }
-    // const filterAndSortPosts = (limit) => {
-    //     let search = document.querySelector('#searchPost').value
-
-    //     let selectedCategories = []
-    //     let categories = $('input[name="product_categories"]:checked')
-    //     for (var category of categories) {
-    //         selectedCategories.push(category.value)
-    //     }
-
-    //     let selectedHeadings = []
-    //     let headings = $('input[name="product_heading"]:checked')
-    //     for (let heading of headings) {
-    //         selectedHeadings.push(heading.value)
-    //     }
-
-    //     let date = document.querySelector('#sortByDatePost').value
-    //     $.ajax({
-    //         method: 'get',
-    //         url: 'models/posts/filter.php',
-    //         data: {
-    //             text: search,
-    //             categories: selectedCategories,
-    //             headings: selectedHeadings,
-    //             limit: limit,
-    //             date: date,
-    //         },
-    //         dataType: 'json',
-    //         success: function (data) {
-
-    //             printAllPost(data.posts, limit)
-    //             printPagination(data.pages, '#postPagination', limit, 'post-pagination')
-    //         },
-
-    //     })
-    // }
     const printPostHeadings = (headings) => {
 
         let ispis = ''
@@ -981,7 +951,7 @@ $(document).ready(function () {
         $('#postHeading').html(ispis)
     }
 
-    //  utilites
+
 
     const createValidationErrorMessage = (element, cls, text) => {
         const el = document.querySelector(element)
@@ -1037,10 +1007,13 @@ $(document).ready(function () {
     const printPagination = (numOfPages, whereToPlace, limit, cls) => {
         let ispis = ''
         let lim = 1
+
         if (limit) {
-            lim += limit
+            lim += parseInt(limit)
         }
         for (let i = 0; i < numOfPages; i++) {
+
+
             ispis += ` <li class="page-item ${lim == (i + 1) ? 'active' : ''}"><a class="page-link ${cls}" href="#" data-limit="${i}">${i + 1}</a></li>`
 
         }
@@ -1051,8 +1024,6 @@ $(document).ready(function () {
         const dateTime = datetime.split(' ')
         const time = dateTime[1]
         const date = dateTime[0].split('-')
-        console.log(time)
-        console.log(date)
         const finalDate = time + " " + date[2] + "/" + date[1] + "/" + date[0]
         return finalDate
     }
