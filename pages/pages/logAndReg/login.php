@@ -1,3 +1,8 @@
+<?php
+if (isset($_SESSION['user'])) {
+    header("Location: index.php?page=status");
+}
+?>
 <section>
     <div class="container">
         <div class="row my-5">
@@ -6,16 +11,26 @@
                     <?php
 
                     if (isset($_SESSION['errors'])) :
-                        $errors = $_SESSION['errors'];
-                        foreach ($errors as $error) :
+                        if (is_array($_SESSION['errors'])) :
+                            $errors = $_SESSION['errors'];
+                            foreach ($errors as $error) :
                     ?>
+                                <div class="alert alert-danger fw-bolder" role="alert">
+                                    <?= $error ?>
+                                </div>
+                            <?php
+                            endforeach;
+                        else :
+                            $error = $_SESSION['error'];
+                            ?>
+
                             <div class="alert alert-danger fw-bolder" role="alert">
                                 <?= $error ?>
                             </div>
                     <?php
-                        endforeach;
+                        endif;
                     endif;
-                    session_destroy();
+                    unset($_SESSION['errors']);
                     ?>
                 </ul>
 
