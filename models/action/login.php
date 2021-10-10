@@ -7,16 +7,19 @@ if (isset($_POST['btnSubmit'])) {
 
     $rePassword = '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/';
     $errors = [];
+    if ($email == "") {
+        array_push($errors, "Your email isn't ok");
+    }
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         array_push($errors, "Your email isn't ok");
     }
     if (!preg_match($rePassword, $password)) {
-        array_push($errors, "YOur password isn't ok");
+        array_push($errors, "Your password isn't ok");
     }
     if (count($errors) > 0) {
-        foreach ($errors as $error) {
-            $_SESSION['errors'] = $error;
-        }
+
+        $_SESSION['errors'] = $errors;
+        header("Location:../../index.php?page=login");
     } else {
         require_once '../../config/connection.php';
         require_once '../function.php';
