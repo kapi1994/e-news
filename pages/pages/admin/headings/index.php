@@ -1,3 +1,13 @@
+<?php
+if (isset($_SESSION['user'])) {
+    // var_dump($_SESSION['user']);
+    if ($_SESSION['user']->roleName == "Korisnik") {
+        header("Location:index.php?page=401");
+    }
+} else {
+    header("Location:index.php?page=status");
+}
+?>
 <section>
     <div class="container">
         <div class="row my-3">
