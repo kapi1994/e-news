@@ -68,18 +68,8 @@ function updateTag($name, $date, $id)
     return $res;
 }
 
-function getHeadingWithCategory()
-{
-    global $conn;
-    $res = '';
-    $query = $conn->query("SELECT h.*, c.name as categoryName FROM headings h JOIN categories c ON h.category_id = c.id ORDER BY h.created_at DESC");
-    if ($query->rowCount() == 1) {
-        $res = $query->fetch();
-    } else {
-        $res = $query->fetchAll();
-    }
-    return $res;
-}
+
+
 
 function insertHeading($name, $categoryId)
 {
@@ -399,3 +389,121 @@ function getSelectedTags($post_id)
 
 // PAGINACIJA
 define("ELEMENTS_OFFSET", 5);
+function numOfData($query)
+{
+    global $conn;
+    $res = $conn->query($query)->fetch();
+    return $res;
+}
+
+
+function getHeadingWithCategory($limit = 0)
+{
+    global $conn;
+    $res = '';
+    $query = $conn->prepare("SELECT h.*, c.name as categoryName FROM headings h JOIN categories c ON h.category_id = c.id  ORDER BY h.created_at DESC LIMIT :limit, :offset");
+    $limit  = ((int)$limit) * ELEMENTS_OFFSET;
+    $query->bindValue(":limit", $limit, PDO::PARAM_INT);
+    $offset = ELEMENTS_OFFSET;
+    $query->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $query->execute();
+    if ($query->rowCount() > 1) {
+        $res = $query->fetchAll();
+    } else {
+        $res = $query->fetch();
+    }
+    return $res;
+}
+
+function getNumOfHeadings()
+{
+    $movies = rowCount('SELECT COUNT(*)  as numOfHeadings FROM headings h JOIN categories c ON h.category_id = c.id');
+    return $movies;
+}
+
+function rowCount($query)
+{
+    global $conn;
+    $res = $conn->query($query)->fetch();
+    return $res;
+}
+function paginationHeadings()
+{
+    $numOfHeadings = getNumOfHeadings();
+    $numOfPages = ceil($numOfHeadings->numOfHeadings) / ELEMENTS_OFFSET;
+    return $numOfPages;
+}
+
+function getAllTags($limit = 0)
+{
+    global $conn;
+    $res = '';
+    $query = $conn->prepare("SELECT * FROM tags  ORDER BY created_at DESC LIMIT :limit, :offset");
+    $limit  = ((int)$limit) * ELEMENTS_OFFSET;
+    $query->bindValue(":limit", $limit, PDO::PARAM_INT);
+    $offset = ELEMENTS_OFFSET;
+    $query->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $query->execute();
+    if ($query->rowCount() > 1) {
+        $res = $query->fetchAll();
+    } else {
+        $res = $query->fetch();
+    }
+    return $res;
+}
+
+function getNumOfTags()
+{
+    //SELECT COUNT(*)  as numOfHeadings FROM headings h JOIN categories c ON h.category_id = c.id'
+    $tags = rowCount("SELECT COUNT(*) as numberOfTags FROM tags");
+    return $tags;
+}
+
+
+function tagsPagination()
+{
+    $tagElments = getNumOfTags();
+    $numOfPages = ceil($tagElments->numberOfTags) / ELEMENTS_OFFSET;
+    return $numOfPages;
+}
+
+
+// function getAllUsers()
+// {
+// }
+
+function postPagination($limit = 0)
+{
+    $res = '';
+    global $conn;
+    $query = $conn->prepare("SELECT p.* , c.name as categoryName, h.name as headingName FROM posts p JOIN categories c ON p.category_id = c.id JOIN headings h ON p.heading_id = h.id ORDER BY p.created_at DESC LIMIT :limit, :offset");
+    $limit = ((int)$limit) * ELEMENTS_OFFSET;
+    $offset = ELEMENTS_OFFSET;
+
+    $query->bindValue(":limit", $limit, PDO::PARAM_INT);
+    $query->bindValue(":offset", $offset, PDO::PARAM_INT);
+
+    $query->execute();
+    if ($query->rowCount() > 1) {
+        $res = $query->fetchAll();
+    } else {
+        $res = $query->fetch();
+    }
+
+    return $res;
+}
+
+function getNumOfPosts()
+{
+    //SELECT COUNT(*)  as numOfHeadings FROM headings h JOIN categories c ON h.category_id = c.id'
+    $posts = rowCount("SELECT COUNT(*) as numberOfPosts FROM posts");
+    return $posts;
+}
+
+
+function postNumOfPages()
+{
+    $postElements = getNumOfPosts();
+    $numOfPages = ceil($postElements->numberOfPosts) / ELEMENTS_OFFSET;
+    return $numOfPages;
+}
