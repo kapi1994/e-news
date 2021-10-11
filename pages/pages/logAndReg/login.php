@@ -21,7 +21,7 @@ if (isset($_SESSION['user'])) {
                             <?php
                             endforeach;
                         else :
-                            $error = $_SESSION['error'];
+                            $error = $_SESSION['errors'];
                             ?>
 
                             <div class="alert alert-danger fw-bolder" role="alert">
