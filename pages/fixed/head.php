@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="assets/js/bootstrap.bundle.js"></script>
+    <script src="assets/ckeditor/ckeditor.js"></script>
     <title>Document</title>
 </head>
 
