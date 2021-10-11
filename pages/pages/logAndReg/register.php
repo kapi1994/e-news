@@ -24,7 +24,7 @@
                         <em id="userPasswordErrorMessage"></em>
                     </div>
                     <div class="d-grid">
-                        <button class="btn btn-primary" id="btnReguistujte se">Registrujte se</button>
+                        <button class="btn btn-primary" id="btnRegister" type="button">Registrujte se</button>
                     </div>
                 </form>
             </div>
