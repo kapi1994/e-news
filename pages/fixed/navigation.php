@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
-        <a class="navbar-brand" href="#">Navbar</a>
+        <a class="navbar-brand" href="#">E-news</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -25,6 +25,7 @@
                         <li class="nav-item"><a href="index.php?page=tags" class="nav-link">Tags</a></li>
                         <?php if ($_SESSION['user']->roleName == "Admin") : ?>
                             <li class="nav-item"><a href="index.php?page=users" class="nav-link">Users</a></li>
+                            <li class="nav-item"><a href="index.php?page=tasks" class="nav-link">Tasks</a></li>
                         <?php endif; ?>
                         <li class="nav-item"><a href="index.php?page=posts" class="nav-link">Posts</a></li>
                 <?php
