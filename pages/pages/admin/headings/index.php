@@ -71,7 +71,8 @@ if (isset($_SESSION['user'])) {
                                     </tbody>
                                 </table>
                                 <?php
-                                $headingElementsCount =  getNumOfHeadings();
+                                $headingElementsCount =  getNumOfHeadings('', 'count');
+                                // var_dump($headingElementsCount);
                                 if ($headingElementsCount->numOfHeadings > 5) :
 
                                 ?>
@@ -80,7 +81,7 @@ if (isset($_SESSION['user'])) {
                                             <nav aria-label="...">
                                                 <ul class="pagination" id="headingPagination">
                                                     <?php
-                                                    $headingPagination = paginationHeadings();
+                                                    $headingPagination = getNumOfHeadings('', 'fetch');
                                                     for ($i = 0; $i < $headingPagination; $i++) :
                                                         if ($i == 0) :
                                                     ?>

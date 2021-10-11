@@ -35,8 +35,6 @@
                             $categories = getAll('categories');
                             $rb = 1;
                             foreach ($categories as $category) :
-
-                                // foreach ($categories as $category) :
                             ?>
                                 <tr>
                                     <th scope="row"><?= $rb++ ?></th>
