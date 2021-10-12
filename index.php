@@ -53,7 +53,12 @@ if (isset($_GET['page'])) {
         case 'admin_home':
             include 'pages/pages/admin/index.php';
             break;
-
+        case 'tasks':
+            include 'pages/pages/admin/tasks/index.php';
+            break;
+        case 'insert_update_task':
+            include 'pages/pages/admin/tasks/insert_update.php';
+            break;
         case 'login':
             include 'pages/pages/logAndReg/login.php';
             break;
