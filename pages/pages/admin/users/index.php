@@ -58,7 +58,7 @@ if (isset($_SESSION['user'])) {
                             <?php
                             $rb = 1;
 
-                            $users = getAllUsers();
+                            $users = userPagination('', '', '');
 
                             foreach ($users as $user) :
                             ?>
@@ -75,6 +75,36 @@ if (isset($_SESSION['user'])) {
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    <?php
+                    $userPagination = getUserPagination('', '', 'count');
+                    if ($userPagination->numberOfUsers > 5) :
+                    ?>
+                        <div class="row mt-3">
+                            <div class="col-4 mx-auto">
+                                <nav aria-label="...">
+                                    <ul class="pagination" id="tagPagination">
+                                        <?php
+                                        $userPages = getUserPagination('', '', 'pagination');
+                                        for ($i = 0; $i < $userPages; $i++) :
+                                            if ($i == 0) :
+                                        ?>
+                                                <li class="page-item active"><a class="page-link tag-pagination" href="#" data-limit="<?= $i ?>"><?= ($i + 1) ?></a></li>
+                                            <?php
+                                            endif;
+                                            if ($i != 0) :
+                                            ?>
+                                                <li class="page-item"><a class="page-link tag-pagination" href="#" data-limit="<?= $i ?>"><?= ($i + 1) ?></a></li>
+                                        <?php
+                                            endif;
+                                        endfor;
+                                        ?>
+
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
                 </div>
             </div>
         </div>
