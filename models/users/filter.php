@@ -3,29 +3,19 @@ header("Content-type:application/json");
 if ($_SERVER['REQUEST_METHOD'] == "GET") {
     $text = $_GET['text'];
     $compareString = trim("%$text%");
-    $order = $_GET['order'];
+    $order = $_GET['order'] ? $_GET['order'] : 0;
     $role = $_GET['role'];
-
+    $limit = isset($_GET['limit']) ? $_GET['limit'] : 0;
 
     require_once '../../config/connection.php';
-    $baseQuery = "SELECT  u.*, r.name as roleName FROM users u JOIN roles r ON u.role_id = r.id WHERE r.name != 'Admin'";
-    if ($compareString) {
-        $baseQuery .= " AND (last_name like '$compareString' OR first_name LIKE '$compareString')";
-    }
-    if ($role) {
-        $baseQuery .= " AND role_id = '$role'";
-    }
-    if ($order) {
-        if ($order == 0) {
-            $baseQuery .= " ORDER BY created_at DESC";
-        } else {
-            $baseQuery .= " ORDER BY created_at ASC";
-        }
-    } else {
-        $baseQuery .= " ORDER BY created_at DESC";
-    }
-    $res = $conn->query($baseQuery)->fetchAll();
-    echo json_encode($res);
+    require_once '../function.php';
+    $usersPagination = userPagination($limit, $compareString, $role, $order);
+    $userPages = getUserPagination($compareString, $role, 'pagination');
+    echo json_encode([
+        'res' => $usersPagination,
+        'pages' => $userPages,
+        'limit' => $limit
+    ]);
 } else {
     http_response_code(404);
 }
