@@ -2,7 +2,8 @@
 header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $text = $_GET['text'];
-    $order = $_GET['order'];
+    $order = $_GET['order'] ? $_GET['order'] : 0;
+
     $compareString = trim("%$text%");
     $pagination = isset($_GET['limit']) ? $_GET['limit'] : 0;
     require_once '../../config/connection.php';
