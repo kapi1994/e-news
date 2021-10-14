@@ -1,0 +1,20 @@
+<main class="container">
+    <div class="row my-3">
+        <div class="col-lg-10 mx-auto">
+            <div class="row">
+                <div class="col-lg-5">
+                    <img src="assets/images/author/a.jpg" alt="" class="img-fluid">
+                </div>
+                <div class="col-lg-7">
+                    <h1 class="text-center my-5"> Nemanja Jovičić</h1>
+                    <p class="text-muted text-justify fs-4">Strastveni ljubitelj video igara.</p>
+                    <div class="col-lg-5">
+                        <div class="d-grid">
+                            <a href="#" class="btn btn-outline-primary mt-2">Portfolio</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
