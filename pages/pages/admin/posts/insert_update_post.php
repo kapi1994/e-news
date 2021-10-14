@@ -101,5 +101,5 @@ if (isset($_SESSION['user'])) {
 </section>
 
 <script>
-
+    CKEDITOR.replace('postDescription');
 </script>
