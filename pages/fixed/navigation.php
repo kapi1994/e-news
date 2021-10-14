@@ -1,6 +1,12 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
-        <a class="navbar-brand" href="#">E-news</a>
+        <?php if (isset($_SESSION['user']) && $_SESSION['user']->roleName != 'User') :
+        ?>
+            <a class="navbar-brand" href="index.php?page=admin_home">E-news</a>
+        <?php else : ?>
+            <a class="navbar-brand" href="index.php?page=home">E-news</a>
+        <?php endif; ?>
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
