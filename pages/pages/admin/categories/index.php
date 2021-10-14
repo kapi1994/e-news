@@ -32,19 +32,28 @@
                         </thead>
                         <tbody id='categories'>
                             <?php
-                            $categories = getAll('categories');
-                            $rb = 1;
-                            foreach ($categories as $category) :
+                            $categoriesCount = categoriesCount();
+                            if ($categoriesCount->mumberOfCategories > 0) :
                             ?>
+                                <?php
+                                $categories = getAll('categories');
+                                $rb = 1;
+                                foreach ($categories as $category) :
+                                ?>
+                                    <tr>
+                                        <th scope="row"><?= $rb++ ?></th>
+                                        <td><?= $category->name ?></td>
+                                        <td><?= date("H:i:s d/m/Y", strtotime($category->created_at)) ?></td>
+                                        <td><?= $category->updated_at != null ? date("H:i:s d/m/Y", strtotime($category->updated_at)) : "/" ?></td>
+                                        <td><a href="index.php?page=category_action&id=<?= $category->id ?>" class="btn btn-success btn-sm">Update</a></td>
+                                        <td><button type="button" class="btn btn-sm btn-danger delete-category" data-id="<?= $category->id ?>">Delete</button></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else : ?>
                                 <tr>
-                                    <th scope="row"><?= $rb++ ?></th>
-                                    <td><?= $category->name ?></td>
-                                    <td><?= date("H:i:s d/m/Y", strtotime($category->created_at)) ?></td>
-                                    <td><?= $category->updated_at != null ? date("H:i:s d/m/Y", strtotime($category->updated_at)) : "/" ?></td>
-                                    <td><a href="index.php?page=category_action&id=<?= $category->id ?>" class="btn btn-success btn-sm">Update</a></td>
-                                    <td><button type="button" class="btn btn-sm btn-danger delete-category" data-id="<?= $category->id ?>">Delete</button></td>
+                                    <th colspan="6" class="text-center">We don't have any categories at the moment</th>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
