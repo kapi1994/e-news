@@ -16,27 +16,30 @@
                 if (!isset($_SESSION['user']) || (isset($_SESSION['user']) && $_SESSION['user']->roleName == "User")) :
                     $userMenus = getAll('categories');
 
+
+                ?><?php
                     foreach ($userMenus as $meni) :
-                ?>
-                        <li class="nav-item"><a href="index.php?page=news&id=<?= $meni->id ?>" class="nav-link"><?= $meni->name ?></a></li>
-                <?php endforeach;
-                endif;
-                ?>
-                <?php
-                if (isset($_SESSION['user'])) :
-                    if ($_SESSION['user']->roleName == "Urednik" || $_SESSION['user']->roleName == "Admin") :
-                ?>
-                        <li class="nav-item"><a href="index.php?page=categories" class="nav-link">Categories</a></li>
-                        <li class="nav-item"><a href="index.php?page=headings" class="nav-link">Headings</a></li>
-                        <li class="nav-item"><a href="index.php?page=tags" class="nav-link">Tags</a></li>
-                        <?php if ($_SESSION['user']->roleName == "Admin") : ?>
-                            <li class="nav-item"><a href="index.php?page=users" class="nav-link">Users</a></li>
-                            <li class="nav-item"><a href="index.php?page=tasks" class="nav-link">Tasks</a></li>
-                        <?php endif; ?>
-                        <li class="nav-item"><a href="index.php?page=posts" class="nav-link">Posts</a></li>
-                <?php
-                    endif;
-                endif; ?>
+                    ?>
+                <li class="nav-item"><a href="index.php?page=news&id=<?= $meni->id ?>" class="nav-link"><?= $meni->name ?></a></li>
+            <?php endforeach; ?>
+            <li class=" nav-item"><a href="index.php?page=author" class="nav-link">Author</a></li>
+        <?php endif;
+        ?>
+        <?php
+        if (isset($_SESSION['user'])) :
+            if ($_SESSION['user']->roleName == "Urednik" || $_SESSION['user']->roleName == "Admin") :
+        ?>
+                <li class="nav-item"><a href="index.php?page=categories" class="nav-link">Categories</a></li>
+                <li class="nav-item"><a href="index.php?page=headings" class="nav-link">Headings</a></li>
+                <li class="nav-item"><a href="index.php?page=tags" class="nav-link">Tags</a></li>
+                <?php if ($_SESSION['user']->roleName == "Admin") : ?>
+                    <li class="nav-item"><a href="index.php?page=users" class="nav-link">Users</a></li>
+                    <li class="nav-item"><a href="index.php?page=tasks" class="nav-link">Tasks</a></li>
+                <?php endif; ?>
+                <li class="nav-item"><a href="index.php?page=posts" class="nav-link">Posts</a></li>
+        <?php
+            endif;
+        endif; ?>
             </ul>
             <ul class="navbar-nav mb-2 mb-lg-0">
                 <?php
