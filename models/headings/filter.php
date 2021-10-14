@@ -2,11 +2,12 @@
 header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
-    // $query = '';
+
 
     $text = $_GET['text'];
     $compareString = trim("%$text%");
-    $order = $_GET['order'];
+    $order = $_GET['order']  ? $_GET['order'] : 0;
+
     $limit = isset($_GET['limit']) ? $_GET['limit'] : 0;
 
 
