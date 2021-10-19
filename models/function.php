@@ -507,3 +507,10 @@ function postNumOfPages()
     $numOfPages = ceil($postElements->numberOfPosts) / ELEMENTS_OFFSET;
     return $numOfPages;
 }
+
+function categoriesCount()
+{
+    global $conn;
+    $res = $conn->query("SELECT COUNT(*) as numberOfCategories FROM categories")->fetch();
+    return $res;
+}
