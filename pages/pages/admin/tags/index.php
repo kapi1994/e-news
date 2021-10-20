@@ -11,7 +11,7 @@ if (isset($_SESSION['user'])) {
     <div class="container">
         <div class="row my-5">
             <div class="col-lg-3">
-                <div class="my-3">
+                <div class="mb-3">
                     <div class="d-grid">
                         <a href="index.php?page=tag_action" class="btn btn-primary">Add new tag</a>
                     </div>
@@ -42,31 +42,41 @@ if (isset($_SESSION['user'])) {
                         </thead>
                         <tbody id='tags'>
                             <?php
-                            $rb = 1;
-                            $tags = getAllTags();
-                            foreach ($tags as $tag) :
+                            $tagElemenets = getNumOfTags('count');
+                            if ($tagElemenets->numOfTags > 0) :
                             ?>
+                                <?php
+                                $rb = 1;
+                                $tags = getAllTags();
+                                foreach ($tags as $tag) :
+                                ?>
+                                    <tr>
+                                        <th><?= $rb++ ?></th>
+                                        <td><?= $tag->name ?></td>
+                                        <td><?= date("H:i:s d/m/Y", strtotime($tag->created_at)) ?></td>
+                                        <td><?= $tag->updated_at != null  ? date("H:i:s d/m/Y", strtotime($tag->updated_at)) : '/' ?></td>
+                                        <td><a href="index.php?page=tag_action&id=<?= $tag->id ?>" class="btn btn-success btn-sm">Update</a></td>
+                                        <td><button type="button" class="btn btn-danger btn-sm" data-id="<?= $tag->id ?>">Delete</button></td>
+                                    </tr>
+                                <?php endforeach;
+                            else :
+                                ?>
                                 <tr>
-                                    <th><?= $rb++ ?></th>
-                                    <td><?= $tag->name ?></td>
-                                    <td><?= date("H:i:s d/m/Y", strtotime($tag->created_at)) ?></td>
-                                    <td><?= $tag->updated_at != null  ? date("H:i:s d/m/Y", strtotime($tag->updated_at)) : '/' ?></td>
-                                    <td><a href="index.php?page=tag_action&id=<?= $tag->id ?>" class="btn btn-success btn-sm">Update</a></td>
-                                    <td><button type="button" class="btn btn-danger btn-sm" data-id="<?= $tag->id ?>">Delete</button></td>
+                                    <th colspan="6" class="text-center">At this moment we dont have any tags</th>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                     <?php
-                    $tagElemenets = getNumOfTags();
-                    if ($tagElemenets->numberOfTags > 5) :
+                    $tagElemenets = getNumOfTags('count');
+                    if ($tagElemenets->numOfTags > 5) :
                     ?>
                         <div class="row mt-3">
                             <div class="col-4 mx-auto">
                                 <nav aria-label="...">
                                     <ul class="pagination" id="tagPagination">
                                         <?php
-                                        $tagPagination = tagsPagination();
+                                        $tagPagination = getNumOfTags('pagination');
                                         for ($i = 0; $i < $tagPagination; $i++) :
                                             if ($i == 0) :
                                         ?>
