@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
     require_once '../../config/connection.php';
     require_once '../function.php';
     $usersPagination = userPagination($limit, $compareString, $role, $order);
-    $userPages = getUserPagination($compareString, $role, 'pagination');
+    $userPages = getNumOfUsers('pagination', $compareString, $role);
     echo json_encode([
         'res' => $usersPagination,
         'pages' => $userPages,
