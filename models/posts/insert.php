@@ -1,4 +1,5 @@
 <?php
+session_start();
 header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $errors = [];
@@ -15,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $image_type = $image['type'];
     $image_size = $image['size'];
     $image_name = $image['name'];
-
+    $user_id = isset($_SESSION['user']) ? $_SESSION['user']->id : '';
     if ($name == "") {
         array_push($errors, "Name dont leave empty");
     }
@@ -51,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             http_response_code(409);
         } else {
             try {
-                insertPost($name, $description, $resize_image, $category, $heading, $tags_arr);
+                insertPost($user_id, $name, $description, $resize_image, $category, $heading, $tags_arr);
                 echo json_encode("Post is successfully added");
                 http_response_code(201);
             } catch (PDOException $th) {
