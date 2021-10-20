@@ -27,7 +27,7 @@
         ?>
         <?php
         if (isset($_SESSION['user'])) :
-            if ($_SESSION['user']->roleName == "Urednik" || $_SESSION['user']->roleName == "Admin") :
+            if ($_SESSION['user']->roleName == "Journalist" || $_SESSION['user']->roleName == "Admin") :
         ?>
                 <li class="nav-item"><a href="index.php?page=categories" class="nav-link">Categories</a></li>
                 <li class="nav-item"><a href="index.php?page=headings" class="nav-link">Headings</a></li>
