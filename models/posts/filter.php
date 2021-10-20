@@ -1,4 +1,5 @@
 <?php
+session_start();
 header("Content-type:application/json");
 if ($_SERVER['REQUEST_METHOD'] == "GET") {
     $text = $_GET['text'];
@@ -7,14 +8,14 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
     $categories = isset($_GET['categories']) ? $_GET['categories'] : '';
     $headings = isset($_GET['headings']) ? $_GET['headings'] : '';
     $pagination = isset($_GET['limit']) ? $_GET['limit'] : 0;
-
+    $user = isset($_SESSION['user']) ? $_SESSION['user'] : '';
     require_once '../../config/connection.php';
     require_once '../function.php';
     $categories_arr =  isset($_GET['categories'])    ? implode(', ', $categories) : '';
     $headings_arr =   isset($_GET['headings']) ? implode(', ', $headings) : '';
 
-    $elements =  postPagination($pagination, $compareString, $categories_arr, $headings_arr, $order);
-    $pages = getPostPagination('pagination', $categories_arr, $headings_arr, $compareString);
+    $elements =  postPagination($user_id, $pagination, $compareString, $categories_arr, $headings_arr, $order);
+    $pages = getNumOfPosts('pagination', $categories_arr, $headings_arr, $compareString);
 
     echo json_encode([
         'posts' => $elements,
