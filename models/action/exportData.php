@@ -15,6 +15,12 @@ if (isset($_GET['action'])) {
         foreach ($data as $d) echo $d->id . "\t" . $d->name . "\t" . $d->created_at . "\t" . $d->updated_at . "\t\n";
         exit();
     } else {
-        echo 'json';
+        $timestamp = time();
+        $filename = 'dokumentacijaNJ' . $timestamp . '.doc';
+        header("Content-type: application/vnd.ms-word");
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        echo "Nemanja Jovicic \n";
+        echo "Ljubitelj video igara";
+        exit();
     }
 }
