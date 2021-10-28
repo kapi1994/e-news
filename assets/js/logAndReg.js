@@ -12,7 +12,7 @@ $(document).ready(function () {
         if (validationForm().length == 0) {
             $.ajax({
                 method: 'post',
-                url: 'models/actions/register.php',
+                url: 'models/action/register.php',
                 data: {
                     firstName: firstName,
                     lastName: lastName,
