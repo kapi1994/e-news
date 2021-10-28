@@ -59,7 +59,7 @@ $(document).ready(function () {
     $(document).on('change', '#sortHeading', function (e) {
         e.preventDefault()
         let id = $(this).val()
-        filterHeading(id)
+        filterHeading()
     })
     $(document).on('click', '.heading-pagination', function (e) {
         e.preventDefault()
@@ -73,7 +73,6 @@ $(document).ready(function () {
     const filterHeadings = (d) => {
         let text = $('#searchHeadings').val()
         let ordering = $('#sortHeading').val()
-        console.log(d)
         $.ajax({
             method: "GET",
             url: 'models/headings/filter.php',
@@ -86,7 +85,6 @@ $(document).ready(function () {
             success: function (data) {
                 console.log(data)
                 printAllHeadings(data.headings, data.limit)
-                // printPagination(data.pages, data.limit)
                 printPagination(data.pages, '#headingPagination', data.limit, 'heading-pagination')
             }, error: function (err) {
                 console.log(err)
@@ -247,8 +245,6 @@ $(document).ready(function () {
         for (let heading of headings) {
             selectedHeadings.push(heading.value)
         }
-        // console.log(d)
-        // console.log(order)
 
         $.ajax({
             method: 'get',
@@ -326,7 +322,9 @@ $(document).ready(function () {
             },
             dataType: "json",
             success: function (data) {
-                printAllUsers(data)
+                console.log(data)
+                printAllUsers(data.res, data.limit)
+                printPagination(data.pages, '#userPagination', data.limit, 'user-paginations')
             },
             error: function (err) { }
         })
@@ -533,9 +531,9 @@ $(document).ready(function () {
     // tags
     const tagsFormValidationAndRequest = () => {
         const name = document.querySelector("#tagName").value
-        const id = document.querySelector('#tagId').value
+        const id = document.querySelector('#TagId').value
 
-        if (id == " ") {
+        if (id == "") {
 
             if (validationTags().length == 0) {
                 $.ajax({
@@ -549,9 +547,12 @@ $(document).ready(function () {
                         }
                     },
                     error: function (jqXHR, statusTxt, xhr) {
-                        printResponseMessages(jqXHR.status, jqXHR.responseJSON, '#crudShowErrorMessages', 'warning,danger')
+                        console.log(jqXHR)
+                        printResponseMessages(jqXHR.status, jqXHR.responseJSON, '#showDbTagsErrorMessages', 'warning,danger')
                     }
                 })
+            } else {
+                console.log('ne')
             }
         } else {
 
@@ -636,9 +637,9 @@ $(document).ready(function () {
             }
         })
     }
-    const printAllUsers = (users) => {
+    const printAllUsers = (users, limit) => {
 
-        ispis = '', rb = 1
+        ispis = '', rb = (parseInt(limit) * 5) + 1
         if (users.length > 0) {
             users.forEach(user => {
                 ispis += printUser(user, rb)
@@ -658,7 +659,7 @@ $(document).ready(function () {
                 <td>${user.roleName}</td>
                 <td>${prittierDateFormat(user.created_at)}</td>
                 <td>${user.updated_at ? prittierDateFormat(user.updated_at) : '-'}</td>
-                <td><a href="index.php?page=action-user&id=${user.id}" class="btn btn-success btn-sm">Update</a></td>
+                <td><a href="index.php?page=user_action&id=${user.id}" class="btn btn-success btn-sm">Update</a></td>
                 <td><button type="button" class="btn btn-danger delete-user btn-sm" data-id="${user.id}">Delete</button></td>
             </tr>
         `
@@ -671,7 +672,6 @@ $(document).ready(function () {
 
         const password = id == "" ? document.querySelector("#userPassword").value : ""
         const role = $('input[name="userRole"]:checked').val()
-        // console.log(role)
         if (id == "") {
             if (validationUserForm().length == 0) {
                 $.ajax({
@@ -758,12 +758,7 @@ $(document).ready(function () {
                 removeValidationErrrorMessage('#userPasswordErrorMessage', 'text-danger')
             }
         }
-        // if (!reUsername.test(username)) {
-        //     errors.push(username)
-        //     createValidationErrorMessage('#userUsernameErrorMessage', 'text-danger', "Your username isn't ok")
-        // } else {
-        //     removeValidationErrrorMessage('#userUsernameErrorMessage', 'text-danger')
-        // }
+
         if (!role) {
             errors.push(role)
             createValidationErrorMessage('#userRoleErrorMessage', 'text-danger', 'You must choose role')
@@ -820,9 +815,8 @@ $(document).ready(function () {
     const postFormVaildationAndRequest = () => {
         const id = document.querySelector("#postId").value
         const name = document.querySelector('#postName').value
-        const postDesc = document.querySelector('#postDescription').value
+        const postDesc = CKEDITOR.instances.postDescription.getData()
         const postImage = document.getElementById('postImage').files
-        //const postImageSrc = document.querySelector('#postImageSrc').src
         const postCategory = document.querySelector('#postCategory').value
         const postHeading = document.querySelector('#postHeading').value
         const tags = $('input[name="postTags"]:checked')
@@ -855,7 +849,7 @@ $(document).ready(function () {
                     },
                     error: function (jqXHR, statusTxt, xhr) {
 
-                        printResponseMessages(jqXHR.status, jqXHR.responseJSON, '#crudPostErrorMessages', 'warning,danger')
+                        printResponseMessages(jqXHR.status, jqXHR.responseJSON, '#showDbPostsCrudMessages', 'warning,danger')
                     }
                 })
             }
@@ -886,7 +880,7 @@ $(document).ready(function () {
     const postValidation = () => {
         const id = document.querySelector("#postId").value
         const name = document.querySelector('#postName').value
-        const postDesc = document.querySelector('#postDescription').value
+        const postDesc = CKEDITOR.instances.postDescription.getData()
         const postImage = document.getElementById('postImage').files
         const postCategory = document.querySelector('#postCategory').value
         const postHeading = document.querySelector('#postHeading').value
@@ -952,7 +946,72 @@ $(document).ready(function () {
     }
 
 
+    $(document).on('click', '#submitTasks', function (e) {
+        e.preventDefault()
+        let id = document.querySelector('#taskId').value
+        let text = CKEDITOR.instances.description.getData();
+        let user = document.querySelector('#ddlUser').value
+        console.log(text)
+        if (id == '') {
+            if (validationTasks().length == 0) {
+                $.ajax({
+                    method: "POST",
+                    url: "models/tasks/insert.php",
+                    data: {
+                        description: text,
+                        user: user
+                    },
+                    dataType: 'json',
+                    success: function (data, status, xhr) {
+                        if (xhr.status == 201) {
+                            window.location.href = 'index.php?page=tasks'
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                })
+            }
+        } else {
+            if (validationTasks().length == 0) {
+                $.ajax({
+                    method: 'post',
+                    url: 'models/tasks/update.php',
+                    data: {
+                        description: text,
+                        user_id: user,
+                        id: id
+                    }, dataType: 'json',
+                    success: function (data, statusTxt, xhr) {
+                        if (xhr.status == 204) {
+                            window.location.href = "index.php?page=tasks"
+                        }
+                    }, error: function (err) {
+                        console.log(err)
+                    }
+                })
+            }
+        }
+    })
+    const validationTasks = () => {
+        let text = CKEDITOR.instances.description.getData();
+        let user = document.querySelector('#ddlUser').value
+        let errors = []
+        if (text == '') {
+            errors.push(text)
+            createValidationErrorMessage('#validationErrorTaskDescription', 'text-danger', "Task description can't be empty")
+        } else {
+            removeValidationErrrorMessage('#validationErrorTaskDescription', 'text-danger')
+        }
+        if (user == 0) {
+            errors.push(user)
+            createValidationErrorMessage('#validationErrorTaskUser', 'text-danger', "You must choose user")
+        } else {
+            removeValidationErrrorMessage('#validationErrorTaskUser', 'text-danger')
+        }
 
+        return errors;
+    }
     const createValidationErrorMessage = (element, cls, text) => {
         const el = document.querySelector(element)
         el.classList.add(cls)
