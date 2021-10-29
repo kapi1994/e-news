@@ -4,7 +4,8 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $post_id = $_POST['post'];
     $text = $_POST['text'];
-    $user_id = $_SESSION['user'] ? $_SESSION['user']->id : '';
+    $user_id = isset($_SESSION['user']) ? $_SESSION['user']->id : '';
+    $parent_comment = isset($_POST['comment']) ? $_POST['comment'] : 0;
     $errors = [];
     if ($text == " ") {
         array_push($errors, "Komentar ne moze ostati prazan");
@@ -18,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         require_once '../../config/connection.php';
         require "../function.php";
         try {
-            insertComment('comments', $user_id, "", $post_id, $text);
+            insertComment('comments', $user_id, $parent_comment, $post_id, $text);
             echo json_encode("Comment is successfully added");
             http_response_code(201);
         } catch (PDOException $th) {
