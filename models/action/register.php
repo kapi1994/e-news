@@ -39,6 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         try {
             insertUser($firstName, $lastName, $email, $password, $role);
+            insertActivity("Register", $email);
             echo json_encode("Register success");
             http_response_code(201);
         } catch (PDOException $th) {
