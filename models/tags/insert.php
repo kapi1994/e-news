@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             try {
                 insertTag($name);
                 echo json_encode("Tag is successfully created");
-                http_response_code(204);
+                http_response_code(201);
             } catch (PDOException $th) {
                 echo json_encode($th->getMessage());
                 http_response_code(500);
