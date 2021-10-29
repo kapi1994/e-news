@@ -27,12 +27,13 @@ if (isset($_POST['btnSubmit'])) {
                 $userRole = $user->roleName;
                 $_SESSION['user'] = $user;
                 if ($userRole == "User") {
-                    header("Location: ../../index.php?page=home");
+                    header("Location: ../../index.php");
                 } else if ($userRole == "Urednik") {
-                    header("Location:../../index.php?page=admin_home");
+                    header("Location:../../admin.php");
                 } else {
-                    header("Location:../../index.php?page=admin_home");
+                    header("Location:../../admin.php");
                 }
+                insertActivity('Login', $email);
             } else {
                 $_SESSION['errors'] = "Credentials aren't ok!";
                 header("Location:../../index.php?page=login");
