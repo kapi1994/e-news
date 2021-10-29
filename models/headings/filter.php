@@ -15,9 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     require_once '../function.php';
 
     $res = getHeadingWithCategory($limit, $compareString, $order);
-    $pages  = getNumOfHeadings($compareString, 'pagination');
-
-
+    $pages = getNumOfHeadings('pagination', $compareString);
     echo json_encode([
         'headings' => $res,
         'pages' => $pages,
