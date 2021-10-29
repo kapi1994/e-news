@@ -18,10 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } else {
         require_once '../../config/connection.php';
+        require_once '../function.php';
         try {
-            $queryInsert = "INSERT INTO tasks (description,user_id) VALUES(?, ?)";
-            $query = $conn->prepare($queryInsert);
-            $query->execute([$description, $user]);
+            insertTasks($description, $user);
             echo json_encode("Task is successfully created");
             http_response_code(201);
         } catch (PDOException $ex) {
