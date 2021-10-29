@@ -2,9 +2,9 @@
     <div class="container">
         <?php if (isset($_SESSION['user']) && $_SESSION['user']->roleName != 'User') :
         ?>
-            <a class="navbar-brand" href="index.php?page=admin_home">E-news</a>
+            <a class="navbar-brand fw-bold fst-italic" href="admin.php">E-news</a>
         <?php else : ?>
-            <a class="navbar-brand" href="index.php?page=home">E-news</a>
+            <a class="navbar-brand fw-bold fst-italic" href="index.php">E-news</a>
         <?php endif; ?>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,23 +20,24 @@
                 ?><?php
                     foreach ($userMenus as $meni) :
                     ?>
-                <li class="nav-item"><a href="index.php?page=news&id=<?= $meni->id ?>" class="nav-link"><?= $meni->name ?></a></li>
+                <li class="nav-item"><a href="index.php?page=news&id=<?= $meni->id ?>" class="nav-link <?php if (isset($_GET['id']) && isset($_GET['id']) && $_GET['id'] == $meni->id) : ?>fw-bold active<?php endif; ?>"><?= $meni->name ?></a></li>
             <?php endforeach; ?>
-            <li class=" nav-item"><a href="index.php?page=author" class="nav-link">Author</a></li>
+            <li class=" nav-item"><a href="index.php?page=author" class="nav-link <?php if (isset($_GET['id']) && $_GET['page'] == 'author') : ?> fw-bold active<?php endif; ?>">Author</a></li>
+
         <?php endif;
         ?>
         <?php
         if (isset($_SESSION['user'])) :
             if ($_SESSION['user']->roleName == "Journalist" || $_SESSION['user']->roleName == "Admin") :
         ?>
-                <li class="nav-item"><a href="index.php?page=categories" class="nav-link">Categories</a></li>
-                <li class="nav-item"><a href="index.php?page=headings" class="nav-link">Headings</a></li>
-                <li class="nav-item"><a href="index.php?page=tags" class="nav-link">Tags</a></li>
+                <li class="nav-item"><a href="admin.php?page=categories" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'categories') : ?> fw-bold active<?php endif; ?>">Categories</a></li>
+                <li class="nav-item"><a href="admin.php?page=headings" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'headings') : ?> fw-bold active<?php endif; ?>">Headings</a></li>
+                <li class="nav-item"><a href="admin.php?page=tags" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'tags') : ?> fw-bold active<?php endif; ?>">Tags</a></li>
                 <?php if ($_SESSION['user']->roleName == "Admin") : ?>
-                    <li class="nav-item"><a href="index.php?page=users" class="nav-link">Users</a></li>
-                    <li class="nav-item"><a href="index.php?page=tasks" class="nav-link">Tasks</a></li>
+                    <li class="nav-item"><a href="admin.php?page=users" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'users') : ?> fw-bold active<?php endif; ?>">Users</a></li>
+                    <li class="nav-item"><a href="admin.php?page=tasks" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'tasks') : ?> fw-bold active<?php endif; ?>">Tasks</a></li>
                 <?php endif; ?>
-                <li class="nav-item"><a href="index.php?page=posts" class="nav-link">Posts</a></li>
+                <li class="nav-item"><a href="admin.php?page=posts" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'posts fw-bold fts-italic') : ?> fw-bold active<?php endif; ?>">Posts</a></li>
         <?php
             endif;
         endif; ?>
@@ -45,8 +46,8 @@
                 <?php
                 if (!isset($_SESSION['user'])) :
                 ?>
-                    <li class="nav-item"><a href="index.php?page=login" class="nav-link">Login</a></li>
-                    <li class="nav-item"><a href="index.php?page=register" class="nav-link">Register</a></li>
+                    <li class="nav-item"><a href="index.php?page=login" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'login') : ?> fw-bold active<?php endif; ?>">Login</a></li>
+                    <li class="nav-item"><a href="index.php?page=register" class="nav-link<?php if (isset($_GET['page']) && $_GET['page'] == 'register') : ?> fw-bold active<?php endif; ?>">Register</a></li>
                 <?php else : ?>
                     <li class="nav-item"><a href="models/action/logout.php" class="nav-link">Logout</a></li>
 
