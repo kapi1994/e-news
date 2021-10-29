@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     require_once '../function.php';
 
     $elements = getAllTags($pagination, $compareString, $order);
-    $numOfPages = getNumOfTags($compareString, 'pagination');
+    $numOfPages = getNumOfTags('pagination', $compareString);
     echo json_encode([
         'tags' => $elements,
         'pages' => $numOfPages,
