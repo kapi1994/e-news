@@ -1,10 +1,10 @@
 <?php
 if (isset($_SESSION['user'])) {
     if ($_SESSION['user']->roleName  == "User") {
-        header("Location:admin.php?page=status");
+        header("Location:admin.php?page=status&code=401");
     }
 } else {
-    header("Location:admin.php?page=status");
+    header("Location:admin.php?page=status&code=401");
 }
 ?>
 <section>

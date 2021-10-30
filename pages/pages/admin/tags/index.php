@@ -1,10 +1,10 @@
 <?php
 if (isset($_SESSION['user'])) {
     if ($_SESSION['user']->roleName == "User") {
-        header("Location:index.php?page=status");
+        header("Location:admin.php?page=status&code=401");
     }
 } else {
-    header("Location:index.php?page=401");
+    header("Location:admin.php?page=status&code=401");
 }
 ?>
 <section>
@@ -13,7 +13,7 @@ if (isset($_SESSION['user'])) {
             <div class="col-lg-3">
                 <div class="mb-3">
                     <div class="d-grid">
-                        <a href="index.php?page=tag_action" class="btn btn-primary">Add new tag</a>
+                        <a href="admin.php?page=tag_action" class="btn btn-primary">Add new tag</a>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -55,7 +55,7 @@ if (isset($_SESSION['user'])) {
                                         <td><?= $tag->name ?></td>
                                         <td><?= date("H:i:s d/m/Y", strtotime($tag->created_at)) ?></td>
                                         <td><?= $tag->updated_at != null  ? date("H:i:s d/m/Y", strtotime($tag->updated_at)) : '/' ?></td>
-                                        <td><a href="index.php?page=tag_action&id=<?= $tag->id ?>" class="btn btn-success btn-sm">Update</a></td>
+                                        <td><a href="admin.php?page=tag_action&id=<?= $tag->id ?>" class="btn btn-success btn-sm">Update</a></td>
                                         <td><button type="button" class="btn btn-danger btn-sm" data-id="<?= $tag->id ?>">Delete</button></td>
                                     </tr>
                                 <?php endforeach;
