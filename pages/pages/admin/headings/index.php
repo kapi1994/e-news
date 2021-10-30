@@ -1,23 +1,22 @@
 <?php
 if (isset($_SESSION['user'])) {
-    // var_dump($_SESSION['user']);
-    if ($_SESSION['user']->roleName == "Korisnik") {
-        header("Location:index.php?page=401");
+    if ($_SESSION['user']->roleName == "User") {
+        header("Location:admin.php?page=status&code=401");
     }
 } else {
-    header("Location:index.php?page=status");
+    header("Location:admin.php?page=status&code=401");
 }
 ?>
 <section>
     <div class="container">
         <div class="row my-3">
             <div class="col-lg-3">
-                <div class="d-grid"><a href="index.php?page=heading_action" class="btn btn-primary">Add new heading</a></div>
+                <div class="d-grid"><a href="admin.php?page=heading_action" class="btn btn-primary">Add new heading</a></div>
             </div>
         </div>
         <div class="row mb-5">
             <div class="col-lg-3">
-                <div class="d-none  d-lg-block">
+                <div>
                     <div class="mb-3">
                         <input type="text" name="searchHeadings" id="searchHeadings" class="form-control" placeholder="Search headings">
                     </div>
@@ -49,11 +48,11 @@ if (isset($_SESSION['user'])) {
                         <tbody id="headings">
                             <?php
                             $headingsCount = getNumOfHeadings('count');
+
                             if ($headingsCount->numOfHeadings > 0) :
                             ?>
                                 <?php
                                 $rb  = 1;
-                                // var_dump(getNumOfRows());
                                 $headings = getHeadingWithCategory();
 
                                 foreach ($headings as $heading) :
@@ -64,7 +63,7 @@ if (isset($_SESSION['user'])) {
                                         <td><?= $heading->categoryName ?></td>
                                         <td><?= date("H:i:s d/m/Y", strtotime($heading->created_at)) ?></td>
                                         <td><?= $heading->updated_at != null ? date("H:i:s d/m/Y") : "/" ?></td>
-                                        <td><a href="index.php?page=heading_action&id=<?= $heading->id ?>" class="btn btn-success btn-sm">Update</a></td>
+                                        <td><a href="admin.php?page=heading_action&id=<?= $heading->id ?>" class="btn btn-success btn-sm">Update</a></td>
                                         <td><button class="btn btn-danger btn-sm delete-heading" data-id="<?= $heading->id ?>">Delete</button></td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -87,6 +86,7 @@ if (isset($_SESSION['user'])) {
                                     <ul class="pagination" id="headingPagination">
                                         <?php
                                         $headingPagination = getNumOfHeadings('fetch');
+
                                         for ($i = 0; $i < $headingPagination; $i++) :
                                             if ($i == 0) :
                                         ?>

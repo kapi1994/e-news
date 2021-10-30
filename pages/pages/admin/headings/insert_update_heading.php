@@ -1,3 +1,11 @@
+<?php
+if (isset($_SESSION['user'])) {
+    if ($_SESSION['user']->roleName == "User") {
+        header("Location:admin.php?page=status&code=401");
+    }
+} else {
+    header("Location:admin.php?page=status&code=401");
+} ?>
 <section>
     <div class="container">
         <?php
@@ -5,8 +13,9 @@
             $heading = getOneFetchAndCheckData('headings', 'id', $_GET['id'], 'fetch');
         }
         ?>
-        <row class="my-5">
+        <div class="my-5">
             <div class="col-lg-6 mx-auto">
+                <?php if (isset($_GET['id'])) : ?> <h1 class="text-center">Update heading</h1><?php else : ?><h1 class="text-center">Add new heading</h1><?php endif; ?>
                 <div id="showDbResponseErrorMessages"></div>
                 <form method="POST">
                     <input type="hidden" name="headingId" id="headingId" value="<?= isset($_GET['id']) ? $heading->id : "" ?>">
@@ -31,6 +40,6 @@
                     <div class="d-grid"><button class="btn btn-primary" id="btnHeading"><?php if (isset($_GET['id'])) : ?> Update <?php else : ?> Save<?php endif; ?> </button></div>
                 </form>
             </div>
-        </row>
+        </div>
     </div>
 </section>
