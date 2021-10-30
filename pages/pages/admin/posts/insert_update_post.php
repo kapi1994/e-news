@@ -1,6 +1,6 @@
 <?php
 if (isset($_SESSION['user'])) {
-    if ($_SESSION['user']->roleName == "Korisnik") {
+    if ($_SESSION['user']->roleName == "User") {
         header("Location:index.php?page=login");
     }
 } else {
@@ -22,6 +22,8 @@ if (isset($_SESSION['user'])) {
         ?>
         <div class="row my-5">
             <div class="col-lg-6 mx-auto">
+                <?php if (isset($_GET['id'])) : ?> <h1 class="text-center">Update post</h1><?php else : ?> <h1 class="text-center">Create new user</h1><?php endif; ?>
+                <div id="showDbPostsCrudMessages"></div>
                 <form method="POST">
                     <input type="hidden" name="postId" id="postId" value="<?= isset($_GET['id']) ? $post->id : '' ?>">
                     <div class="mb-3">
