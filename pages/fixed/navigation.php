@@ -20,7 +20,7 @@
                 ?><?php
                     foreach ($userMenus as $meni) :
                     ?>
-                <li class="nav-item"><a href="index.php?page=news&id=<?= $meni->id ?>" class="nav-link <?php if (isset($_GET['id']) && isset($_GET['id']) && $_GET['id'] == $meni->id) : ?>fw-bold active<?php endif; ?>"><?= $meni->name ?></a></li>
+                <li class="nav-item"><a href="index.php?page=news&name=<?= $meni->name ?>" class="nav-link <?php if (isset($_GET['name']) && isset($_GET['name']) && $_GET['name'] == $meni->name) : ?>fw-bold active<?php endif; ?>"><?= $meni->name ?></a></li>
             <?php endforeach; ?>
             <li class=" nav-item"><a href="index.php?page=author" class="nav-link <?php if (isset($_GET['id']) && $_GET['page'] == 'author') : ?> fw-bold active<?php endif; ?>">Author</a></li>
 
