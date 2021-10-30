@@ -1,3 +1,11 @@
+<?php
+if (isset($_SESSION['user'])) {
+    if ($_SESSION['user']->roleName == "User") {
+        header("Location:admin.php?page=status&code=401");
+    }
+} else {
+    header("Location:admin.php?page=status&code=401");
+} ?>
 <section>
     <?php
     if (isset($_GET['id'])) {
@@ -8,6 +16,7 @@
     <div class="container">
         <div class="row my-5">
             <div class="col-sm-8 col-lg-6 mx-auto">
+                <?php if (isset($_GET['id'])) : ?><h1 class="text-center">Update category</h1><?php else : ?> <h1 class="text-center">Add new user</h1><?php endif; ?>
                 <div id="showDbResponseErrorMessages"></div>
                 <form method="POST">
                     <input type="hidden" name="categoryId" id="categoryId" value="<?= isset($_GET['id']) ? $category_data->id : '' ?>">

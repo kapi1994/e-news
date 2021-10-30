@@ -1,3 +1,12 @@
+<?php
+if (isset($_SESSION['user'])) {
+    if ($_SESSION['user']->roleName == "User") {
+        header("Location:admin.php?page=status&code=401");
+    }
+} else {
+    header("Location: index.php?page=status&code=401");
+}
+?>
 <section>
     <div class="container">
         <div class="row my-3">
@@ -5,11 +14,11 @@
                 <div class="row">
                     <div class="col-lg-3">
                         <div class="d-grid">
-                            <a href="index.php?page=category_action" class="btn btn-primary">Add new category</a>
+                            <a href="admin.php?page=category_action" class="btn btn-primary">Add new category</a>
                         </div>
 
                     </div>
-                    <div class="col-lg-3">
+                    <div class="mt-1  mt-md-0 mt-lg-0 col-lg-3">
                         <div class="d-grid"><a href="models/action/exportData.php?action=excel" class="btn btn-danger my-sm- my-md-2 my-lg-0">Export to excel</a></div>
                     </div>
                 </div>
@@ -33,7 +42,7 @@
                         <tbody id='categories'>
                             <?php
                             $categoriesCount = categoriesCount();
-                            if ($categoriesCount->mumberOfCategories > 0) :
+                            if ($categoriesCount->numberOfCategories  > 0) :
                             ?>
                                 <?php
                                 $categories = getAll('categories');
@@ -45,7 +54,7 @@
                                         <td><?= $category->name ?></td>
                                         <td><?= date("H:i:s d/m/Y", strtotime($category->created_at)) ?></td>
                                         <td><?= $category->updated_at != null ? date("H:i:s d/m/Y", strtotime($category->updated_at)) : "/" ?></td>
-                                        <td><a href="index.php?page=category_action&id=<?= $category->id ?>" class="btn btn-success btn-sm">Update</a></td>
+                                        <td><a href="admin.php?page=category_action&id=<?= $category->id ?>" class="btn btn-success btn-sm">Update</a></td>
                                         <td><button type="button" class="btn btn-sm btn-danger delete-category" data-id="<?= $category->id ?>">Delete</button></td>
                                     </tr>
                                 <?php endforeach; ?>
