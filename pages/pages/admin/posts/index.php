@@ -1,23 +1,20 @@
 <?php
 if (isset($_SESSION['user'])) {
     // var_dump($_SESSION['user']);
-    if ($_SESSION['user']->roleName == "Korisnik") {
-        header("Location:index.php?page=401");
+    if ($_SESSION['user']->roleName == "User") {
+        header("Location:admin.php?page=status&status=401");
     }
 } else {
-    header("Location:index.php?page=status");
+    header("Location:admin.php?page=status&status=401");
 }
-if ($_SESSION['user']->roleName == "Admin") {
-    $posts = postPagination();
-} else {
-    $posts = getOneFetchAndCheckData('posts', 'user_id', $_SESSION['user']->id, 'fetch');
-}
+$user = $_SESSION['user'];
+$posts = postPagination($user);
 ?>
 <section>
     <div class="container">
         <div class="row my-3">
             <div class="col-lg-3">
-                <div class="d-grid"><a href="index.php?page=post_action" class="btn btn-primary">Create new post</a></div>
+                <div class="d-grid"><a href="admin.php?page=post_action" class="btn btn-primary">Create new post</a></div>
             </div>
         </div>
         <div class="row mb-5">
@@ -79,27 +76,36 @@ if ($_SESSION['user']->roleName == "Admin") {
                         </thead>
                         <tbody id="posts">
                             <?php
-                            $rb  = 1;
-
-                            foreach ($posts as $post) :
+                            $postsElements = getNumOfPosts('count');
+                            if ($postsElements->numberOfPosts  > 0) :
                             ?>
+                                <?php
+                                $rb  = 1;
+
+                                foreach ($posts as $post) :
+                                ?>
+                                    <tr>
+                                        <th><?= $rb++ ?></th>
+                                        <td><?= cutName($post->name) ?></td>
+                                        <td><?= $post->categoryName ?></td>
+                                        <td><?= $post->headingName ?></td>
+                                        <td><?= date("H:i:s d/m/Y", strtotime($post->created_at)) ?></td>
+                                        <td><?= $post->updated_at != null ? date("H:i:s d/m/Y", strtotime($post->updated_at)) : "/" ?></td>
+                                        <td><a href="admin.php?page=post_action&id=<?= $post->id ?>" class="btn btn-sm btn-success">Update</a></td>
+                                        <td><button type="button" class="btn btn-sm btn-danger" data-id="">Delete</button></td>
+                                        <td><a href="admin.php?page=post_details&id=<?= $post->id ?>" class="btn btn-sm btn-info">Details</a></td>
+                                    </tr>
+                                <?php endforeach;
+                            else : ?>
                                 <tr>
-                                    <th><?= $rb++ ?></th>
-                                    <td><?= $post->name ?></td>
-                                    <td><?= $post->categoryName ?></td>
-                                    <td><?= $post->headingName ?></td>
-                                    <td><?= date("H:i:s d/m/Y", strtotime($post->created_at)) ?></td>
-                                    <td><?= $post->updated_at != null ? date("H:i:s d/m/Y", strtotime($post->updated_at)) : "/" ?></td>
-                                    <td><a href="index.php?page=post_action&id=<?= $post->id ?>" class="btn btn-sm btn-success">Update</a></td>
-                                    <td><button type="button" class="btn btn-sm btn-danger" data-id="">Delete</button></td>
-                                    <td><a href="index.php?page=post_details&id=<?= $post->id ?>" class="btn btn-sm btn-info">Details</a></td>
+                                    <th class="text-center" colspan="9">We dont have any post at this moment</th>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
                 <?php
-                $postsCount = getNumOfPosts();
+                $postsCount = getNumOfPosts('count');
                 if ($postsCount->numberOfPosts > 5) :
                 ?>
                     <div class="row mt-3">
@@ -107,7 +113,7 @@ if ($_SESSION['user']->roleName == "Admin") {
                             <nav aria-label="...">
                                 <ul class="pagination" id="postPagination">
                                     <?php
-                                    $postPagination = postNumOfPages();
+                                    $postPagination = getNumOfPosts('pagination');
                                     for ($i = 0; $i < $postPagination; $i++) :
                                         if ($i == 0) :
                                     ?>
