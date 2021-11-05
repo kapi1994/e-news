@@ -1,11 +1,11 @@
 <?php
 if (isset($_SESSION['user'])) {
-    // var_dump($_SESSION['user']);
-    if ($_SESSION['user']->roleName == "Korisnik") {
-        header("Location:index.php?page=401");
+
+    if ($_SESSION['user']->roleName == "User") {
+        header("Location:index.php?page=status&code=401");
     }
 } else {
-    header("Location:index.php?page=status");
+    header("Location:index.php?page=status&code=401");
 }
 ?>
 <main class="container">
@@ -67,9 +67,9 @@ if (isset($_SESSION['user'])) {
                     </div>
                 </div>
             <?php else : ?>
-                <h1 class="my-3">Zadaci</h1>
+                <h1 class="my-3">Today tasks</h1>
                 <?php
-                $tasks = $conn->query("SELECT * FROM tasks WHERE user_id = '$user->id'")->fetchAll();
+                $tasks = getAllTasks($user->id);
 
                 foreach ($tasks as $task) :
                 ?>
