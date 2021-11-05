@@ -1,9 +1,9 @@
 <?php
 session_start();
 header("Content-type:application/json");
-if ($_SERVER['REQUEST_METHOD'] == "POST") {
-    $post = $_POST['post_id'];
-    $parent_comment = isset($_POST['comments']) ? $_POST['comments'] : 0;
+if ($_SERVER['REQUEST_METHOD'] == "GET") {
+    $post = $_GET['post'];
+    $parent_comment = isset($_GET['comment']) ? $_GET['comment'] : 0;
     require_once '../../config/connection.php';
     require_once '../function.php';
     $user = isset($_SESSION['user']) ? $_SESSION['user'] : '';
