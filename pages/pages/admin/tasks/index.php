@@ -1,7 +1,15 @@
+<?php
+if (isset($_SESSION['user'])) {
+    if ($_SESSION['user']->roleName != "Admin") {
+        header("Location:admin.php?page=status&code=401");
+    }
+} else {
+    header("Location:admin.php?page=status&code");
+} ?>
 <main class="container">
     <div class="row my-3">
         <div class="col-lg-3">
-            <div class="d-grid"><a href="index.php?page=insert_update_task" class="btn btn-primary">Create new task</a></div>
+            <div class="d-grid"><a href="admin.php?page=insert_update_task" class="btn btn-primary">Create new task</a></div>
         </div>
     </div>
     <div class="row mb-3">
@@ -19,7 +27,7 @@
                 </thead>
                 <tbody>
                     <?php
-                    $tasks = $conn->query("SELECT t.* ,u.first_name, u.last_name FROM tasks t JOIN users u ON t.user_id = u.id")->fetchAll();
+                    $tasks = getAllTasks();
                     $rb  = 1;
 
                     foreach ($tasks as $task) :
@@ -27,11 +35,11 @@
                     ?>
                         <tr>
                             <th><?= $rb++ ?></th>
-                            <td><?= $task->description ?></td>
+                            <td><?= $task->name ?></td>
                             <td><?= $task->first_name . ' ' . $task->last_name ?></td>
                             <td><?= $task->created_at ?></td>
-                            <td><a href="index.php?page=insert_update_task&id=1" class="btn btn-sm btn-success" data-id="<?= $task->id ?>">Update</td>
-                            <td><button type="button" class="btn btn-sm btn-danger" data-id="<?= $task->id ?>">Delete</td>
+                            <td><a href="admin.php?page=insert_update_task&id=<?= $task->id ?>" class="btn btn-sm btn-success" data-id="<?= $task->id ?>">Update</td>
+                            <td><button type="button" class="btn btn-sm btn-danger delete-task" data-id="<?= $task->id ?>">Delete</td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
