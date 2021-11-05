@@ -3,9 +3,7 @@ session_start();
 require_once 'config/connection.php';
 require_once 'models/function.php';
 
-if (!$_SESSION['user'] || $_SESSION['user']->roleName == "User") {
-    header("Location:index.php?status=403");
-}
+
 require_once 'pages/fixed/head.php';
 require_once 'pages/fixed/navigation.php';
 $page = '';
@@ -44,6 +42,7 @@ if (isset($_GET['page'])) {
         case 'users':
             include 'pages/pages/admin/users/index.php';
             break;
+
         case 'user_action':
             include 'pages/pages/admin/users/insert_update_action_user.php';
             break;
