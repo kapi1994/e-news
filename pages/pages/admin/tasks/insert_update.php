@@ -1,24 +1,33 @@
+<?php
+if (isset($_SESSION['user'])) {
+    if ($_SESSION['user']->roleName == "User" && $_SESSION['user']->roleName == "Journalist") {
+        header("Location:index.php?page=status");
+    }
+} else {
+    header("Location:index.php?page=status");
+} ?>
 <main class="container">
     <div class="row my-3">
+        <?php if (isset($_GET['id'])) : ?><h1 class="text-center">Update task</h1><?php else : ?> <h1 class="text-center">Create new task</h1> <?php endif; ?>
         <div class="col-lg-6 mx-auto">
             <form method="POST">
                 <input type="hidden" name="taskId" id="taskId" value="<?= isset($_GET['id']) ? $_GET['id'] : '' ?>">
                 <?php
                 if (isset($_GET['id'])) {
-                    $id = $_GET['id'];
-                    $task = $conn->query("SELECT * FROM tasks t JOIN users u ON t.user_id = u.id WHERE t.id = '$id'")->fetch();
+
+                    $task = getOneFetchAndCheckData('tasks', 'id', $_GET['id'], 'fetch');
                 }
                 ?>
                 <div class="mb-3">
                     <label for="">Description:</label>
                     <textarea name="description" id="description" cols="30" rows="5" class="form-control">
-                        <?= isset($_GET['id']) ? $task->description : '' ?>
+                        <?= isset($_GET['id']) ? $task->name : '' ?>
                     </textarea>
                     <em id="validationErrorTaskDescription"></em>
                 </div>
                 <div class="mb-3">
                     <?php
-                    $users = $conn->query("SELECT u.id, u.first_name, u.last_name FROM users u JOIN roles r ON u.role_id = r.id WHERE r.name = 'Urednik'")->fetchAll();
+                    $users = getUsersWithRoleOfJournalist();
 
                     ?>
                     <label for="">Za koga:</label>
@@ -28,7 +37,7 @@
                         foreach ($users as $user) :
 
                         ?>
-                            <option value="<?= $user->id ?>" <?php if (isset($_GET['id']) && $task->user_id = $user->id) : ?> selected<?php endif; ?>><?= $user->first_name . ' ' . $user->last_name ?></option>
+                            <option value="<?= $user->id ?>" <?php if (isset($_GET['id']) && $task->user_Id == $user->id) : ?> selected<?php endif; ?>><?= $user->first_name . ' ' . $user->last_name ?></option>
                         <?php endforeach; ?>
                     </select>
                     <em id="validationErrorTaskUser"></em>
