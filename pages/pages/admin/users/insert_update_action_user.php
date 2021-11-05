@@ -1,10 +1,10 @@
 <?php
 if (isset($_SESSION['user'])) {
     if ($_SESSION['user']->roleName != "Admin") {
-        header("Location:index.php?page=401");
+        header("Location:index.php?page=status&code=401");
     }
 } else {
-    header("Location:../../index.php?page=401");
+    header("Location:../../index.php?page=status&code=401");
 }
 ?>
 <section>
@@ -16,6 +16,7 @@ if (isset($_SESSION['user'])) {
         ?>
         <div class="row my-5">
             <div class="col-lg-6 mx-auto">
+                <?php if (isset($_GET['id'])) : ?> <h1 class="text-center">Update user</h1><?php else : ?> <h1 class="text-center">Create new user </h1><?php endif; ?>
                 <div id="crudUserErrorMessage"></div>
                 <form method="POST">
                     <input type="hidden" name="userId" id="userId" value="<?= isset($_GET['id']) ? $user->id : '' ?>">
