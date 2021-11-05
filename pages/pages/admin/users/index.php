@@ -1,17 +1,16 @@
 <?php
 if (isset($_SESSION['user'])) {
     if ($_SESSION['user']->roleName != "Admin") {
-        header("Locatition: ../../index.php?page=401");
+        header("Location:admin.php?page=status&code=401");
     }
 } else {
-    header("Location:../../index.php?page=401");
-}
-?>
+    header("Location:index.php?page=status&code=401");
+} ?>
 <section>
     <div class="container">
         <div class="row my-3">
             <div class="col-lg-3">
-                <div class="d-grid"><a href="index.php?page=user_action" class="btn btn-primary">Create new user</a></div>
+                <div class="d-grid"><a href="admin.php?page=user_action" class="btn btn-primary">Create new user</a></div>
             </div>
         </div>
         <div class="row mb-5">
@@ -56,27 +55,36 @@ if (isset($_SESSION['user'])) {
                         </thead>
                         <tbody id="users">
                             <?php
-                            $rb = 1;
-
-                            $users = userPagination('', '', '');
-
-                            foreach ($users as $user) :
+                            $userElements = getNumOfUsers('count');
+                            if ($userElements->numberOfUsers > 0) :
                             ?>
+                                <?php
+                                $rb = 1;
+
+                                $users = userPagination('', '', '');
+
+                                foreach ($users as $user) :
+                                ?>
+                                    <tr>
+                                        <th scope="row"><?= $rb++ ?></th>
+                                        <td><?= $user->first_name . " " . $user->last_name ?></td>
+                                        <td><?= $user->email ?></td>
+                                        <td><?= $user->roleName ?></td>
+                                        <td><?= date("H:i:s d/m/Y", strtotime($user->created_at)) ?></td>
+                                        <td><?= $user->updated_at != null ? date("H:i:s d/m/Y", strtotime($user->updated_at)) : '/' ?></td>
+                                        <td><a href="admin.php?page=user_action&id=<?= $user->id ?>" class="btn btn-sm btn-success">Update</a></td>
+                                        <td><button type="button" class="btn btn-danger btn-sm" data-id="<?= $user->id ?>">Delete</button></td>
+                                    </tr>
+                                <?php endforeach;
+                            else : ?>
                                 <tr>
-                                    <th scope="row"><?= $rb++ ?></th>
-                                    <td><?= $user->first_name . " " . $user->last_name ?></td>
-                                    <td><?= $user->email ?></td>
-                                    <td><?= $user->roleName ?></td>
-                                    <td><?= date("H:i:s d/m/Y", strtotime($user->created_at)) ?></td>
-                                    <td><?= $user->updated_at != null ? date("H:i:s d/m/Y", strtotime($user->updated_at)) : '/' ?></td>
-                                    <td><a href="index.php?page=user_action&id=<?= $user->id ?>" class="btn btn-sm btn-success">Update</a></td>
-                                    <td><button type="button" class="btn btn-danger btn-sm" data-id="<?= $user->id ?>">Delete</button></td>
+                                    <th colspan='8' class="text-center">We dont have any user at this moment</th>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                     <?php
-                    $userPagination = getUserPagination('', '', 'count');
+                    $userPagination = getNumOfUsers('count');
                     if ($userPagination->numberOfUsers > 5) :
                     ?>
                         <div class="row mt-3">
@@ -84,16 +92,16 @@ if (isset($_SESSION['user'])) {
                                 <nav aria-label="...">
                                     <ul class="pagination" id="tagPagination">
                                         <?php
-                                        $userPages = getUserPagination('', '', 'pagination');
+                                        $userPages = getNumOfUsers('pagination');
                                         for ($i = 0; $i < $userPages; $i++) :
                                             if ($i == 0) :
                                         ?>
-                                                <li class="page-item active"><a class="page-link tag-pagination" href="#" data-limit="<?= $i ?>"><?= ($i + 1) ?></a></li>
+                                                <li class="page-item active"><a class="page-link user-pagination" href="#" data-limit="<?= $i ?>"><?= ($i + 1) ?></a></li>
                                             <?php
                                             endif;
                                             if ($i != 0) :
                                             ?>
-                                                <li class="page-item"><a class="page-link tag-pagination" href="#" data-limit="<?= $i ?>"><?= ($i + 1) ?></a></li>
+                                                <li class="page-item"><a class="page-link user-pagination" href="#" data-limit="<?= $i ?>"><?= ($i + 1) ?></a></li>
                                         <?php
                                             endif;
                                         endfor;
