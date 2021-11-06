@@ -2,8 +2,15 @@
     <div class="container">
         <div class="row my-5">
             <?php
-            if (isset($_GET['id'])) {
-                $posts = getOneFetchAndCheckData('posts', 'category_id', $_GET['id'], "fetch");
+            if (isset($_GET['name'])) {
+                $categoryName = $_GET['name'];
+                $posts = getPostFromCategory($categoryName);
+            } else if (isset($_GET['headingName'])) {
+                $headingName = $_GET['headingName'];
+                $posts = getHeadingsPosts($headingName);
+            } else {
+                $tagName = $_GET['tag_id'];
+                $posts = getSelectedPosts($tagName);
             }
             foreach ($posts as $post) :
 
