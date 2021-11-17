@@ -220,7 +220,7 @@ $(document).ready(function () {
     $(document).on('change', '#filterByDate', function (e) {
         e.preventDefault()
         let id = $(this).val()
-        filterPosts(id)
+        filterPosts()
     })
     $(document).on('click', '.post-pagination', function (e) {
         e.preventDefault()
@@ -245,7 +245,7 @@ $(document).ready(function () {
         for (let heading of headings) {
             selectedHeadings.push(heading.value)
         }
-
+        // console.log(d)
         $.ajax({
             method: 'get',
             url: 'models/posts/filter.php',
@@ -357,7 +357,7 @@ $(document).ready(function () {
                     dataType: 'json',
                     success: function (data, statsTxt, xhr) {
                         if (xhr.status == 201) {
-                            window.location.href = 'index.php?page=categories'
+                            window.location.href = 'admin.php?page=categories'
                         }
                     },
                     error: function (jqXHR, statusTxt, xhr) {
@@ -374,7 +374,7 @@ $(document).ready(function () {
                     dataType: 'json',
                     success: function (data, statusTxt, xhr) {
                         if (xhr.status == 204) {
-                            window.location.href = "index.php?page=categories"
+                            window.location.href = "admin.php?page=categories"
                         }
                     },
                     error: function (jqXHR, statusTxt, xhr) {
@@ -419,7 +419,7 @@ $(document).ready(function () {
                 <td>${category.name}</td>
                 <td>${prittierDateFormat(category.created_at)}</td>
                 <td>${category.updated_at ? prittierDateFormat(category.updated_at) : '-'}</td>
-                <td><a href="index.php?page=action-categories&id=${category.id}" class="btn btn-sm btn-success">Update</a></td>
+                <td><a href="admin.php?page=action-categories&id=${category.id}" class="btn btn-sm btn-success">Update</a></td>
                 <td><button type="button" class="btn btn-sm btn-danger delete-category" data-id="${category.id}">Delete</button></td>
             </tr>
         `
@@ -460,7 +460,7 @@ $(document).ready(function () {
                 <td>${heading.categoryName}</td>
                 <td>${prittierDateFormat(heading.created_at)}</td>
                 <td>${heading.updated_at ? prittierDateFormat(heading.updated_at) : '-'}</td>
-                <td><a href="index.php?page=heading_action&id=${heading.id}" class="btn btn-sm btn-success">Update</a></td>
+                <td><a href="admin.php?page=heading_action&id=${heading.id}" class="btn btn-sm btn-success">Update</a></td>
                 <td><button type="button" class="btn btn-sm btn-danger" data-id="${heading.id}">Delete</button></td>
             </tr>
         `
@@ -478,7 +478,7 @@ $(document).ready(function () {
                     dataType: 'json',
                     success: function (data, statusTxt, xhr) {
                         if (xhr.status == 201) {
-                            window.location.href = 'index.php?page=headings'
+                            window.location.href = 'admin.php?page=headings'
                         }
                     },
                     error: function (jqXHR, statusTxt, xhr) {
@@ -495,7 +495,7 @@ $(document).ready(function () {
                     dataType: 'json',
                     success: function (data, statusTxt, xhr) {
                         if (xhr.status == 204) {
-                            window.location.href = 'index.php?page=headings'
+                            window.location.href = 'admin.php?page=headings'
                         }
                     },
                     error: function (jqXHR, statusTxt, xhr) {
@@ -543,7 +543,7 @@ $(document).ready(function () {
                     success: function (data, statusTxt, xhr) {
 
                         if (xhr.status == 201) {
-                            window.location.href = "index.php?page=tags"
+                            window.location.href = 'admin.php?page=tags'
                         }
                     },
                     error: function (jqXHR, statusTxt, xhr) {
@@ -563,7 +563,7 @@ $(document).ready(function () {
                     data: { name: name, id: id },
                     success: function (data, statusTxt, xhr) {
                         if (xhr.status == 204) {
-                            window.location.href = 'index.php?page=tags'
+                            window.location.href = 'admin.php?page=tags'
                         }
                     },
                     error: function (jqXHR, statusTxt, xhr) {
@@ -619,7 +619,7 @@ $(document).ready(function () {
                 <td>${tag.name}</td>
                 <td>${prittierDateFormat(tag.created_at)}</td>
                 <td>${tag.updated_at ? prittierDateFormat(tag.updated_at) : '-'}</td>
-                <td><a href="index.php?page=action-tag&id=${tag.id}" class="btn btn-sm btn-success">Update</a></td>
+                <td><a href="admin.php?page=action-tag&id=${tag.id}" class="btn btn-sm btn-success">Update</a></td>
                 <td><button type="button" class="btn btn-sm btn-danger delete-tag" data-id="${tag.id}">Delete</button></td>
             </tr>
         `
@@ -659,7 +659,7 @@ $(document).ready(function () {
                 <td>${user.roleName}</td>
                 <td>${prittierDateFormat(user.created_at)}</td>
                 <td>${user.updated_at ? prittierDateFormat(user.updated_at) : '-'}</td>
-                <td><a href="index.php?page=user_action&id=${user.id}" class="btn btn-success btn-sm">Update</a></td>
+                <td><a href="admin.php?page=user_action&id=${user.id}" class="btn btn-success btn-sm">Update</a></td>
                 <td><button type="button" class="btn btn-danger delete-user btn-sm" data-id="${user.id}">Delete</button></td>
             </tr>
         `
@@ -686,7 +686,7 @@ $(document).ready(function () {
                     },
                     success: function (data, statusTxt, xhr) {
                         if (xhr.status == 201) {
-                            window.location.href = "index.php?page=users"
+                            window.location.href = "admin.php?page=users"
                         }
                     }, error: function (jqXHR, statusTxt, xhr) {
                         printResponseMessages(jqXHR.status, jqXHR.responseJSON, '#crudUserErrorMessage', 'danger,warning')
@@ -707,7 +707,7 @@ $(document).ready(function () {
                     },
                     success: function (data, statusTxt, xhr) {
                         if (xhr.status == 204) {
-                            window.location.href = "index.php?page=users"
+                            window.location.href = "admin.php?page=users"
                         }
                     }, error: function (jqXHR, statusTxt, xhr) {
                         printResponseMessages(jqXHR.status, jqXHR.responseJSON, '#crudUserErrorMessage', 'danger,warning')
@@ -784,7 +784,7 @@ $(document).ready(function () {
 
         let ispis = ''
         let rb = (5 * limit) + 1
-        console.log(limit)
+
         if (posts.length > 0) {
             posts.forEach(post => {
                 ispis += printPost(post, rb)
@@ -805,9 +805,9 @@ $(document).ready(function () {
                 <td>${post.headingName}</td>
                 <td>${post.created_at}</td>
                 <td>${post.updated_at ? post.updated_at : '/'}</td>
-                <td><a href="index.php?page=post_action&id=${post.id}" class="btn btn-sm btn-success">Update</a></td>
+                <td><a href="admin.php?page=post_action&id=${post.id}" class="btn btn-sm btn-success">Update</a></td>
                 <td><button type="button" class="btn btn-sm btn-danger" data-id="${post.id}">Delete</button></td>
-                <td><a href="index.php?page=post_details&id=${post.id}" class="btn btn-info btn-sm">Details</a></td>
+                <td><a href="admin.php?page=post_details&id=${post.id}" class="btn btn-info btn-sm">Details</a></td>
                 <td></td>
             </tr>
         `
@@ -844,7 +844,7 @@ $(document).ready(function () {
                     success: function (data, statusTxt, xhr) {
 
                         if (xhr.status == 201) {
-                            window.location.href = "index.php?page=posts"
+                            window.location.href = "admin.php?page=posts"
                         }
                     },
                     error: function (jqXHR, statusTxt, xhr) {
@@ -868,7 +868,7 @@ $(document).ready(function () {
                     success: function (data, statusTxt, xhr) {
 
                         if (xhr.status == 204) {
-                            window.location.href = "index.php?page=posts"
+                            window.location.href = "admin.php?page=posts"
                         }
                     }, error: function (jqXHR, statusTxt, xhr) {
                         printResponseMessages(jqXHR.status, jqXHR.responseJSON, '#crudPostErrorMessages', 'warning,danger')
@@ -964,7 +964,7 @@ $(document).ready(function () {
                     dataType: 'json',
                     success: function (data, status, xhr) {
                         if (xhr.status == 201) {
-                            window.location.href = 'index.php?page=tasks'
+                            window.location.href = 'admin.php?page=tasks'
                         }
                     },
                     error: function (err) {
@@ -984,7 +984,7 @@ $(document).ready(function () {
                     }, dataType: 'json',
                     success: function (data, statusTxt, xhr) {
                         if (xhr.status == 204) {
-                            window.location.href = "index.php?page=tasks"
+                            window.location.href = "admin.php?page=tasks"
                         }
                     }, error: function (err) {
                         console.log(err)
@@ -1012,6 +1012,22 @@ $(document).ready(function () {
 
         return errors;
     }
+    $(document).on('click', '.delete-task', function (e) {
+        e.preventDefault()
+        let id = $(this).data("id")
+        $.ajax({
+            method: 'POST',
+            url: 'models/tasks/delete.php',
+            data: { id: id },
+            dataType: 'json',
+            success: function (data) {
+                console.log(data)
+            }, error: function (err) {
+                console.log(err)
+            }
+        })
+    })
+
     const createValidationErrorMessage = (element, cls, text) => {
         const el = document.querySelector(element)
         el.classList.add(cls)
