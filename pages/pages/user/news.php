@@ -1,17 +1,44 @@
 <section>
+    <?php
+    if (isset($_GET['name'])) {
+        $categoryName = $_GET['name'];
+        $posts = getPostFromCategory($categoryName);
+        $headings = getHeadingsByCategoryName($categoryName);
+    } else if (isset($_GET['headingName'])) {
+        $headingName = $_GET['headingName'];
+        $posts = getHeadingsPosts($headingName);
+    } else {
+        $tagId = $_GET['tag_id'];
+        $tagName = getOneFetchAndCheckData('tags', 'id', $tagId, 'fetch');
+        $posts = getSelectedPosts($tagId);
+    }
+
+    if (isset($_GET['name'])) :
+    ?>
+        <div class="container mt-3 d-none d-lg-flex">
+            <nav class="nav nav-pills ">
+
+                <?php foreach ($headings as $heading) : ?>
+                    <a class="nav-link text-dark fs-5" aria-current="page" href="index.php?page=news&headingName=<?= $heading->headingName ?>"><?= $heading->headingName ?></a>
+                <?php endforeach; ?>
+            </nav>
+            <hr class="d-none d-lg-block">
+        </div>
+    <?php elseif (isset($_GET['headingName'])) : ?>
+        <div class="container mt-3">
+            <h1><?= $_GET['headingName'] ?></h1>
+        </div>
+    <?php else : ?>
+        <div class="container mt-3">
+            <h1><?= $tagName->name ?></h1>
+        </div>
+    <?php endif; ?>
+
     <div class="container">
+
         <div class="row my-5">
             <?php
-            if (isset($_GET['name'])) {
-                $categoryName = $_GET['name'];
-                $posts = getPostFromCategory($categoryName);
-            } else if (isset($_GET['headingName'])) {
-                $headingName = $_GET['headingName'];
-                $posts = getHeadingsPosts($headingName);
-            } else {
-                $tagName = $_GET['tag_id'];
-                $posts = getSelectedPosts($tagName);
-            }
+
             foreach ($posts as $post) :
 
             ?>
