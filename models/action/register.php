@@ -5,7 +5,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $lastName = $_POST['lastName'];
     $email = $_POST['email'];
     $password = $_POST['password'];
-    define("USER", 2);
+    define("USER", 3);
     $role = USER;
     $errors = [];
     $reFirstLastName  = '/^[A-Z][a-z]{3,15}$/';
