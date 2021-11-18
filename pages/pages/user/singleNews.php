@@ -48,8 +48,6 @@
                         <?php
 
                         foreach ($comments as $comment) :
-                            var_dump($comment->likes);
-
                         ?>
                             <div class="mt-3" id="comments_display">
                                 <div class="card mb-1">
