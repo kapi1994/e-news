@@ -20,8 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         require "../function.php";
         try {
             insertComment('comments', $user_id, $parent_comment, $post_id, $text);
-            echo json_encode("Comment is successfully added");
-            http_response_code(201);
+            echo json_encode(['user' => $user_id]);
         } catch (PDOException $th) {
             echo json_encode($th->getMessage());
             http_response_code(500);
