@@ -123,7 +123,7 @@ function updateUser($firstName, $lastName, $email, $role_id, $date)
 function getComments($postId, $parentComment = 0)
 {
     global $conn;
-    $res = $conn->query("SELECT c.*, u.first_name as firstName, u.last_name as lastName FROM comments c JOIN users u ON c.user_id = u.id WHERE post_id='$postId' AND parent_id ='$parentComment'")->fetchAll();
+    $res = $conn->query("SELECT c.*, u.first_name as firstName, u.last_name as lastName FROM comments c JOIN users u ON c.user_id = u.id WHERE post_id='$postId' AND parent_id ='$parentComment' ORDER BY created_at ASC")->fetchAll();
     return $res;
 }
 
@@ -136,10 +136,16 @@ function getCommentsWithReaction($post_id, $user_id, $comment_id = 0)
         $comment->user_reaction = userReactions($comment->id, $user_id);
         $comment->likes = countVote($comment->id, 'likes', 'likesCount');
         $comment->disslikes = countVote($comment->id, 'disslikes', 'disslikesCount');
+        $comment->countChild =  countChild($comment->id);
     }
 
-
     return $comments;
+}
+function countChild($comment_id)
+{
+    global $conn;
+    $res = $conn->query("SELECT COUNT(*) as childComments FROM comments WHERE parent_id = '$comment_id'  ")->fetch();
+    return $res;
 }
 function userReactions($comment_id, $user_id)
 {
@@ -170,12 +176,12 @@ function resizeImage($file, $normal_path, $small_path)
     $height = $getImageDimensions[1];
 
     $newHeight = 200;
-    $newHeight = $width / ($height / $newHeight);
+    $newWidth = $width / ($height / $newHeight);
     $imageExtension = pathinfo($new_normal_path, PATHINFO_EXTENSION);
     if ($imageExtension == 'png') {
         $resource = imagecreatefrompng($new_normal_path);
         $canvars  = imagecreatetruecolor($newHeight, $newHeight);
-        imagecopyresampled($canvars, $resource, 0, 0, 0, 0, $newHeight, $newHeight, $width, $height);
+        imagecopyresampled($canvars, $resource, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
         imagepng($canvars, $new_small_path);
     } else {
         $resource = imagecreatefromjpeg($new_normal_path);
@@ -504,7 +510,7 @@ function postPagination($user_id, $limit = 0, $keyword = '', $order = 0, $catego
         }
     }
 
-    if ($categories != '') {
+    if ($categories !=   '') {
         if (($keyword != "" && $user_id->roleName == "Journalist") || $keyword != "") {
             $query .= " AND p.category_id IN ($categories)";
             $baseQuery .= $query;
@@ -533,10 +539,12 @@ function postPagination($user_id, $limit = 0, $keyword = '', $order = 0, $catego
         }
     }
 
-    $baseQuery = $baseQuery . $orderQuery . $limitQuery;
-
     $limit = ((int)$limit) * ELEMENTS_OFFSET;
     $offset = ELEMENTS_OFFSET;
+
+    $baseQuery = $baseQuery . $orderQuery . $limitQuery;
+
+
     $query = $conn->prepare($baseQuery);
     $query->bindValue(":limit", $limit, PDO::PARAM_INT);
     $query->bindValue(":offset", $offset, PDO::PARAM_INT);
