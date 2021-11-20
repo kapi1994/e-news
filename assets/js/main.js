@@ -14,9 +14,9 @@ $(document).ready(function () {
                 text: text
             },
             dataType: "json",
-            success: function () {
+            success: function (data) {
 
-                getComments('comments_display')
+                getComments('comments_display', data.user)
                 document.querySelector('#comment').value = ""
             },
             error: function (err) {
@@ -30,7 +30,9 @@ $(document).ready(function () {
         let post = $(this).data('post')
         let comment = $(this).data("comment")
         const whereToPlace = `comment${comment}`
-        console.log(comment + ' linija iz read more')
+        let user = $(this).data("user")
+        console.log(document.querySelector(`#${whereToPlace}`))
+
         br++
         if (br % 2 != 0) {
             document.querySelector(`#btnReadMore${comment}`).textContent = "show less"
@@ -38,25 +40,26 @@ $(document).ready(function () {
         } else {
             document.querySelector(`#btnReadMore${comment}`).textContent = "show more"
         }
-        getComments(comment, whereToPlace)
 
-
+        getComments(whereToPlace, comment, user)
 
     })
 
-    function getComments(whereToPlace, comment_id = 0) {
-        const comment = comment_id == 0 ? 0 : comment_id
+    function getComments(whereToPlace, comment_id, user_id) {
+        const comment = comment_id != 0 ? comment_id : 0
         const post = window.location.href.split("&")[1].split("=")[1]
+
         $.ajax({
             method: "get",
             url: 'models/comments/getComments.php',
-            data: { comment: comment_id, post: post },
+            data: { comment: comment, post: post, user: user_id },
             dataType: 'json',
             success: function (data) {
-                console.log(data)
-                printComments(data.comments, data.user, whereToPlace)
+                printComments(data, whereToPlace)
             },
-            error: function (err) { }
+            error: function (err) {
+                console.log(err)
+            }
         })
     }
     $(document).on('click', '.vote-action', function (e) {
@@ -64,10 +67,10 @@ $(document).ready(function () {
         let post = $(this).data('post')
         let comment = $(this).data('comment')
         let action = $(this).data("action")
-        // console.log(action)
+
         let like = $(this).data('like')
         let disslike = $(this).data('disslike')
-        // console.log(comment)
+
         $.ajax({
             method: "POST",
             url: "models/comments/vote.php",
@@ -85,7 +88,7 @@ $(document).ready(function () {
         })
     })
     const getVote = (comment, action) => {
-        // console.log(action)
+
         $.ajax({
             method: 'get',
             url: "models/comments/getVote.php",
@@ -95,7 +98,7 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function (data) {
-                // console.log(data)
+
                 printVote(comment, data, action)
             },
             error: function (err) {
@@ -105,20 +108,16 @@ $(document).ready(function () {
     }
 
     const printVote = (comment, data, action) => {
-        // console.log(data)
+
         const votelike = `voteLike${comment}`
         const voteDisslike = `voteDisslike${comment}`
         const countDisslike = `countDisslike${comment}`
-        // console.log(`Disslike za commentar ${voteDisslike}` + document.querySelector(`#${voteDisslike}`))
-        // console.log(`Lajk za kometar ${votelike}` + document.querySelector(`#${votelike}`))
+
         const countLike = `countLike${comment}`
-        // console.log(countLike)
+
         const userVote = data.user_id
         const vote = data.vote
-        console.log(data.likeCount + " " + countLike)
-        // // console.log(action)
-        // // console.log(vote)
-        console.log(data)
+
         if (action == 'likes') {
             console.log('like')
             if (vote.likes > 0) {
@@ -150,27 +149,7 @@ $(document).ready(function () {
         }
 
     }
-    const addClass = (element, classes) => {
-        // console.log(element)
-        const el = document.querySelector(`#${element}`)
-        el.classList.add(classes)
-    }
-    const removeClass = (element, classes) => {
-        const el = document.querySelector(`#${element}`)
-        el.classList.remove(classes)
-    }
 
-    const increseVoteCount = (el, data) => {
-        let element = document.querySelector(`#${el}`)
-        element.textContent++
-
-    }
-    const removeVoteCount = (el, data) => {
-        const element = document.querySelector(`#${el}`)
-        if (element.textContent > 0) {
-            element.textContent--
-        }
-    }
     $(document).on('click', '.reply-comment', function (e) {
         e.preventDefault()
         let post = $(this).data('post')
@@ -195,29 +174,23 @@ $(document).ready(function () {
         })
     })
 
-    const printComments = (comments, user, whereToPlace) => {
-        console.log(whereToPlace)
-        ispis = ''
-        if (comments.length > 0) {
-            comments.forEach(comment => {
-                ispis += printComment(comment, user)
-            })
-        }
-        // console.log(ispis)
-        $(`#${whereToPlace}`).html(ispis)
+    const printComments = (data, whereToPlace) => {
+        console.log(`${whereToPlace}`)
+        let ispis = ''
+        data.comments.forEach(comment => {
+            ispis += printComment(comment, data.user)
+        })
+        document.querySelector(`#${whereToPlace}`).innerHTML = ispis
     }
 
     const printComment = (comment, user) => {
         let ispis = ''
-        let user_neg = user == '' ? "disabled" : ''
-        // console.log(comment)
-        // $comment->disslikes->UserId
-        let user_like_yes = user != '' && user.id == comment.likes.userId ? 'text-success' : 'text-dark'
-        let user_disslike_yes = user != '' && user.id == comment.likes.userId ? 'text-danger' : 'text-dark'
-        let user_like = user != null && comment.user_reaction != FALSE && user_id == comment.user_reaction.user_id && comment.user_reaction.likes > 0 ? 'text-success' : 'text-dark'
-        let user_disslike = user != null && comment.user_reaction != FALSE && user_id == comment.user_reaction.user_id && comment.user_reaction.disslikes > 0 ? 'text-danger' : 'text-dark'
+        let user_neg = user == null ? "disabled" : ''
+        console.log(comment)
+        let user_like = user != null && comment.user_reaction != false && comment.user_id == comment.user_reaction.user_id && comment.user_reaction.likes > 0 ? 'text-success' : 'text-dark'
+        let user_disslike = user != null && comment.user_reaction != false && comment.user_id == comment.user_reaction.user_id && comment.user_reaction.disslikes > 0 ? 'text-danger' : 'text-dark'
+
         ispis += `
-            <div >
                 <div class="card mb-1">
                 <div class="card-header">
                     <div class="float-start">
@@ -229,41 +202,49 @@ $(document).ready(function () {
                 </div>
                 <div class="card-body">
                     <p class="card-text">${comment.text}</p>
-                    <div class="gap-3 d-flex">`
-        ispis += `<button class="btn btn-transparent d-flex vote-action" data-like="${comment.likes.likes != null ? comment.likes.likes : 0}" data-disslike="${comment.disslikes.disslikes != null ? comment.disslikes.disslikes : 0}" id="like-${comment.id}" data-action="likes" data-post="${comment.post_id}" data-comment="${comment.id}" ${user == null ? disabled : ''}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" id="voteLike${comment.id}" class="bi bi-hand-thumbs-up ${user_like} " viewBox=" 0 0 16 16">
-                                    <path d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a9.84 9.84 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.163 3.163 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16H8c-.605 0-1.07-.081-1.466-.218a4.82 4.82 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z" />
+                    <div class="gap-3 d-flex">
+                        <button class="btn btn-transparent d-flex vote-action" id="like-${comment.id}" data-action="likes" data-post="${comment.post_id}" data-comment="${comment.id}" ${user_neg}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" id="voteLike${comment.id}" class="bi bi-hand-thumbs-up  ${user_like}" viewBox=" 0 0 16 16">
+                                <path d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a9.84 9.84 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.163 3.163 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16H8c-.605 0-1.07-.081-1.466-.218a4.82 4.82 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z" />
                             </svg>
-                        <big class="ms-3 mt-1" id="countLike${comment.id}>${comment.likes.likesCount}</big>
-                     </button>
+                            <big class="ms-3 mt-1" id="countLike${comment.id}">${comment.likes.likesCount}</big>
+                        </button>
 
 
-                     <button class="btn btn-transparent d-flex vote-action" data-like="${comment.likes.likes != null ? comment.likes.likes : 0}" data-disslike="${comment.disslikes.disslikes != null ? comment.disslikes.disslikes : 0}" id="disslike-<?= $comment->id ?>" data-action="disslikes" data-post="<?= $post->id ?>" data-comment="<?= $comment->id ?>" <?php if (!isset($_SESSION['user'])) : ?> disabled<?php endif; ?>>
+                        <button class="btn btn-transparent d-flex vote-action"  id="disslike-${comment.id}" data-action="disslikes" data-post="${comment.post_id}" data-comment="${comment.id}" ${user_neg}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" id="voteDisslike${comment.id}" class="bi bi-hand-thumbs-up ${user_disslike}" viewBox="0 0 16 16">
                                 <path d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a9.84 9.84 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.163 3.163 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16H8c-.605 0-1.07-.081-1.466-.218a4.82 4.82 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z" />
                             </svg>
-                        <big class="ms-3 mt-1" id="countDisslike${comment.id}">${comment.disslikes.disslikeCount}</big>
-                    </button>
+                            <big class="ms-3 mt-1" id="countDisslike${comment.id}">${comment.disslikes.disslikesCount}</big>
+                        </button>
                     </div>
                 </div>
+                
                 <div class="card-footer">
-                    <div class="float-end gap-2">
-
-                            <button class="btn btn-primary read-more" type="button" data-bs-toggle="collapse" data-bs-target="#comment${comment.id}" aria-expanded="false" aria-controls="comment${comment.id}" data-comment="${comment.id}">
+                <div class="float-end gap-2">`
+        if (comment.countChild.childComments > 0) {
+            ispis += `  <button class="btn btn-primary read-more" data-user="${user.id}" type="button" id="btnReadMore${comment.id}" data-bs-toggle="collapse" data-bs-target="#comment${comment.id}" aria-expanded="false" aria-controls="comment${comment.id}" data-comment="${comment.id}">
                                 Show more
-                            </button>`
-        if (user != '') {
-            ispis += `   <button class=" btn btn-outline-primary" data-post="${comment.post_id}" data-comment="${comment.id}" data-bs-toggle="collapse" data-bs-target="#commentReply${comment.id}" aria-expanded="false" aria-controls="commentReply${comment.id}">Reply</button>`
+                    </button>`
+        }
+        if (user != null) {
+            ispis += `  <button class=" btn btn-outline-primary comment-reply" data-post="${comment.post_id}" data-comment="${comment.id}" data-bs-toggle="collapse" data-bs-target="#commentReply${comment.id} " aria-expanded="false" aria-controls="commentReply${comment.id} ">Reply</button>`
         }
 
-        //                     <button class=" btn btn-outline-primary" data-post="${comment.post_id}" data-comment="${comment.id}" data-bs-toggle="collapse" data-bs-target="#commentReply${comment.id}" aria-expanded="false" aria-controls="commentReply${comment.id}">Reply</button>
 
-        ispis += `         </div >
-                </div >
+        ispis += `</div>
+                    </div>
+                    </div>
+                  
+                    
+                    <div class="collapse my-2" id="comment${comment.id}">
 
-            </div >
-        </div >
-        `
+                                </div>
+
+                                <div class="collapse" id="commentReply${comment.id}">
+
+                                </div>
+                `
         return ispis
     }
 
@@ -274,4 +255,25 @@ $(document).ready(function () {
         const finalDate = time + " " + date[2] + "/" + date[1] + "/" + date[0]
         return finalDate
     }
+    $(document).on('click', '.comment-reply', function (e) {
+        let comment = $(this).data('comment')
+        let post = $(this).data('post')
+        // commentReply8
+        console.log(comment)
+        console.log(document.querySelector(`#commentReply${comment}`))
+        let ispis = '';
+        ispis += `
+          
+                <div class="card card-body">
+                    <textarea name="comment" id="comment_${comment}" cols="30" rows="5" class="form-control"></textarea>
+                        <div class="row">
+                            <div class="float-end col-3  mt-2">
+                                <div class="d-grid"><button class="btn btn-primary reply-comment" type="button" id="btnCommentReply${comment}" data-post="${post}" data-comment="${comment}">Save</button></div>
+                            </div>
+                </div>
+            
+        `
+        document.querySelector(`#commentReply${comment}`).innerHTML = ispis
+    })
+
 })
