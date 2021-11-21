@@ -43,7 +43,10 @@ if (isset($_SESSION['user'])) {
                         <label for="">Password:</label>
                         <input type="password" name="password" id="password" class="form-control">
                     </div>
-                    <div class="d-grid"><button type='submit' class="btn btn-primary" name='btnSubmit'>Ulogujte se</button></div>
+                    <div class="d-grid gap-2">
+                        <button type='submit' class="btn btn-primary" name='btnSubmit'>Ulogujte se</button>
+                        <a href="index.php?page=register" class="btn btn-outline-dark">Ako nemate nalog? Registrujte se.</a>
+                    </div>
                 </form>
             </div>
         </div>
