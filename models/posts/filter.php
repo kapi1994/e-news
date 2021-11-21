@@ -3,7 +3,6 @@ session_start();
 header("Content-type:application/json");
 if ($_SERVER['REQUEST_METHOD'] == "GET") {
     $text = $_GET['text'];
-    $compareString = trim("%$text%");
     $order  = $_GET['order'] ? $_GET['order'] : 0;
     $categories = isset($_GET['categories']) ? $_GET['categories'] : '';
 
@@ -17,8 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
     $categories_arr =  isset($_GET['categories']) ? implode(', ', $categories) : '';
     $headings_arr =   isset($_GET['headings']) ? implode(', ', $headings) : '';
 
-    $elements =  postPagination($user, $pagination, $compareString, $order, $categories_arr, $headings_arr);
-    $pages = getNumOfPosts('pagination', $categories_arr, $headings_arr, $compareString);
+
+    $elements =  postPagination($user, $pagination, $text, $order, $categories_arr, $headings_arr);
+    $pages = getNumOfPosts('pagination', $user, $categories_arr, $headings_arr, $text);
 
     echo json_encode([
         'posts' => $elements,
