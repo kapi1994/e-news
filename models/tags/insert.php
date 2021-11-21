@@ -2,7 +2,7 @@
 header("Content-type:application/json");
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $name = $_POST['name'];
-    $reName = '/^[A-Z]{0,}[a-z]{1,15}(\s[A-Z]{0,}[a-z]{1,15})?$/';
+    $reName = '/^([A-Z]{1,}|[A-Z][a-z]{2,15})(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,})*$/';
     $errors = [];
     if (!preg_match($reName, $name)) {
         array_push($errors, "Name of the tag isn't ok");
