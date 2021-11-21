@@ -25,7 +25,7 @@
                     </div>
                     <div class="d-grid gap-2">
                         <button class="btn btn-primary" id="btnRegister" type="button">Registrujte se</button>
-                        <a href="index.php?page=login" class="btn btn-outline-dark">Image nalog? Ulogujte se.</a>
+                        <a href="index.php?page=login" class="btn btn-outline-dark">Register</a>
                     </div>
                 </form>
             </div>
