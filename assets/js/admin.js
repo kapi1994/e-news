@@ -509,7 +509,7 @@ $(document).ready(function () {
         const name = document.querySelector('#headingName').value
         const categoryId = document.querySelector('#headingCategory').value
         console.log(categoryId)
-        const reName = /^[A-Z][a-z]{2,15}(\s)?([A-Z][a-z]{2,15})*$/
+        const reName = /^([A-Z]{1,}|[A-Z][a-z]{2,15})(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,})*$/
         const errors = []
         if (!reName.test(name)) {
             errors.push(name)
@@ -575,7 +575,7 @@ $(document).ready(function () {
     }
     const validationTags = () => {
         const name = document.querySelector('#tagName').value
-        const reNameTag = /^[A-Z][a-z]{1,15}(\s[A-Z][a-z]{3,15})?$/
+        const reNameTag = /^([A-Z]{1,}|[A-Z][a-z]{2,15})(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,})*$/
         const errors = []
         if (!reNameTag.test(name)) {
             errors.push(name)
