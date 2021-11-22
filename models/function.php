@@ -483,7 +483,7 @@ function getNumOfTags($action, $keyword = '')
 
 
 
-function postPagination($user_id, $limit = 0, $keyword = '', $order = 0, $categories = '', $headings = '')
+function postPagination($user, $limit = 0, $text = "", $order = 0, $categories = "", $headings = "")
 {
 
     global $conn;
@@ -491,41 +491,50 @@ function postPagination($user_id, $limit = 0, $keyword = '', $order = 0, $catego
     $orderQuery = " ORDER BY p.created_at DESC";
     $query = '';
     $limitQuery = ' LIMIT :limit, :offset';
-
+    $compareString = trim("%$text%");
 
     $baseQuery = "SELECT p.*, c.name as categoryName, h.name as headingName FROM posts p JOIN categories c ON p.category_id = c.id JOIN headings h ON p.heading_id = h.id";
-
-
-    if ($user_id->roleName == "Journalist") {
-        $query = " WHERE p.user_id = '$user_id->id'";
-        $baseQuery .= $query;
+    if ($user->roleName == "Journalist") {
+        $query = " WHERE p.user_id = '$user->id'";
     }
-    if ($keyword != '') {
-        if ($user_id->roleName == "Journalist") {
-            $query .= " AND  p.name LIKE '$keyword'";
-            $baseQuery .= $query;
+
+    if ($text != "") {
+        if ($user->roleName == "Journalist") {
+            $query .= " AND p.name LIKE '$compareString'";
         } else {
-            $query = " WHERE p.name LIKE '$keyword'";
+            $query = " WHERE p.name LIKE '$compareString'";
             $baseQuery .= $query;
         }
     }
 
-    if ($categories !=   '') {
-        if (($keyword != "" && $user_id->roleName == "Journalist") || $keyword != "") {
+
+    if ($categories != "") {
+        if ($user->roleName == "Journalist") {
             $query .= " AND p.category_id IN ($categories)";
             $baseQuery .= $query;
+            // return $baseQuery;
         } else {
-            $query = " WHERE p.category_id IN ($categories)";
-            $baseQuery .= $query;
+            if ($text != "") {
+                $query .= " AND p.category_id IN ($categories)";
+            } else {
+                $query = " WHERE p.category_id IN ($categories)";
+                $baseQuery .= $query;
+            }
         }
     }
-    if ($headings != '') {
-        if (($categories != '' && $keyword != '' && $user_id->roleName == "Journalist") || ($keyword != '' || $categories != '')) {
-            $query .= " AND p.heading_id IN ('$headings')";
+
+    if ($headings != "") {
+        if ($user->roleName == "Journalist") {
+            $query = " AND p.heading_id IN ('$headings')";
             $baseQuery .= $query;
+            // return $baseQuery;
         } else {
-            $query = " WHERE p.heading_id IN ('$headings')";
-            $baseQuery .= $query;
+            if (($text != "" && $categories != "") || ($text != "" || $categories != "")) {
+                $query .= " AND p.heading_id IN ('$headings')";
+            } else {
+                $query = " WHERE p.heading_id IN ('$headings')";
+                $baseQuery .= $query;
+            }
         }
     }
 
@@ -554,22 +563,62 @@ function postPagination($user_id, $limit = 0, $keyword = '', $order = 0, $catego
     return $res;
 }
 
-function getNumOfPosts($action, $keyword = '', $categories = '', $heading = '')
+function getNumOfPosts($action, $user, $text = "", $categories = '', $headings = '')
 {
     global $conn;
     $baseQuery = "SELECT COUNT(*) as numberOfPosts FROM posts";
-    $query = '';
-    if ($keyword != '') {
-        $query = " WHERE name LIKE '$keyword'";
+
+    $compareString = trim("%$text%");
+    if ($user->roleName == "Journalist") {
+        $query = " WHERE user_id = '$user->id'";
     }
-    $baseQuery .= $query;
+    // var_dump($user)
+    if ($text != "") {
+        if ($user->roleName == "Journalist") {
+            $query .= " AND name LIKE '$compareString'";
+        } else {
+            $query = " WHERE name LIKE '$compareString'";
+            $baseQuery .= $query;
+        }
+    }
+
+
+    if ($categories != "") {
+        if ($user->roleName == "Journalist") {
+            $query .= " AND category_id IN ($categories)";
+            $baseQuery .= $query;
+        } else {
+            if ($text != "") {
+                $query .= " AND category_id IN ($categories)";
+            } else {
+                $query = " WHERE p.category_id IN ($categories)";
+                $baseQuery .= $query;
+            }
+        }
+    }
+
+    if ($headings != "") {
+        if ($user->roleName == "Journalist") {
+            $query .= " AND heading_id IN ('$headings')";
+            $baseQuery .= $query;
+        } else {
+            if (($text != "" && $categories != "") || ($text != "" || $categories != "")) {
+                $query .= " AND heading_id IN ('$headings')";
+            } else {
+                $query = " WHERE heading_id IN ('$headings')";
+                $baseQuery .= $query;
+            }
+        }
+    }
+
+    $baseQuery = $baseQuery . $query;
+    // return $baseQuery;
     if ($action == 'count') {
         $res = $conn->query($baseQuery)->fetch();
     } else {
         $pages = $conn->query($baseQuery)->fetch();
         $res = ceil($pages->numberOfPosts / ELEMENTS_OFFSET);
-    }
-
+    };
     return $res;
 }
 
