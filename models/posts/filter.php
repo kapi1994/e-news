@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 
 
     $elements =  postPagination($user, $pagination, $text, $order, $categories_arr, $headings_arr);
-    $pages = getNumOfPosts('pagination', $user, $categories_arr, $headings_arr, $text);
+    $pages = getNumOfPosts('pagination', $user, $text, $categories_arr, $headings_arr);
 
     echo json_encode([
         'posts' => $elements,
