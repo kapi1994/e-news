@@ -3,7 +3,7 @@ header("Content-type:application/json");
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $name = $_POST['name'];
     $categoryId = $_POST['categoryId'];
-    $reName = '/^([A-Z]{1,}|[A-Z][a-z]{2,15})(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,})*$/';
+    $reName = '/^([A-Z]{1,}|[A-Z][a-z]{2,15})(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,}|\s[\d]{0,2})*$/';
     $errors = [];
 
     if (!preg_match($reName, $name)) {
