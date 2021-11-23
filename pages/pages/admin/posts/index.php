@@ -7,7 +7,7 @@ if (isset($_SESSION['user'])) {
 } else {
     header("Location:admin.php?page=status&status=401");
 }
-$user = $_SESSION['user'];
+$user = isset($_SESSION['user']) ? $_SESSION['user'] : '';
 $posts = postPagination($user);
 ?>
 <section>
@@ -23,32 +23,45 @@ $posts = postPagination($user);
                     <input type="text" name="searchPosts" id="searchPosts" placeholder="searchPosts" class="form-control">
                 </div>
                 <div class="mb-3">
-                    <p>Serach by category:</p>
-                    <?php
-                    $categories = getAll("categories");
-                    foreach ($categories as $category) :
-                    ?>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="<?= $category->id ?>" id="category<?= $category->id ?>" name="categories">
-                            <label class="form-check-label" for="category<?= $category->id ?>">
-                                <?= $category->name ?>
-                            </label>
+                    <div class="d-grid">
+                        <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategories" aria-expanded="false" aria-controls="collapseCategories">
+                            Filter by categories:
+                        </button>
+                        <div class="collapse mt-2" id="collapseCategories">
+                            <?php
+                            $categories = getAll("categories");
+                            foreach ($categories as $category) :
+                            ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="<?= $category->id ?>" id="category<?= $category->id ?>" name="categories">
+                                    <label class="form-check-label" for="category<?= $category->id ?>">
+                                        <?= $category->name ?>
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
-                    <?php endforeach; ?>
+                    </div>
+
                 </div>
                 <div class="mb-3">
-                    <p>Search by headings:</p>
-                    <?php
-                    $headings = getAll('headings');
-                    foreach ($headings as $heading) :
-                    ?>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="<?= $heading->id ?>" id="heading<?= $heading->id ?>" name='headings'>
-                            <label class="form-check-label" for="heading<?= $heading->id ?>">
-                                <?= $heading->name ?>
-                            </label>
-                        </div>
-                    <?php endforeach; ?>
+                    <div class="d-grid">
+                        <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHeadings" aria-expanded="false" aria-controls="collapseHeadings">
+                            Filter by headings:
+                        </button>
+                    </div>
+                    <div class="collapse mt-2" id="collapseHeadings">
+                        <?php
+                        $headings = getAll('headings');
+                        foreach ($headings as $heading) :
+                        ?>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="<?= $heading->id ?>" id="heading<?= $heading->id ?>" name='headings'>
+                                <label class="form-check-label" for="heading<?= $heading->id ?>">
+                                    <?= $heading->name ?>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <p>Filter by creation date:</p>
@@ -76,7 +89,7 @@ $posts = postPagination($user);
                         </thead>
                         <tbody id="posts">
                             <?php
-                            $postsElements = getNumOfPosts('count');
+                            $postsElements = getNumOfPosts('count', $user);
                             if ($postsElements->numberOfPosts  > 0) :
                             ?>
                                 <?php
@@ -105,7 +118,7 @@ $posts = postPagination($user);
                     </table>
                 </div>
                 <?php
-                $postsCount = getNumOfPosts('count');
+                $postsCount = getNumOfPosts('count', $user);
                 if ($postsCount->numberOfPosts > 5) :
                 ?>
                     <div class="row mt-3">
@@ -113,7 +126,7 @@ $posts = postPagination($user);
                             <nav aria-label="...">
                                 <ul class="pagination" id="postPagination">
                                     <?php
-                                    $postPagination = getNumOfPosts('pagination');
+                                    $postPagination = getNumOfPosts('pagination', $user);
                                     for ($i = 0; $i < $postPagination; $i++) :
                                         if ($i == 0) :
                                     ?>
@@ -137,3 +150,16 @@ $posts = postPagination($user);
         </div>
     </div>
 </section>
+<div class="collapse" id="collapseCategories">
+    <?php
+    $categories = getAll("categories");
+    foreach ($categories as $category) :
+    ?>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="<?= $category->id ?>" id="category<?= $category->id ?>" name="categories">
+            <label class="form-check-label" for="category<?= $category->id ?>">
+                <?= $category->name ?>
+            </label>
+        </div>
+    <?php endforeach; ?>
+</div>
