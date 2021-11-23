@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+header("Content-type:application/json");
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $post_id = $_POST['post'];
     $text = $_POST['text'];
