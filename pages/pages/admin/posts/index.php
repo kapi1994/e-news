@@ -150,16 +150,3 @@ $posts = postPagination($user);
         </div>
     </div>
 </section>
-<div class="collapse" id="collapseCategories">
-    <?php
-    $categories = getAll("categories");
-    foreach ($categories as $category) :
-    ?>
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" value="<?= $category->id ?>" id="category<?= $category->id ?>" name="categories">
-            <label class="form-check-label" for="category<?= $category->id ?>">
-                <?= $category->name ?>
-            </label>
-        </div>
-    <?php endforeach; ?>
-</div>
