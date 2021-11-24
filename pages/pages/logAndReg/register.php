@@ -2,6 +2,7 @@
     <div class="container">
         <div class="row my-5">
             <div class="col-6 mx-auto">
+                <h1 class="text-center">Register</h1>
                 <form action="">
                     <div class="mb-3">
                         <label for="userFirstName">First name:</label>
