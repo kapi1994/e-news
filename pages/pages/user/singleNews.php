@@ -16,7 +16,8 @@
                     <div class="col-lg-8">
                         <img src="assets/images/posts/normal/<?= $post->image_path ?>" alt="" class="img-fluid">
                         <div class="d-flex">
-                            <p class="text-danger my-3 fs-6"><?= $post->headingName ?></p><span class="my-3 mx-3 text-muted"><?= date("H:i:s d/m/Y", strtotime($post->created_at)); ?></span>
+                            <p class="text-danger my-3 fs-6"><?= $post->headingName ?></p><span class="my-3 mx-3 text-muted fw-bold">Autor: <?= $post->first_name . " " . $post->last_name ?></span><span class="my-3 mx-3 text-muted"><?= date("H:i:s d/m/Y", strtotime($post->created_at)); ?></span>
+
                         </div>
                         <h1 class="mb-3 fs-2"><?= $post->name ?></h1>
                         <p class="fs-5 text-justify"><?= $post->description ?></p>
@@ -27,7 +28,7 @@
                             ?>
                                 <div class="col-3">
                                     <div class="d-grid">
-                                        <a href="index.php?page=news&tag_id=<?= $tag->id ?>" class="btn btn-primary"><?= $tag->name ?></a>
+                                        <a href="index.php?page=news&tag_id=<?= $tag->id ?>" class="btn btn-sm btn-outline-dark mb-1"><?= $tag->name ?></a>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
