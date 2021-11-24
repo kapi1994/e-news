@@ -1,7 +1,7 @@
 <?php
 header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $reName = '/^([A-Z]{1,}|[A-Z][a-z]{2,15}|[\w\d]{1,})([\.\:])?(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,})*$/';
+    $reName = '/^([A-Z]{1,}|[A-Z][a-z]{2,15}|[\w\d]{1,})(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,})*$/';
     $errors = [];
     if (!preg_match($reName, $_POST['id'])) {
         array_push($errors, "Tag name isn't ok");
@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 try {
                     updateTag($_POST['name'], $date, $_POST['id']);
+                    http_response_code(204);
                 } catch (PDOException $th) {
                     echo json_encode($th->getMessage());
                     http_response_code(500);
@@ -32,6 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             try {
                 updateTag($_POST['name'], $date, $_POST['id']);
+                http_response_code(204);
             } catch (PDOException $th) {
                 echo json_encode($th->getMessage());
                 http_response_code(500);
