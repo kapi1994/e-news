@@ -37,7 +37,7 @@
                     <li class="nav-item"><a href="admin.php?page=users" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'users') : ?> fw-bold active<?php endif; ?>">Users</a></li>
                     <li class="nav-item"><a href="admin.php?page=tasks" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'tasks') : ?> fw-bold active<?php endif; ?>">Tasks</a></li>
                 <?php endif; ?>
-                <li class="nav-item"><a href="admin.php?page=posts" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'posts fw-bold fts-italic') : ?> fw-bold active<?php endif; ?>">Posts</a></li>
+                <li class="nav-item"><a href="admin.php?page=posts" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'posts') : ?> fw-bold active<?php endif; ?>">Posts</a></li>
         <?php
             endif;
         endif; ?>
