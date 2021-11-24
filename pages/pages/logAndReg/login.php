@@ -35,6 +35,7 @@ if (isset($_SESSION['user'])) {
                 </ul>
 
                 <form action="models/action/login.php" method="POST">
+                    <h1 class="text-center">Login</h1>
                     <div class="mb-3">
                         <label for="">Email:</label>
                         <input type="email" name="email" id="email" class="form-control">
