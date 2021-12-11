@@ -1,6 +1,7 @@
 <?php
 header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $journalistRole = isset($_POST['journalistRole']) ? $_POST['journalistRole'] : NULL;
     $errors = [];
     $reName  = "/^[A-Z][a-z]{3,15}$/";
     $rePassword = "/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/";
@@ -31,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             http_response_code(409);
         } else {
             try {
-                insertUser($_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['password'], $_POST['role']);
+                insertUser($_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['password'], $_POST['role'], $journalistRole);
                 echo json_encode("User is successfully created");
                 http_response_code(201);
             } catch (PDOException $th) {
