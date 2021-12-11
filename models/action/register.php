@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $errors = [];
     $reFirstLastName  = '/^[A-Z][a-z]{3,15}$/';
     $rePassword = '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/';
-
+    define('USER_CATEGORY', NULL);
     if (!preg_match($reFirstLastName, $firstName)) {
         array_push($errors, "FIrst name isn't ok");
     }
@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             http_response_code(409);
         }
         try {
-            insertUser($firstName, $lastName, $email, $password, $role);
+            insertUser($firstName, $lastName, $email, $password, $role, USER_CATEGORY);
             insertActivity("Register", $email);
             echo json_encode("Register success");
             http_response_code(201);
