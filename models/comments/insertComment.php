@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         require_once '../../config/connection.php';
         require "../function.php";
         try {
-            insertComment('comments', $user_id, $parent_comment, $post_id, $text);
+            insertComment('comments', $text, $parent_comment, $post_id, $user_id);
             echo json_encode(['user' => $user_id]);
         } catch (PDOException $th) {
             echo json_encode($th->getMessage());
