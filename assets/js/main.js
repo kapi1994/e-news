@@ -32,27 +32,24 @@ $(document).ready(function () {
         const whereToPlace = `comment${comment}`
         let user = $(this).data("user")
         console.log(document.querySelector(`#${whereToPlace}`))
-
+        // console.log
         br++
         if (br % 2 != 0) {
             document.querySelector(`#btnReadMore${comment}`).textContent = "show less"
-
+            getComments(whereToPlace, comment)
         } else {
             document.querySelector(`#btnReadMore${comment}`).textContent = "show more"
         }
-
-        getComments(whereToPlace, comment, user)
-
     })
 
-    function getComments(whereToPlace, comment_id, user_id) {
+    function getComments(whereToPlace, comment_id) {
         const comment = comment_id != 0 ? comment_id : 0
         const post = window.location.href.split("&")[1].split("=")[1]
 
         $.ajax({
             method: "get",
             url: 'models/comments/getComments.php',
-            data: { comment: comment, post: post, user: user_id },
+            data: { comment: comment, post: post },
             dataType: 'json',
             success: function (data) {
                 printComments(data, whereToPlace)
@@ -155,6 +152,8 @@ $(document).ready(function () {
         let post = $(this).data('post')
         let comment = $(this).data('comment')
         let text = document.querySelector(`#comment_${comment}`).value
+        console.log(`comment_${comment}`)
+
         $.ajax({
             method: 'post',
             url: "models/comments/insertComment.php",
@@ -165,9 +164,12 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function (data) {
-                console.log(data)
-                // console(data.comments)
-                // console.log(data.user)
+
+
+                document.querySelector(`#comment_${comment}`).value = ""
+                $(`#commentReply${comment}`).collapse('hide')
+                getComments('comments_display')
+
             }, error: function (err) {
                 console.log(err)
             }
@@ -184,6 +186,7 @@ $(document).ready(function () {
     }
 
     const printComment = (comment, user) => {
+        console.log(comment)
         let ispis = ''
         let user_neg = user == null ? "disabled" : ''
         console.log(comment)
@@ -194,7 +197,13 @@ $(document).ready(function () {
                 <div class="card mb-1">
                 <div class="card-header">
                     <div class="float-start">
-                        <h2 class="fs-6 mt-1">${comment.firstName + ' ' + comment.lastName}</h2>
+                       `
+        if (comment.parent_id > 0) {
+            ispis += ` <h2 class="fs-6 mt-1">Reply @${comment.firstName + ' ' + comment.lastName}</h2>`
+        } else {
+            ispis += ` <h2 class="fs-6 mt-1">${comment.firstName + ' ' + comment.lastName}</h2>`
+        }
+        ispis += `
                     </div>
                     <div class="float-end">
                         <span class="text-muted">${prittierDateFormat(comment.created_at)}</span>
@@ -228,7 +237,7 @@ $(document).ready(function () {
                     </button>`
         }
         if (user != null) {
-            ispis += `  <button class=" btn btn-outline-primary comment-reply" data-post="${comment.post_id}" data-comment="${comment.id}" data-bs-toggle="collapse" data-bs-target="#commentReply${comment.id} " aria-expanded="false" aria-controls="commentReply${comment.id} ">Reply</button>`
+            ispis += `  <button class=" btn btn-outline-primary comment-reply" data-post="${comment.id_post}" data-comment="${comment.id}" data-bs-toggle="collapse" data-bs-target="#commentReply${comment.id} " aria-expanded="false" aria-controls="commentReply${comment.id} ">Reply</button>`
         }
 
 
@@ -275,5 +284,6 @@ $(document).ready(function () {
         `
         document.querySelector(`#commentReply${comment}`).innerHTML = ispis
     })
-
+    const date = new Date()
+    document.querySelector('#getYear').textContent = date.getFullYear()
 })
