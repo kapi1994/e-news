@@ -152,8 +152,6 @@ $(document).ready(function () {
         let post = $(this).data('post')
         let comment = $(this).data('comment')
         let text = document.querySelector(`#comment_${comment}`).value
-        console.log(`comment_${comment}`)
-
         $.ajax({
             method: 'post',
             url: "models/comments/insertComment.php",
@@ -164,12 +162,9 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function (data) {
-
-
                 document.querySelector(`#comment_${comment}`).value = ""
                 $(`#commentReply${comment}`).collapse('hide')
                 getComments('comments_display')
-
             }, error: function (err) {
                 console.log(err)
             }
@@ -186,7 +181,6 @@ $(document).ready(function () {
     }
 
     const printComment = (comment, user) => {
-        console.log(comment)
         let ispis = ''
         let user_neg = user == null ? "disabled" : ''
         console.log(comment)
