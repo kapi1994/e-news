@@ -183,7 +183,8 @@ $(document).ready(function () {
     $(document).on('change', '#postCategory', function (e) {
         e.preventDefault()
         let id = $(this).val()
-        console.log(id)
+        document.querySelector('#postHeading').value = 0
+        document.querySelector('#heading_tag').innerHTML = ''
         $.ajax({
             method: "GET",
             url: "models/posts/getHeadingsByCategory.php",
@@ -197,6 +198,63 @@ $(document).ready(function () {
             }
         })
     })
+    $(document).on('change', '#postHeading', function (e) {
+        e.preventDefault()
+        let id = $(this).val()
+        let post_id = $(this).data('post')
+        $.ajax({
+            method: 'GET',
+            url: 'models/posts/getTagsByHeading.php',
+            data: { heading_id: id, post_id: post_id },
+            dataType: 'json',
+            success: function (data) {
+                printTags(data)
+                compareCheckboxes(data)
+            }, error: function (err) {
+                console.log(err)
+            }
+        })
+    })
+
+    const printTags = (data) => {
+        let ispis = ''
+        let tags = data.allTags
+
+
+        tags.forEach(tag => {
+            ispis += printTagByHeading(tag)
+        })
+        document.querySelector('#heading_tag').innerHTML = ispis
+    }
+    const printTagByHeading = (tag) => {
+
+        return `
+        
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" value="${tag.id}" id="tag${tag.id}" name="postTags"  ${tag == true && postTagsArr == true && postTagsArr.includes(tag.id) ? checked : ''}>
+            <label class="form-check-label" for="tag${tag.id}">
+                ${tag.name}
+            </label>
+        </div>
+        `
+
+    }
+    const compareCheckboxes = (data) => {
+        let tags = data.allTags
+        let selectedTags = data.postTag
+        let selectedTagsArr = []
+        selectedTags.forEach(selectedTag => {
+            selectedTagsArr.push(selectedTag.id)
+        })
+
+        tags.forEach(tag => {
+            for (let i = 0; i < selectedTagsArr.length; i++) {
+                if (selectedTagsArr[i] == tag.id) {
+                    document.querySelector(`#tag${selectedTagsArr[i]}`).checked = true
+                }
+            }
+        })
+    }
     $(document).on('change', '#sortByDatePost', function (e) {
         e.preventDefault()
         filterPosts()
@@ -267,7 +325,10 @@ $(document).ready(function () {
             }
         })
     }
-    // users 
+
+
+
+
     $(document).on('click', '.delete-user', function (e) {
         e.preventDefault()
         let id = $(this).data('id')
@@ -311,6 +372,7 @@ $(document).ready(function () {
         let text = document.querySelector("#searchUser").value
         let orderUser = document.querySelector('#orderUserByDate').value
         let role = document.querySelector('#filterByRole').value
+
         // console.log(role);
         $.ajax({
             method: 'get',
@@ -326,7 +388,9 @@ $(document).ready(function () {
                 printAllUsers(data.res, data.limit)
                 printPagination(data.pages, '#userPagination', data.limit, 'user-paginations')
             },
-            error: function (err) { }
+            error: function (err) {
+                // console.log(err)
+            }
         })
     }
 
@@ -509,7 +573,7 @@ $(document).ready(function () {
         const name = document.querySelector('#headingName').value
         const categoryId = document.querySelector('#headingCategory').value
         console.log(categoryId)
-        const reName = /^([A-Z]{1,}|[A-Z][a-z]{2,15})(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,})*$/
+        const reName = /^([A-Z]{1,}|[A-Z][a-z]{2,15})(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,}|\s[\d]{0,2})*$/
         const errors = []
         if (!reName.test(name)) {
             errors.push(name)
@@ -532,14 +596,15 @@ $(document).ready(function () {
     const tagsFormValidationAndRequest = () => {
         const name = document.querySelector("#tagName").value
         const id = document.querySelector('#TagId').value
-
+        const heading = document.querySelector('#heading_tag').value
+        console.log(heading)
         if (id == "") {
 
             if (validationTags().length == 0) {
                 $.ajax({
                     method: 'post',
                     url: 'models/tags/insert.php',
-                    data: { name: name },
+                    data: { name: name, heading_id: heading },
                     success: function (data, statusTxt, xhr) {
 
                         if (xhr.status == 201) {
@@ -551,8 +616,6 @@ $(document).ready(function () {
                         printResponseMessages(jqXHR.status, jqXHR.responseJSON, '#showDbTagsErrorMessages', 'warning,danger')
                     }
                 })
-            } else {
-                console.log('ne')
             }
         } else {
 
@@ -560,7 +623,7 @@ $(document).ready(function () {
                 $.ajax({
                     method: 'post',
                     url: 'models/tags/update.php',
-                    data: { name: name, id: id },
+                    data: { name: name, id: id, heading_id: heading },
                     success: function (data, statusTxt, xhr) {
                         if (xhr.status == 204) {
                             window.location.href = 'admin.php?page=tags'
@@ -575,13 +638,21 @@ $(document).ready(function () {
     }
     const validationTags = () => {
         const name = document.querySelector('#tagName').value
-        const reNameTag = /^([A-Z]{1,}|[A-Z][a-z]{2,15})(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,})*$/
+        const heading = document.querySelector("#heading_tag").value
+        const reNameTag = /^([A-Z]{1,}|[A-Z][a-z]{2,15}|[\w\d]{1,})([\.\:])?(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,})*$/
         const errors = []
         if (!reNameTag.test(name)) {
             errors.push(name)
             createValidationErrorMessage('#tagNameErrorMessage', 'text-danger', "Tag name isn't ok")
         } else {
             removeValidationErrrorMessage('#tagNameErrorMessage', 'text-danger')
+        }
+
+        if (heading == 0) {
+            errors.push(heading)
+            createValidationErrorMessage('#tagHeading', 'text-danger', 'Must choose heading')
+        } else {
+            removeValidationErrrorMessage('#tagHeading', 'text-danger')
         }
         return errors
     }
@@ -664,7 +735,25 @@ $(document).ready(function () {
             </tr>
         `
     }
+    const getAllRoles = document.querySelectorAll('.roles')
+    getAllRoles.forEach(role => {
+        role.addEventListener('change', () => {
+            let journalistRoles = document.querySelectorAll('.journalistRoles')
+            if (role.value == 2) {
+                journalistRoles.forEach(journalistRole => {
+                    journalistRole.disabled = false
+                })
+            } else {
+                journalistRoles.forEach(journalistRole => {
+                    journalistRole.checked = false
+                    journalistRole.disabled = true
+                })
+            }
+        })
+    })
     const userFormValidationAndRequest = () => {
+
+
         const id = document.querySelector('#userId').value
         const first_name = document.querySelector('#userFirstName').value
         const last_name = document.querySelector('#userLastName').value
@@ -672,6 +761,9 @@ $(document).ready(function () {
 
         const password = id == "" ? document.querySelector("#userPassword").value : ""
         const role = $('input[name="userRole"]:checked').val()
+
+        const journalistRole = $('input[name="journalistRole"]:checked').val()
+
         if (id == "") {
             if (validationUserForm().length == 0) {
                 $.ajax({
@@ -682,7 +774,8 @@ $(document).ready(function () {
                         last_name: last_name,
                         email: email,
                         password: password,
-                        role: role
+                        role: role,
+                        journalistRole: journalistRole
                     },
                     success: function (data, statusTxt, xhr) {
                         if (xhr.status == 201) {
@@ -703,7 +796,8 @@ $(document).ready(function () {
                         first_name: first_name,
                         last_name: last_name,
                         email: email,
-                        role: role
+                        role: role,
+                        journalistRole: journalistRole
                     },
                     success: function (data, statusTxt, xhr) {
                         if (xhr.status == 204) {
@@ -717,6 +811,8 @@ $(document).ready(function () {
         }
     }
     const validationUserForm = () => {
+
+
         const id = document.querySelector('#userId').value
         const first_name = document.querySelector('#userFirstName').value
         const last_name = document.querySelector('#userLastName').value
@@ -725,6 +821,7 @@ $(document).ready(function () {
         const password = id == "" ? document.querySelector("#userPassword").value : ""
 
         const role = $('input[name="userRole"]:checked').val()
+        const journalistRole = $('input[name="journalistRole"]:checked').val()
 
         const reFirstLastName = /^[A-Z][a-z]{3,15}$/
         const reEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
@@ -764,6 +861,12 @@ $(document).ready(function () {
             createValidationErrorMessage('#userRoleErrorMessage', 'text-danger', 'You must choose role')
         } else {
             removeValidationErrrorMessage('#userRoleErrorMessage', 'text-danger')
+        }
+        if (role == 2 && !journalistRole) {
+            errors.push(journalistRole)
+            createValidationErrorMessage('#journalistRoleError', 'text-danger', 'If u choose journalist,  u must choose category for journalist')
+        } else {
+            removeValidationErrrorMessage('#journalistRoleError', 'text-danger')
         }
         return errors
     }
