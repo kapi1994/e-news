@@ -1,6 +1,5 @@
 <?php
 if (isset($_SESSION['user'])) {
-    // var_dump($_SESSION['user']);
     if ($_SESSION['user']->roleName == "User") {
         header("Location:admin.php?page=status&status=401");
     }
@@ -22,27 +21,31 @@ $posts = postPagination($user);
                 <div class="mb-3">
                     <input type="text" name="searchPosts" id="searchPosts" placeholder="searchPosts" class="form-control">
                 </div>
-                <div class="mb-3">
-                    <div class="d-grid">
-                        <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategories" aria-expanded="false" aria-controls="collapseCategories">
-                            Filter by categories:
-                        </button>
-                        <div class="collapse mt-2" id="collapseCategories">
-                            <?php
-                            $categories = getAll("categories");
-                            foreach ($categories as $category) :
-                            ?>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="<?= $category->id ?>" id="category<?= $category->id ?>" name="categories">
-                                    <label class="form-check-label" for="category<?= $category->id ?>">
-                                        <?= $category->name ?>
-                                    </label>
-                                </div>
-                            <?php endforeach; ?>
+                <?php
+                if (isset($_SESSION['user']) && $_SESSION['user']->roleName == "Admin") :
+                ?>
+                    <div class="mb-3">
+                        <div class="d-grid">
+                            <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCategories" aria-expanded="false" aria-controls="collapseCategories">
+                                Filter by categories:
+                            </button>
+                            <div class="collapse mt-2" id="collapseCategories">
+                                <?php
+                                $categories = getAll("categories");
+                                foreach ($categories as $category) :
+                                ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="<?= $category->id ?>" id="category<?= $category->id ?>" name="categories">
+                                        <label class="form-check-label" for="category<?= $category->id ?>">
+                                            <?= $category->name ?>
+                                        </label>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
-                    </div>
 
-                </div>
+                    </div>
+                <?php endif; ?>
                 <div class="mb-3">
                     <div class="d-grid">
                         <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHeadings" aria-expanded="false" aria-controls="collapseHeadings">
@@ -51,7 +54,12 @@ $posts = postPagination($user);
                     </div>
                     <div class="collapse mt-2" id="collapseHeadings">
                         <?php
-                        $headings = getAll('headings');
+                        if ($user->roleName == "Journalist") {
+                            $JournalistCategory = $_SESSION['user']->category_id;
+                            $headings = $conn->query("SELECT * FROM headings WHERE category_id ='$JournalistCategory'");
+                        } else {
+                            $headings = getAll('headings');
+                        }
                         foreach ($headings as $heading) :
                         ?>
                             <div class="form-check">

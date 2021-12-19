@@ -45,17 +45,33 @@ if (isset($_SESSION['user'])) {
                     <div class="mb-3">
                         <label for="" class="mb-1">Roles:</label>
                         <?php
-                        $roles = getAll('roles');
+                        $roles = rolesWithoutAdmin();
                         foreach ($roles as $role) :
                         ?>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="userRole" id="userRole<?= $role->id ?>" value="<?= $role->id ?>" <?php if (isset($_GET['id']) && $role->id == $user->role_id) : ?> checked<?php else : ?><?php endif; ?>>
+                                <input class="form-check-input roles" type="radio" name="userRole" id="userRole<?= $role->id ?>" value="<?= $role->id ?>" <?php if (isset($_GET['id']) && $role->id == $user->role_id) : ?> checked<?php else : ?><?php endif; ?>>
                                 <label class="form-check-label" for="userRole<?= $role->id ?>">
                                     <?= $role->name ?>
                                 </label>
                             </div>
                         <?php endforeach; ?>
                         <em id="userRoleErrorMessage"></em>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="journalistRole">Journalist category:</label>
+                        <?php
+                        $categories = getAll('categories');
+                        foreach ($categories as $category) :
+                        ?>
+                            <div class="form-check">
+                                <input class="form-check-input journalistRoles " type="radio" name="journalistRole" value="<?= $category->id ?>" id="journalistRole<?= $category->id ?>" <?php if ((isset($_GET['id']) && $user->role_id != 2 || (!isset($_GET['id'])))) : ?> disabled<?php endif; ?>>
+                                <label class="form-check-label" for="journalistRole<?= $category->id ?>">
+                                    <?= $category->name ?>
+                                </label>
+                            </div>
+                        <?php endforeach ?>
+                        <em id="journalistRoleError"></em>
                     </div>
                     <div class="d-grid"><button class="btn btn-primary" id="btnSumbitUser"><?php if (isset($_GET['id'])) : ?>Update<?php else : ?> Save<?php endif; ?></button></div>
                 </form>
