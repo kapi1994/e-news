@@ -46,7 +46,7 @@ if (!isset($_SESSION['user']) || ($_SESSION['user'] && $_SESSION['user']->roleNa
                 </div>
             </div>
             <hr>
-            <div class="row">
+            <div class="row mb-2">
                 <div class="col-lg-6 mx-auto d-flex justify-content-center">
                     Copyright <p id="getYear" class="ms-3"></p>
                 </div>
@@ -56,18 +56,18 @@ if (!isset($_SESSION['user']) || ($_SESSION['user'] && $_SESSION['user']->roleNa
 <?php endif ?>
 </body>
 <script>
-    const date = new Date()
-    document.querySelector('#getYear').textContent = date.getFullYear()
+
 </script>
 <script src=" assets/js/jquery.js">
 </script>
-<script src="assets/package/dist/chart.js"></script>
+
 <script src="assets/js/admin.js"></script>
 <script src="assets/js/main.js"></script>
 <script src="assets/js/logAndReg.js"></script>
 <?php
 if (isset($_SESSION['user']) && $_SESSION['user']->roleName == "Admin") :
 ?>
+    <script src="assets/package/dist/chart.js"></script>
     <script src="assets/js/statistics.js"></script>
 <?php endif; ?>
 
