@@ -36,15 +36,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($check > 0) {
             echo json_encode("That email is already taken!");
             http_response_code(409);
-        }
-        try {
-            insertUser($firstName, $lastName, $email, $password, $role, USER_CATEGORY);
-            insertActivity("Register", $email);
-            echo json_encode("Register success");
-            http_response_code(201);
-        } catch (PDOException $th) {
-            echo json_encode($th->getMessage());
-            http_response_code(500);
+        } else {
+            try {
+                insertUser($firstName, $lastName, $email, $password, $role, USER_CATEGORY);
+                insertActivity("Register", $email);
+                echo json_encode("Register success");
+                http_response_code(201);
+            } catch (PDOException $th) {
+                echo json_encode($th->getMessage());
+                http_response_code(500);
+            }
         }
     }
 } else {
