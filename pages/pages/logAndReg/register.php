@@ -2,8 +2,9 @@
     <div class="container">
         <div class="row my-5">
             <div class="col-6 mx-auto">
+                <div id="registerResponseErrorMessage"></div>
                 <h1 class="text-center">Register</h1>
-                <form action="">
+                <form action="#">
                     <div class="mb-3">
                         <label for="userFirstName">First name:</label>
                         <input type="text" name="userFirstName" id="userFirstName" class="form-control">
@@ -26,7 +27,7 @@
                     </div>
                     <div class="d-grid gap-2">
                         <button class="btn btn-primary" id="btnRegister" type="button">Registrujte se</button>
-                        <a href="index.php?page=login" class="btn btn-outline-dark">Register</a>
+                        <a href="index.php?page=login" class="btn btn-outline-dark">Imate nalog? Ulogujte se</a>
                     </div>
                 </form>
             </div>
