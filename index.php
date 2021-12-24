@@ -30,6 +30,9 @@ if (isset($_GET['page'])) {
         case 'author':
             include 'pages/pages/user/author.php';
             break;
+        case 'contact':
+            include 'pages/pages/user/contact.php';
+            break;
         default:
             include 'pages/fixed/status.php';
     }
