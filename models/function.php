@@ -35,18 +35,18 @@ function updateCategory($name, $date, $id)
     $queryUpdate->execute([$name, $date, $id]);
     return $queryUpdate;
 }
-function insertTag($name)
+function insertTag($name, $heading)
 {
     global $conn;
-    $queryInsert = $conn->prepare("INSERT INTO tags (name) VALUES(?)");
-    $queryInsert->execute([$name]);
+    $queryInsert = $conn->prepare("INSERT INTO tags (name, heading_id) VALUES(?,?)");
+    $queryInsert->execute([$name, $heading]);
     return $queryInsert;
 }
-function updateTag($name, $date, $id)
+function updateTag($name, $date, $heading, $id)
 {
     global $conn;
-    $res = $conn->prepare("UPDATE tags SET name=?,date=? WHERE id=? ");
-    $res->execute([$name, $date, $id]);
+    $res = $conn->prepare("UPDATE tags SET name=?,updated_at=?, heading_id =? WHERE id=? ");
+    $res->execute([$name, $date, $heading, $id]);
     return $res;
 }
 
@@ -95,21 +95,16 @@ function getAllUsers()
 {
     global $conn;
     $res = '';
-    $query = $conn->query("SELECT u.*, r.name as roleName FROM users u JOIN roles r ON u.role_id = r.id WHERE r.name != 'Admin' ORDER BY u.created_at DESC");
+    $res = $conn->query("SELECT u.*, r.name as roleName FROM users u JOIN roles r ON u.role_id = r.id WHERE r.name != 'Admin' ORDER BY u.created_at DESC")->fetchAll();
 
-    if ($query->rowCount() == 1) {
-        $res = $query->fetch();
-    } else {
-        $res = $query->fetchAll();
-    }
     return $res;
 }
 
-function insertUser($firstName, $lastName, $email, $password, $role)
+function insertUser($firstName, $lastName, $email, $password, $role, $journalistRole)
 {
     global $conn;
-    $res = $conn->prepare("INSERT INTO users (first_name,last_name, email, password, role_id) VALUES(?,?,?,?,?)");
-    $res->execute([$firstName, $lastName, $email, md5($password), $role]);
+    $res = $conn->prepare("INSERT INTO users (first_name,last_name, email, password, role_id,category_id) VALUES(?,?,?,?,?,?)");
+    $res->execute([$firstName, $lastName, $email, md5($password), $role, $journalistRole]);
     return $res;
 }
 
@@ -123,7 +118,7 @@ function updateUser($firstName, $lastName, $email, $role_id, $date)
 function getComments($postId, $parentComment = 0)
 {
     global $conn;
-    $res = $conn->query("SELECT c.*, u.first_name as firstName, u.last_name as lastName FROM comments c JOIN users u ON c.user_id = u.id WHERE post_id='$postId' AND parent_id ='$parentComment' ORDER BY created_at ASC")->fetchAll();
+    $res = $conn->query("SELECT c.*, u.first_name as firstName, u.last_name as lastName FROM comments c JOIN users u ON c.id_user = u.id WHERE id_post='$postId' AND parent_id ='$parentComment' ORDER BY created_at ASC")->fetchAll();
     return $res;
 }
 
@@ -170,24 +165,34 @@ function resizeImage($file, $normal_path, $small_path)
     $new_normal_path = $normal_path . $new_image_name;
     $new_small_path = $small_path . $new_image_name;
     move_uploaded_file($tmp_name, $new_normal_path);
-    $getImageDimensions = getimagesize($new_normal_path);
+    // $getImageDimens  new_normalions = getimagesize($new_normal_path);
     //var_dump($getImageDimensions);
-    $width = $getImageDimensions[0];
-    $height = $getImageDimensions[1];
-
-    $newHeight = 200;
-    $newWidth = $width / ($height / $newHeight);
-    $imageExtension = pathinfo($new_normal_path, PATHINFO_EXTENSION);
-    if ($imageExtension == 'png') {
-        $resource = imagecreatefrompng($new_normal_path);
-        $canvars  = imagecreatetruecolor($newHeight, $newHeight);
-        imagecopyresampled($canvars, $resource, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-        imagepng($canvars, $new_small_path);
-    } else {
-        $resource = imagecreatefromjpeg($new_normal_path);
-        $canvars  = imagecreatetruecolor($newHeight, $newHeight);
-        imagecopyresampled($canvars, $resource, 0, 0, 0, 0, $newHeight, $newHeight, $width, $height);
-        imagejpeg($canvars, $new_small_path);
+    $getImageDimensions = getimagesize($new_normal_path);
+    $w = $getImageDimensions[0];
+    $h = $getImageDimensions[1];
+    $tw = 300;
+    $th = ($tw * $h) / $w;
+    $thumbnail = imagecreatetruecolor($tw, $th);
+    imagealphablending($thumbnail, false);
+    imagesavealpha($thumbnail, true);
+    $transparent = imagecolorallocatealpha($thumbnail, 255, 255, 255, 127);
+    imagefilledrectangle($thumbnail, 0, 0, $tw, $th, $transparent);
+    switch ($image['type']) {
+        case 'image/png':
+            $source = imagecreatefrompng($new_normal_path);
+            break;
+        default:
+            $source = imagecreatefromjpeg($new_normal_path);
+            break;
+    }
+    imagecopyresampled($thumbnail, $source, 0, 0, 0, 0, $tw, $th, $w, $h);
+    switch ($image['type']) {
+        case 'image/png':
+            imagepng($thumbnail, $new_small_path);
+            break;
+        default:
+            imagejpeg($thumbnail, $new_small_path);
+            break;
     }
 
     return $new_image_name;
@@ -223,16 +228,16 @@ function loginUser($email, $password)
     $user = $res->fetch();
     return $user;
 }
-function insertComment($table, $user_id, $comment_id = 0, $post_id, $text)
+function insertComment($table, $text, $comment_id, $post_id, $user_id)
 {
     global $conn;
     $queryInsert = "";
     if ($comment_id == 0) {
-        $queryInsert  = $conn->prepare("INSERT INTO $table (text,user_id, post_id) VALUES(?,?,?)");
-        $queryInsert->execute([$text, $user_id, $post_id]);
+        $queryInsert  = $conn->prepare("INSERT INTO $table (text,id_post, id_user) VALUES(?,?,?)");
+        $queryInsert->execute([$text,  $post_id, $user_id]);
     } else {
-        $queryInsert  = $conn->prepare("INSERT INTO $table (text,user_id, post_id,parent_id) VALUES(?,?,?,?)");
-        $queryInsert->execute([$text, $user_id, $post_id, $comment_id]);
+        $queryInsert  = $conn->prepare("INSERT INTO $table ( text ,parent_id, id_post, id_user) VALUES(?,?,?,?)");
+        $queryInsert->execute([$text, $comment_id, $post_id, $user_id]);
     }
 }
 
@@ -352,7 +357,7 @@ function getColumnsTable()
 function getSelectedTags($post_id)
 {
     global $conn;
-    $query = "SELECT * FROM tags WHERE id IN ";
+    $query = "SELECT id, name FROM tags WHERE id IN ";
     $query .= "(SELECT tag_id FROM post_tag WHERE post_id = ?)";
     $result = $conn->prepare($query);
     $result->execute([$post_id]);
@@ -483,7 +488,7 @@ function getNumOfTags($action, $keyword = '')
 
 
 
-function postPagination($user, $limit = 0, $text = "", $order = 0, $categories = "", $headings = "")
+function    postPagination($user, $limit = 0, $text = "", $order = 0, $categories = "", $headings = "")
 {
 
     global $conn;
@@ -496,6 +501,7 @@ function postPagination($user, $limit = 0, $text = "", $order = 0, $categories =
     $baseQuery = "SELECT p.*, c.name as categoryName, h.name as headingName FROM posts p JOIN categories c ON p.category_id = c.id JOIN headings h ON p.heading_id = h.id";
     if ($user->roleName == "Journalist") {
         $query = " WHERE p.user_id = '$user->id'";
+        $baseQuery .= $query;
     }
 
     if ($text != "") {
@@ -591,7 +597,7 @@ function getNumOfPosts($action, $user, $text = "", $categories = '', $headings =
             if ($text != "") {
                 $query .= " AND category_id IN ($categories)";
             } else {
-                $query = " WHERE p.category_id IN ($categories)";
+                $query = " WHERE category_id IN ($categories)";
                 $baseQuery .= $query;
             }
         }
@@ -611,7 +617,7 @@ function getNumOfPosts($action, $user, $text = "", $categories = '', $headings =
         }
     }
 
-    $baseQuery = $baseQuery . $query;
+    // $baseQuery = $baseQuery . $query;
     // return $baseQuery;
     if ($action == 'count') {
         $res = $conn->query($baseQuery)->fetch();
@@ -633,16 +639,18 @@ function categoriesCount()
 function userPagination($limit = 0, $keyword = '', $order = 0, $role_id = 0)
 {
     global $conn;
-    $query = " WHERE r.name != 'Admin'";
-    $baseQuery = "SELECT u.*, r.name as roleName From users u JOIn roles r ON u.role_id = r.id";
+    $query = "";
+    $baseQuery = "SELECT u.*, r.name as roleName from users u join roles r ON u.role_id = r.id WHERE r.name != 'Admin'";
     $orderQuery = ' ORDER BY u.created_at DESC';
     $limitQuery = ' LIMIT :limit, :offset';
 
     if ($keyword != '') {
         $query .= " AND (u.first_name LIKE '$keyword' OR u.last_name LIKE '$keyword')";
+        $baseQuery .= $query;
     }
     if ($role_id != 0) {
         $query .= " AND u.role_id = '$role_id'";
+        $baseQuery .= $query;
     }
     if ($order == 1) {
         $orderQuery = " ORDER BY u.created_at ASC";
@@ -664,18 +672,20 @@ function getNumOfUsers($action, $keyword = '', $role_id = 0)
 {
     global $conn;
     $query = '';
-    $res = '';
-    $baseQuery = "SELECT COUNT(*) as numberOfUsers FROM users u JOIN roles r ON u.role_id = u.id";
-    $query = " WHERE r.name !='Admin' ";
+
+    $baseQuery = "SELECT COUNT(*) as numberOfUsers FROM users u JOIN roles r ON u.role_id = r.id WHERE r.name !='Admin'";
+
 
     if ($keyword != '') {
         $query .= " AND (u.first_name LIKE '$keyword' OR u.last_name LIKE '$keyword')";
+        $baseQuery .= $query;
     }
     if ($role_id != 0) {
         $query .= " AND u.role_id = '$role_id'";
+        $baseQuery .= $query;
     }
 
-    $baseQuery = $baseQuery . $query;
+    // var_dump($baseQuery);
     if ($action == 'count') {
         $res = $conn->query($baseQuery)->fetch();
     } else {
@@ -726,14 +736,7 @@ function cutName($name)
     return $res;
 }
 
-function insertActivity($action, $email)
-{
-    $file_open = fopen('../../data/userLog.txt', 'a');
-    $date = date("d-m-Y H:i:s");
-    $content = "{$email}\t{$action}\t{$date}\n";
-    fwrite($file_open, $content);
-    fclose($file_open);
-}
+
 
 function loggedInToday($path)
 {
@@ -888,4 +891,165 @@ function getHeadingsByCategoryName($categoryName)
     global $conn;
     $res = $conn->query("SELECT h.name as headingName FROM headings h JOIN categories c ON h.category_id = c.id WHERE c.name = '$categoryName'")->fetchAll();
     return $res;
+}
+
+function rolesWithoutAdmin()
+{
+    global $conn;
+    $res = $conn->query("SELECT * FROM roles WHERE name!='Admin'")->fetchAll();
+    return $res;
+}
+
+function getHeadingByCategoryId($id)
+{
+    global $conn;
+    $res = $conn->query("SELECT id, name FROM headings WHERE category_id = '$id' ")->fetchAll();
+    return $res;
+}
+function getTagsByCategory($category_id)
+{
+    global $conn;
+    $res = $conn->query("SELECT id, name FROM tags WHERE category_id='$category_id'")->fetchAll();
+    return $res;
+}
+
+function getTagsByHeading($heading_id)
+{
+    global $conn;
+    $res = $conn->query("SELECT id, name FROM tags WHERE heading_id ='$heading_id'")->fetchAll();
+    return $res;
+}
+
+function accountIsDisabled($user_email)
+{
+    $fileU = fopen("../../data/userLog.txt", "r");
+    $rowsU = file("../../data/userLog.txt");
+    fclose($fileU);
+    foreach ($rowsU as $row) {
+        $data = explode("\t", $row);
+        if ($data[0] == $user_email && $data[1] == "Dissabled account") {
+            return true;
+        }
+    }
+    return false;
+}
+
+function insertActivity($action, $email)
+{
+    $file_open = fopen('../../data/userLog.txt', 'a');
+    $date = date("d-m-Y H:i:s");
+    $content = "{$email}\t{$action}\t{$date}\n";
+    fwrite($file_open, $content);
+    fclose($file_open);
+
+    if ($action == "Dissabled account") {
+        sendDissMail($email, $date);
+    }
+}
+
+
+function insertThreeTimesInFive($user_email)
+{
+    $fileU = fopen("../../data/userLog.txt", "r");
+    $rowsU = file("../../data/userLog.txt");
+    fclose($fileU);
+    $dates = [];
+    foreach ($rowsU as $row) {
+        $data  = explode("\t", $row);
+        if ($data[0] == $user_email && $data[1] == "Invalid password") {
+            array_push($dates, $data[2]);
+        }
+    }
+
+    if (count($dates) < 3) {
+        return false;
+    }
+    if (threeInFiveMinutes($dates)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function threeInFiveMinutes($array)
+{
+    $first = strtotime($array[count($array) - 3] . " +5 minutes");
+    $last = strtotime($array[count($array) - 1]);
+
+    if ($first >= $last) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function sendDissMail($email, $date)
+{
+    global $conn;
+    // echo $email;
+    $from = "masternews247@gmail.com";
+    $usernameFrom = "E-news Admin";
+    $user = $conn->prepare("SELECT * FROM users WHERE email=?");
+    $user->execute([$email]);
+    $userData = $user->fetch();
+    // var_dump($userData);
+    $token = md5($userData->email . $date);
+    $to = $userData->email;
+    $usernameTo = $userData->first_name . " " . $userData->last_name;
+
+    $message = "Your account has been disabled! Click here to verify it;s you: http://localhost/e-news-master/models/action/verify.php?token=" . $token . "&id=" . $userData->id;
+    $messageHTML = "<div><h1>Your account has been disabled!</h1> <br/><p> Please click <a href='https://localhost/e-news-master/models/action/verify.php?token=" . $token . "&id=" . $userData->id . "'>this link</a> to verify that this is you.</p></div>";
+    $subject = "Your Account Has Been Disabled";
+
+    include 'sendEmail.php';
+}
+function enableAccount($user_id, $token)
+{
+
+    $fileU = fopen("../../data/userLog.txt", "r");
+    $rowsU = file("../../data/userLog.txt");
+    fclose($fileU);
+    $user = getOneFetchAndCheckData('users', 'id', $user_id, 'fetch');
+    // echo $token;
+    $email = $user->email; /*$new = tokenMatch($rowsU, $user_id, $token); return [$token, $email, $new];*/
+    // return $email;
+    // echo $user_id;
+    if (tokenMatch($rowsU, $user_id, $token)) {
+        $new = "";
+        foreach ($rowsU as $row) {
+            $data = explode("\t", $row);
+            echo $data;
+            if (!($data[0] == $email && (($data[1] == "Dissabled account") || ($data[1] == "Invalid password")))) {
+                $new .= $row;
+                echo $new;
+            }
+        }
+        $fileU = fopen("../../data/userLog.txt", "w");
+        fwrite($fileU, $new);
+        fclose($fileU);
+        return true;
+    } else {
+        return 'ne';
+    }
+}
+
+function tokenMatch($rowsU, $user_id, $token)
+{
+
+    $user = getOneFetchAndCheckData('users', 'id', $user_id, 'fetch');
+    // echo $user_id;
+    $email = $user->email;
+    // echo $email;
+    /*$token = md5($user->email.$date);*/
+    foreach ($rowsU as $row) {
+        $data = explode("\t", $row);
+        var_dump($data);
+        if (($data[0] == $email && $data[1] == "Dissabled account")) {
+            // echo $token;
+            // echo md5($email . trim($data[2]));
+            // return 'da';
+            return $token == md5($email . trim($data[2]));
+        }
+    }
+    return false;
 }
