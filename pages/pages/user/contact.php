@@ -1,24 +1,24 @@
 <main class="container">
     <div class="row my-3">
         <div class="col-lg-6 mx-auto">
-            <div id="printEmailMessage"></div>
+            <div id="printContactMessage"></div>
             <h1 class="text-center fs-1">Contact us</h1>
             <form action="models/action/contactus.php">
                 <div class="row g-3 align-items-center mb-3">
                     <div class="col-6">
                         <label for="firstName" class="col-form-label">First name:</label>
-                        <input type="text" name="firstName" id="firstName" class="form-control">
+                        <input type="text" name="firstName" id="firstName" class="form-control" value="<?= isset($_SESSION['user']) ? $_SESSION['user']->first_name : '' ?>">
                         <em id="contactFirstNameErrorMessage"></em>
                     </div>
                     <div class="col-6">
                         <label for="lastName" class="col-form-label">Last name:</label>
-                        <input type="text" name="lastName" id="lastName" class="form-control">
+                        <input type="text" name="lastName" id="lastName" class="form-control" value="<?= isset($_SESSION['user']) ? $_SESSION['user']->last_name : '' ?>">
                         <em id="contactLastNameErrorMessage"></em>
                     </div>
                 </div>
                 <div class="mb-3">
                     <label for="email">Email:</label>
-                    <input type="text" name="email" id="email" class="form-control" value="">
+                    <input type="text" name="email" id="email" class="form-control" value="<?= isset($_SESSION['user']) ? $_SESSION['user']->email : '' ?>">
                     <em id="contactEmailErrorMessage"></em>
                 </div>
                 <div class="mb-3">
