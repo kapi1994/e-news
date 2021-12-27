@@ -280,4 +280,98 @@ $(document).ready(function () {
     })
     const date = new Date()
     document.querySelector('#getYear').textContent = date.getFullYear()
+
+    $(document).on('click', '#btnContactUs', function (e) {
+        e.preventDefault()
+        // alert('da')
+        contactFormValidation()
+    })
+
+    const contactFormValidation = () => {
+        console.log('radi')
+        let first_name = document.querySelector('#firstName').value
+        let last_name = document.querySelector('#lastName').value
+        let email = document.querySelector('#email').value
+        let message = document.querySelector('#message').value
+
+        let errors = [];
+        console.log(first_name)
+        let reFirstLastName = /^[A-Z][a-z]{3,15}$/
+        let reEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+        // let reMessage = /^$/
+        if (!reFirstLastName.test(first_name)) {
+            errors.push(first_name)
+            createValidationErrorMessage('#contactFirstNameErrorMessage', 'text-danger', "First name isn't valid")
+        } else {
+            removeValidtionErrorMessage('#contactFirstNameErrorMessage', 'text-danger')
+        }
+        if (!reFirstLastName.test(last_name)) {
+            errors.push(last_name)
+            createValidationErrorMessage('#contactLastNameErrorMessage', 'text-danger', "Last name isn't vadlid")
+        } else {
+            removeValidtionErrorMessage('#contactLastNameErrorMessage', 'text-danger')
+        }
+        if (!reEmail.test(email)) {
+            errors.push(email)
+            createValidationErrorMessage('#contactEmailErrorMessage', 'text-danger', "Email isn't valid")
+        } else {
+            removeValidtionErrorMessage('#contactEmailErrorMessage', 'text-danger')
+        }
+        if (message.length == 0) {
+            errors.push(message)
+            createValidationErrorMessage('#contactMessageErrorMessage', 'text-danger', 'Message must not be empty')
+        } else {
+            removeValidtionErrorMessage('#contactMessageErrorMessage', 'text-danger')
+        }
+        if (errors.length == 0) {
+            $.ajax({
+                method: 'post',
+                url: 'models/action/contact.php',
+                data: {
+                    firstName: first_name,
+                    lastName: last_name,
+                    email: email,
+                    message: message
+                }, dataType: 'json',
+                success: function (data, statusTxt, xhr) {
+                    console.log(data.user)
+                    if (xhr.status == 201) {
+                        printMessage('We contact you soon as we can', '#printContactMessage', 'success')
+                        if (data.user != "") {
+                            document.querySelector('#message').value = ""
+                        } else {
+                            document.querySelector('#message').value = ""
+                            document.querySelector('#email').value = ""
+                            document.querySelector('#firstName').value = ""
+                            document.querySelector('#lastName').value = ""
+                        }
+                    }
+                }, error: function (err) {
+                    console.log(err)
+                }
+            })
+        }
+    }
+    const createValidationErrorMessage = (element, classes, text) => {
+        const el = document.querySelector(element)
+        el.classList.add(classes)
+        el.textContent = text
+    }
+
+    const removeValidtionErrorMessage = (element, classes) => {
+        const el = document.querySelector(element)
+        el.classList.remove(classes)
+        el.textContent = ""
+    }
+    const printMessage = (message, whereToPlace, color) => {
+
+        let ispis = ''
+        ispis += `
+            <div class="alert alert-${color} alert-dismissible fade show fw-bold" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `
+        $(whereToPlace).html(ispis)
+    }
 })
