@@ -28,6 +28,7 @@ if (isset($_SESSION['user'])) {
                 </div>
             </div>
             <div class="col-xs-12 col-lg-9">
+                <div id="printTagCrudMessage"></div>
                 <div class="table-responsive-sm table-responsive-md">
                     <table class="text-center align-middle table">
                         <thead class="table-dark">
@@ -56,7 +57,7 @@ if (isset($_SESSION['user'])) {
                                         <td><?= date("H:i:s d/m/Y", strtotime($tag->created_at)) ?></td>
                                         <td><?= $tag->updated_at != null  ? date("H:i:s d/m/Y", strtotime($tag->updated_at)) : '/' ?></td>
                                         <td><a href="admin.php?page=tag_action&id=<?= $tag->id ?>" class="btn btn-success btn-sm">Update</a></td>
-                                        <td><button type="button" class="btn btn-danger btn-sm" data-id="<?= $tag->id ?>">Delete</button></td>
+                                        <td><button type="button" class="btn btn-danger btn-sm delete-tag" data-id="<?= $tag->id ?>">Delete</button></td>
                                     </tr>
                                 <?php endforeach;
                             else :
