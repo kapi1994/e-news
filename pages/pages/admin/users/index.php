@@ -90,7 +90,7 @@ if (isset($_SESSION['user'])) {
                     <div class="row mt-3">
                         <div class="col-4 mx-auto">
                             <nav aria-label="...">
-                                <ul class="pagination" id="tagPagination">
+                                <ul class="pagination" id="userPagination">
                                     <?php
                                     $userPages = getNumOfUsers('pagination');
                                     for ($i = 0; $i < $userPages; $i++) :
