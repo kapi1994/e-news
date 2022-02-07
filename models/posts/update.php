@@ -1,11 +1,12 @@
 <?php
+session_start();
 header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = $_POST['id'];
     $name = $_POST['name'];
     $desc = $_POST['postDesc'];
 
-    $category = $_POST['category'];
+    $category = isset($_SESSION['user']) ? $_SESSION['user']->category_id : $_POST['category'];
     $heading = $_POST['heading'];
     $tags = $_POST['tags'];
     $tags_arr = explode(",", $tags);
@@ -19,8 +20,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    if ($category == 0) {
-        array_push($errors, "You must choose category for the post!");
+    if (isset($_SESSION['user'])  && $_SESSION['user']->roleName == "Admin") {
+        if ($category == 0) {
+            array_push($errors, "You must choose category for the post!");
+        }
     }
     if ($heading == 0) {
         array_push($errors, "You must choose heading for the post");
@@ -38,10 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         require_once '../../config/connection.php';
         require_once '../function.php';
         $checkName = getOneFetchAndCheckData('posts', 'name', $_POST['name'], 'check');
-        echo json_encode($checkName);
 
         if ($checkName > 0) {
-            echo json_encode($checkName);
             $post =  getOneFetchAndCheckData('posts', 'name', $name, 'fetch');
             if ($post->id == $id && $post->name == $name) {
                 if (isset($_FILES['image'])) {

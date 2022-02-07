@@ -6,7 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $description = $_POST['postDesc'];
     $image = $_FILES['image'];
-    $category = $_POST['category'];
+    $category = isset($_SESSION['user']) ? $_SESSION['user']->category_id : $_POST['category'];
     $heading = $_POST['heading'];
     $tags = $_POST['tags'];
     $tags_arr = explode(',', $tags);
@@ -23,8 +23,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($description == "") {
         array_push($errors, "Description must not be empty");
     }
-    if ($category == 0) {
-        array_push($errors, "U must pick category");
+    if (isset($_SESSION['user']) && $_SESSION['user']->roleName == "Admin") {
+        if ($category == 0) {
+            array_push($errors, "U must pick category");
+        }
     }
     if ($heading == 0) {
         array_push($errors, "U must pick heading");
