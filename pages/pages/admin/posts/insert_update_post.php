@@ -20,6 +20,7 @@ if (isset($_SESSION['user'])) {
         }
     }
     ?>
+
     <div class="row my-5">
         <div class="col-lg-6 mx-auto">
             <?php if (isset($_GET['id'])) : ?> <h1 class="text-center">Update post</h1><?php else : ?> <h1 class="text-center">Create new post</h1><?php endif; ?>
@@ -61,15 +62,14 @@ if (isset($_SESSION['user'])) {
                 <?php endif; ?>
                 <div class="mb-3">
                     <label for="" class="mb-1">Headings:</label>
-                    <select name="postHeading" id="postHeading" class="form-select" data-post="<?= $post->id ?>">
+                    <select name="postHeading" id="postHeading" class="form-select" data-post="<?= isset($_GET['id']) ? $_GET['id'] : '' ?>">
                         <option value="0">Choose</option>
                         <?php
                         if ($_SESSION['user']->roleName == "Journalist") {
-                            $category_id = $_SESSION['user']->cateogry_id;
+                            $category_id = $_SESSION['user']->category_id;
                             $headings = getHeadingByCategoryId($category_id);
                         } else if ($_GET['id']) {
-                            $headings = $conn->query("SELECT * FROM headings WHERE category_id ='$post->category_id'")->fetchAll();
-                            var_dump($headings);
+                            $headings = getHeadingByCategoryId($_GET['id']);
                         }
                         foreach ($headings as $heading) :
                         ?>
@@ -87,7 +87,6 @@ if (isset($_SESSION['user'])) {
                             <?php
                             if (isset($_GET['id'])) :
                                 $tags = getTagsByHeading($post->heading_id);
-                                var_dump($tagsArr);
                                 foreach ($tags as $tag) :
                             ?>
 
