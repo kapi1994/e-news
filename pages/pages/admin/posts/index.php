@@ -56,7 +56,7 @@ $posts = postPagination($user);
                         <?php
                         if ($user->roleName == "Journalist") {
                             $JournalistCategory = $_SESSION['user']->category_id;
-                            $headings = $conn->query("SELECT * FROM headings WHERE category_id ='$JournalistCategory'");
+                            $headings = getHeadingByCategoryId($JournalistCategory);
                         } else {
                             $headings = getAll('headings');
                         }
@@ -80,6 +80,7 @@ $posts = postPagination($user);
                 </div>
             </div>
             <div class="col-lg-9">
+                <div id="printPostCrudMessage"></div>
                 <div class="table-responsive-sm table-responsive-md">
                     <table class="table text-center align-middle">
                         <thead class="table-dark">
@@ -113,7 +114,7 @@ $posts = postPagination($user);
                                         <td><?= date("H:i:s d/m/Y", strtotime($post->created_at)) ?></td>
                                         <td><?= $post->updated_at != null ? date("H:i:s d/m/Y", strtotime($post->updated_at)) : "/" ?></td>
                                         <td><a href="admin.php?page=post_action&id=<?= $post->id ?>" class="btn btn-sm btn-success">Update</a></td>
-                                        <td><button type="button" class="btn btn-sm btn-danger" data-id="">Delete</button></td>
+                                        <td><button type="button" class="btn btn-sm btn-danger delete-post" data-id="<?= $post->id ?>">Delete</button></td>
                                         <td><a href="admin.php?page=post_details&id=<?= $post->id ?>" class="btn btn-sm btn-info">Details</a></td>
                                     </tr>
                                 <?php endforeach;
