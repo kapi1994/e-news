@@ -42,9 +42,9 @@
             foreach ($posts as $post) :
 
             ?>
-                <div class="col-lg-3 ">
+                <div class="col col-md-6 col-lg-3 mb-1">
                     <div class="card box h-100 d-flex flex-column">
-                        <img src="assets/images/posts/normal/<?= $post->image_path ?>" class="img-fluid" alt="<?= $post->name ?>">
+                        <img src="assets/images/posts/normal/<?= $post->image_path ?>" class="img-resize" alt="<?= $post->name ?>">
 
                         <a href="index.php?page=singleNews&id=<?= $post->id ?>" class="nav-link text-dark mt-auto">
                             <h5 class="card-title fs-6"><?= $post->name ?></h5>
