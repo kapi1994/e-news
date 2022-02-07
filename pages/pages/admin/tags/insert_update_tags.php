@@ -31,20 +31,32 @@ if (isset($_SESSION['user'])) {
 
                     <div class="mb-3">
                         <label for="">Heading:</label>
-                        <select name="heading_tag" id="heading_tag" class="form-select">
-                            <option value="0">Choose</option>
+
+                        <?php
+                        if (isset($_GET['id'])) {
+                            $selectedHeadings = getTagHeadings($_GET['id']);
+                        }
+
+                        if ($_SESSION['user']->roleName == "Journalist") {
+                            $category_id = $_SESSION['user']->category_id;
+                            $headings = getHeadingByCategoryId($category_id);
+                        } else {
+                            $headings = getAll('headings');
+                        } ?>
+                        <div class="row text-center">
                             <?php
-                            if ($_SESSION['user']->roleName == "Journalist") {
-                                $category_id = $_SESSION['user']->category_id;
-                                $headings = getHeadingByCategoryId($category_id);
-                            } else {
-                                $headings = getAll('headings');
-                            }
                             foreach ($headings as $heading) :
                             ?>
-                                <option value="<?= $heading->id ?>" <?php if (isset($_GET['id']) && $tag->heading_id == $heading->id) : ?> selected <?php endif; ?>><?= $heading->name ?></option>
+                                <div class="col-xs-12 col-6 col-lg-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="<?= $heading->id ?>" id="heading<?= $heading->id ?>" name="tagHeadings" <?php if (isset($headings) && isset($selectedHeadings) && in_array($heading->id, $selectedHeadings)) : ?> checked <?php endif; ?>>
+                                        <label class="form-check-label" for="heading<?= $heading->id ?>">
+                                            <?= $heading->name ?>
+                                        </label>
+                                    </div>
+                                </div>
                             <?php endforeach; ?>
-                        </select>
+                        </div>
                         <em id="tagHeading"></em>
                     </div>
                     <div class="d-grid">
