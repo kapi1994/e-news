@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
     try {
         require_once '../../config/connection.php';
         require_once '../function.php';
-        $getAllTags = getTagsByHeading($heading_id);
+        $getAllTags = getTagIdNameByHeading($heading_id);
         $postTags = getSelectedTags($post);
         echo json_encode([
             'allTags' => $getAllTags,
