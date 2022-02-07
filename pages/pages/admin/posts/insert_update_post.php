@@ -82,23 +82,22 @@ if (isset($_SESSION['user'])) {
                     <label for="" class="mb-1">
                         Tags:
                     </label>
-                    <div class="row">
-                        <div id="heading_tag">
-                            <?php
-                            if (isset($_GET['id'])) :
-                                $tags = getTagsByHeading($post->heading_id);
-                                foreach ($tags as $tag) :
-                            ?>
-
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" value="<?= $tag->id ?>" id="tag<?= $tag->id ?>" name="postTags" <?php if (isset($tags) && isset($tagsArr) && in_array($tag->id, $tagsArr)) : ?> checked <?php endif ?>>
-                                        <label class="form-check-label" for="tag<?= $tag->id ?>">
-                                            <?= $tag->name ?>
-                                        </label>
-                                    </div>
-                            <?php endforeach;
-                            endif; ?>
-                        </div>
+                    <?php ?>
+                    <div class="row" id="heading_tag">
+                        <?php
+                        $tags = getTagIdNameByHeading($post->heading_id);
+                        foreach ($tags as $tag) :
+                        ?>
+                            <div class="col-xs-12 col-6 col-lg-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="<?= $tag->id ?>" id="tag<?= $tag->id ?>" name="postTags" <?php
+                                                                                                                                                    if (isset($tags) && isset($tagsArr) && in_array($tag->id, $tagsArr)) :
+                                                                                                                                                    ?>checked<?php endif; ?> <label class="form-check-label" for="tag<?= $tag->id ?>">
+                                    <?= $tag->name ?>
+                                    </label>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                     <em id="postTagsErrorMessage"></em>
                 </div>
