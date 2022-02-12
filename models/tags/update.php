@@ -1,7 +1,7 @@
 <?php
 header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $reName = '/^([A-Z]{1,}|[A-Z][a-z]{2,15}|[\w\d]{1,})(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,})*$/';
+    $reName = '/^([A-Z]{1,}|[A-Z][a-z]{2,15}|[\w\d]{1,})([\.\:])?(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,}|\s[\d]{1,}| \')*/';
     $headings_arr = $_POST['headings'];
     // echo json_encode($headings_arr);
     $errors = [];
