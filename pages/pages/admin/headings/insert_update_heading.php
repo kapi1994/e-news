@@ -26,13 +26,17 @@ if (isset($_SESSION['user'])) {
                     </div>
                     <div class="mb-3">
                         <label for="" class="mb-1">Categories:</label>
-                        <select name="headingCategory" id="headingCategory" class="form-select">
+                        <select name="headingCategory" id="headingCategory" class="form-select" <?php
+                                                                                                if ($_SESSION['user']->roleName == "Journalist") :
+                                                                                                ?> disabled<?php endif; ?>>
                             <option value="0">Choose</option>
                             <?php
                             $categories = getAll('categories');
                             foreach ($categories as $category) :
+
                             ?>
-                                <option value="<?= $category->id ?>" <?php if (isset($_GET['id']) && $heading->category_id == $category->id) : ?> selected <?php endif; ?>><?= $category->name ?></option>
+
+                                <option value="<?= $category->id ?>" <?php if (isset($_GET['id']) && $heading->category_id == $category->id) : ?> selected <?php elseif ($_SESSION['user']->roleName == "Journalist" && $category->id == $_SESSION['user']->category_id) : ?> selected <?php endif; ?>><?= $category->name ?></option>
                             <?php endforeach; ?>
                         </select>
                         <em id="headingCategoryErrorMessage"></em>
