@@ -1,6 +1,6 @@
 <?php
 if (isset($_SESSION['user'])) {
-    if ($_SESSION['user']->roleName == "User") {
+    if ($_SESSION['user']->roleName == "User" || $_SESSION['user']->roleName == "Journalist") {
         header("Location:admin.php?page=status&code=401");
     }
 } else {
