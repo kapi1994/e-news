@@ -1,9 +1,10 @@
 <?php
+session_start();
 header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
 
-
+    $user = $_SESSION['user'];
     $text = $_GET['text'];
     $compareString = trim("%$text%");
     $order = $_GET['order']  ? $_GET['order'] : 0;
@@ -14,8 +15,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     require_once '../../config/connection.php';
     require_once '../function.php';
 
-    $res = getHeadingWithCategory($limit, $compareString, $order);
-    $pages = getNumOfHeadings('pagination', $compareString);
+    $res = getHeadingWithCategory($user, $limit, $compareString, $order);
+    $pages = getNumOfHeadings($user, 'pagination', $compareString);
     echo json_encode([
         'headings' => $res,
         'pages' => $pages,
