@@ -29,8 +29,10 @@
         <?php
         if (isset($_SESSION['user'])) :
             if ($_SESSION['user']->roleName == "Journalist" || $_SESSION['user']->roleName == "Admin") :
+                if ($_SESSION['user']->roleName == "Admin") :
         ?>
-                <li class="nav-item"><a href="admin.php?page=categories" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'categories') : ?> fw-bold active<?php endif; ?>">Categories</a></li>
+                    <li class="nav-item"><a href="admin.php?page=categories" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'categories') : ?> fw-bold active<?php endif; ?>">Categories</a></li>
+                <?php endif; ?>
                 <li class="nav-item"><a href="admin.php?page=headings" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'headings') : ?> fw-bold active<?php endif; ?>">Headings</a></li>
                 <li class="nav-item"><a href="admin.php?page=tags" class="nav-link <?php if (isset($_GET['page']) && $_GET['page'] == 'tags') : ?> fw-bold active<?php endif; ?>">Tags</a></li>
                 <?php if ($_SESSION['user']->roleName == "Admin") : ?>
