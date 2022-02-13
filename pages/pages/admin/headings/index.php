@@ -6,6 +6,7 @@ if (isset($_SESSION['user'])) {
 } else {
     header("Location:admin.php?page=status&code=401");
 }
+$user = $_SESSION['user'];
 ?>
 <section>
     <div class="container">
@@ -47,14 +48,18 @@ if (isset($_SESSION['user'])) {
                         </thead>
                         <tbody id="headings">
                             <?php
-                            $headingsCount = getNumOfHeadings('count');
+                            $headingsCount = getNumOfHeadings($user, 'count');
 
                             if ($headingsCount->numOfHeadings > 0) :
                             ?>
                                 <?php
                                 $rb  = 1;
-                                $headings = getHeadingWithCategory();
-
+                                if ($_SESSION['user']->roleName == "Journalist") {
+                                    $category_id  = $_SESSION['user']->category_id;;
+                                    $headings = getHeadingByCategoryId($category_id);
+                                } else {
+                                    $headings = getHeadingWithCategory($user);
+                                }
                                 foreach ($headings as $heading) :
                                 ?>
                                     <tr>
@@ -75,7 +80,7 @@ if (isset($_SESSION['user'])) {
                         </tbody>
                     </table>
                     <?php
-                    $headingElementsCount =  getNumOfHeadings('count');
+                    $headingElementsCount =  getNumOfHeadings($user, 'count');
 
                     if ($headingElementsCount->numOfHeadings > 5) :
 
@@ -85,7 +90,7 @@ if (isset($_SESSION['user'])) {
                                 <nav aria-label="...">
                                     <ul class="pagination" id="headingPagination">
                                         <?php
-                                        $headingPagination = getNumOfHeadings('fetch');
+                                        $headingPagination = getNumOfHeadings($user, 'fetch');
 
                                         for ($i = 0; $i < $headingPagination; $i++) :
                                             if ($i == 0) :
