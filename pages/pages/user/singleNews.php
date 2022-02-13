@@ -14,6 +14,7 @@
                 ?>
                 <div class="row">
                     <div class="col-lg-8">
+
                         <img src="assets/images/posts/normal/<?= $post->image_path ?>" alt="" class="img-fluid">
                         <div class="d-flex">
                             <p class="text-danger my-3 fs-6"><?= $post->headingName ?></p><span class="my-3 mx-3 text-muted fw-bold">Autor: <?= $post->first_name . " " . $post->last_name ?></span><span class="my-3 mx-3 text-muted"><?= date("H:i:s d/m/Y", strtotime($post->created_at)); ?></span>
@@ -109,36 +110,41 @@
                                 <div class="collapse" id="commentReply<?= $comment->id ?>">
 
                                 </div>
+
+
+                            <?php endforeach; ?>
                         </div>
-
-                    <?php endforeach;
-
-                    ?>
                     </div>
-                    <div class=" col-lg-4">
-                        <?php
-                        foreach ($getPostsWithoutThis as $pGet) :
-                        ?>
-                            <div class="card mb-1">
+                    <div class="col-lg-4">
+                        <div class="row d-flex flex-column">
+                            <?php
+                            foreach ($getPostsWithoutThis as $pGet) :
+                            ?>
+                                <div class="row">
+                                    <div class=" card mb-1">
 
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <img src="assets/images/posts/thumbnail/<?= $pGet->image_path ?>" alt="<?= $pGet->name ?>" class="img-fluid mt-4">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <img src="assets/images/posts/thumbnail/<?= $pGet->image_path ?>" alt="<?= $pGet->name ?>" class="img-fluid mt-4">
+                                                </div>
+                                                <div class="col-6">
+                                                    <a href="index.php?page=singleNews&id=<?= $pGet->id ?>" class="nav-link text-dark"> <em class="text-muted"><?= $pGet->name ?></em></a>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-8">
-                                            <a href="index.php?page=singleNews&id=<?= $pGet->id ?>" class="nav-link text-dark"> <em class="text-muted"><?= $pGet->name ?></em></a>
+                                        <div class="card-footer">
+                                            <div class="float-end">
+                                                <span class="text-muted"><?= date("H:i:s d/m/Y", strtotime($pGet->created_at)); ?></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-footer">
-                                    <div class="float-end">
-                                        <span class="text-muted"><?= date("H:i:s d/m/Y", strtotime($pGet->created_at)); ?></span>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
+
+
                 </div>
 
             </div>
