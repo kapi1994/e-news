@@ -7,3 +7,15 @@
 .large-font{
     font-size:10rem !important;
 }
+
+.img-resize{
+    height: 15rem;
+    object-fit: cover;
+    object-position: center center;
+}
+
+.small-image{
+    height:10rem;
+    object-fit: cover;
+    object-position: center center;
+}
