@@ -6,6 +6,7 @@ if (isset($_SESSION['user'])) {
 } else {
     header("Location:admin.php?page=status&code=401");
 }
+$user = $_SESSION['user'];
 ?>
 <section>
     <div class="container">
@@ -43,12 +44,13 @@ if (isset($_SESSION['user'])) {
                         </thead>
                         <tbody id='tags'>
                             <?php
-                            $tagElemenets = getNumOfTags('count');
+                            $tagElemenets = getNumOfTags($user, 'count');
                             if ($tagElemenets->numOfTags > 0) :
                             ?>
                                 <?php
                                 $rb = 1;
-                                $tags = getAllTags();
+                                $user = $_SESSION['user'];
+                                $tags = getAllTags($user);
                                 foreach ($tags as $tag) :
                                 ?>
                                     <tr>
@@ -69,15 +71,15 @@ if (isset($_SESSION['user'])) {
                         </tbody>
                     </table>
                     <?php
-                    $tagElemenets = getNumOfTags('count');
+                    $tagElemenets = getNumOfTags($user, 'count');
                     if ($tagElemenets->numOfTags > 5) :
                     ?>
                         <div class="row mt-3">
-                            <div class="col-4 mx-auto">
+                            <div class="col col-lg-8 mx-auto">
                                 <nav aria-label="...">
                                     <ul class="pagination" id="tagPagination">
                                         <?php
-                                        $tagPagination = getNumOfTags('pagination');
+                                        $tagPagination = getNumOfTags($user, 'pagination');
                                         for ($i = 0; $i < $tagPagination; $i++) :
                                             if ($i == 0) :
                                         ?>
