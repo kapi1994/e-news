@@ -1,6 +1,8 @@
 <?php
+session_start();
 header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    $user = $_SESSION['user'];
     $text = $_GET['text'];
     $order = $_GET['order'] ? $_GET['order'] : 0;
 
@@ -9,8 +11,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     require_once '../../config/connection.php';
     require_once '../function.php';
 
-    $elements = getAllTags($pagination, $compareString, $order);
-    $numOfPages = getNumOfTags('pagination', $compareString);
+    $elements = getAllTags($user, $pagination, $compareString, $order);
+    $numOfPages = getNumOfTags($user, 'pagination', $compareString);
     echo json_encode([
         'tags' => $elements,
         'pages' => $numOfPages,
