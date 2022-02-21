@@ -104,12 +104,13 @@ $(document).ready(function () {
             data: { id: id },
             dataType: 'json',
             success: function (data, statusTxt, xhr) {
+                // console.log(xhr.status)
                 if (xhr.status == 204) {
-                    getAllTags()
+                    getAllPosts()
                 }
-            },
-            errors: function (jqXHR, statusTxt, xhr) {
-                printResponseMessages(jqXHR.status, jqXHR.responseJSON, '#', 'warnong,warning')
+            }, error: function (jqXHR, statusTxt, xhr) {
+
+                printResponseMessages(jqXHR.status, jqXHR.responseJSON, "#printTagCrudMessage", 'warning,danger')
             }
         })
     })
@@ -166,11 +167,12 @@ $(document).ready(function () {
             data: { id: id },
             dataType: 'json',
             success: function (data, statusTxt, xhr) {
+                // console.log(xhr.status)
                 if (xhr.status == 204) {
                     getAllPosts()
                 }
             }, error: function (jqXHR, statusTxt, xhr) {
-                printResponseMessages(jqXHR.status, jqXHR.responseJSON, "#postShowErrorMessages", 'warning, danger')
+                printResponseMessages(jqXHR.status, jqXHR.responseJSON, "#printPostCrudMessage", 'warning,danger')
             }
         })
     })
@@ -203,25 +205,23 @@ $(document).ready(function () {
         let id = $(this).val()
         let post_id = $(this).data('post')
         $.ajax({
-            method: 'GET',
-            url: 'models/posts/getTagsByHeading.php',
+            method: 'get',
+            url: "models/posts/getTagsByHeading.php",
             data: { heading_id: id, post_id: post_id },
             dataType: 'json',
             success: function (data) {
-                printTags(data)
+                printTags(data.allTags)
                 compareCheckboxes(data)
-            }, error: function (err) {
-                console.log(err)
             }
         })
     })
 
     const printTags = (data) => {
         let ispis = ''
-        let tags = data.allTags
 
 
-        tags.forEach(tag => {
+
+        data.forEach(tag => {
             ispis += printTagByHeading(tag)
         })
         document.querySelector('#heading_tag').innerHTML = ispis
@@ -229,12 +229,13 @@ $(document).ready(function () {
     const printTagByHeading = (tag) => {
 
         return `
-        
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" value="${tag.id}" id="tag${tag.id}" name="postTags"  ${tag == true && postTagsArr == true && postTagsArr.includes(tag.id) ? checked : ''}>
-            <label class="form-check-label" for="tag${tag.id}">
-                ${tag.name}
-            </label>
+        <div class="col-6 col-lg-4">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" value="${tag.id}" id="tag${tag.id}" name="postTags"  ${tag == true && postTagsArr == true && postTagsArr.includes(tag.id) ? checked : ''}>
+                <label class="form-check-label" for="tag${tag.id}">
+                    ${tag.name}
+                </label>
+            </div>
         </div>
         `
 
@@ -364,11 +365,16 @@ $(document).ready(function () {
         e.preventDefault()
         filterUsers()
     })
-    const filterUsers = () => {
-        filterUser()
+    $(document).on('click', '.user-pagination', function (e) {
+        e.preventDefault()
+        let pagination = $(this).data('limit')
+        filterUsers(pagination)
+    })
+    const filterUsers = pagination => {
+        filterUser(pagination)
     }
 
-    const filterUser = () => {
+    const filterUser = (d) => {
         let text = document.querySelector("#searchUser").value
         let orderUser = document.querySelector('#orderUserByDate').value
         let role = document.querySelector('#filterByRole').value
@@ -380,13 +386,14 @@ $(document).ready(function () {
             data: {
                 text: text,
                 order: orderUser,
-                role: role
+                role: role,
+                limit: d
             },
             dataType: "json",
             success: function (data) {
                 console.log(data)
                 printAllUsers(data.res, data.limit)
-                printPagination(data.pages, '#userPagination', data.limit, 'user-paginations')
+                printPagination(data.pages, '#userPagination', data.limit, 'user-pagination')
             },
             error: function (err) {
                 // console.log(err)
@@ -497,15 +504,16 @@ $(document).ready(function () {
             url: 'models/headings/getAll.php',
             dataType: 'json',
             success: function (data) {
-                printAllHeadings(data)
+                printAllHeadings(data.headings, data.limit)
             },
             error: function () { }
         })
     }
     const printAllHeadings = (headings, limit) => {
         let ispis = '', rb = 1
+        console.log(limit)
         let lim = parseInt(limit)
-        let redniBroj = (5 * lim) + 1
+        let redniBroj = (10 * lim) + 1
         if (headings.length > 0) {
             headings.forEach(heading => {
                 ispis += printHeading(heading, redniBroj)
@@ -517,6 +525,7 @@ $(document).ready(function () {
         $('#headings').html(ispis)
     }
     const printHeading = (heading, rb) => {
+
         return `
             <tr>
                 <th scope='row'>${rb}</th>
@@ -525,7 +534,7 @@ $(document).ready(function () {
                 <td>${prittierDateFormat(heading.created_at)}</td>
                 <td>${heading.updated_at ? prittierDateFormat(heading.updated_at) : '-'}</td>
                 <td><a href="admin.php?page=heading_action&id=${heading.id}" class="btn btn-sm btn-success">Update</a></td>
-                <td><button type="button" class="btn btn-sm btn-danger" data-id="${heading.id}">Delete</button></td>
+                <td><button type="button" class="btn btn-sm btn-danger delete-heading" data-id="${heading.id}">Delete</button></td>
             </tr>
         `
     }
@@ -596,15 +605,19 @@ $(document).ready(function () {
     const tagsFormValidationAndRequest = () => {
         const name = document.querySelector("#tagName").value
         const id = document.querySelector('#TagId').value
-        const heading = document.querySelector('#heading_tag').value
-        console.log(heading)
+        const headings = $('input[name="tagHeadings"]:checked')
+        const selectedHeadings = []
+        for (let heading of headings) {
+            selectedHeadings.push(heading.value)
+        }
+        console.log(id)
         if (id == "") {
 
             if (validationTags().length == 0) {
                 $.ajax({
                     method: 'post',
                     url: 'models/tags/insert.php',
-                    data: { name: name, heading_id: heading },
+                    data: { name: name, headings: selectedHeadings },
                     success: function (data, statusTxt, xhr) {
 
                         if (xhr.status == 201) {
@@ -623,7 +636,7 @@ $(document).ready(function () {
                 $.ajax({
                     method: 'post',
                     url: 'models/tags/update.php',
-                    data: { name: name, id: id, heading_id: heading },
+                    data: { name: name, id: id, headings: selectedHeadings },
                     success: function (data, statusTxt, xhr) {
                         if (xhr.status == 204) {
                             window.location.href = 'admin.php?page=tags'
@@ -638,8 +651,12 @@ $(document).ready(function () {
     }
     const validationTags = () => {
         const name = document.querySelector('#tagName').value
-        const heading = document.querySelector("#heading_tag").value
-        const reNameTag = /^([A-Z]{1,}|[A-Z][a-z]{2,15}|[\w\d]{1,})([\.\:])?(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,})*$/
+        const headings = $('input[name="tagHeadings"]:checked')
+        let selectedHeadings = []
+        for (let heading of headings) {
+            selectedHeadings.push(heading.value)
+        }
+        const reNameTag = /^([A-ZČĆŠĐŽ]{1,}|[A-ZČĆŠĐŽ][a-zšđžčć]{2,15}|[\w\d]{1,})([\.\:])?(\s[A-ZĆŠĐŽČ]{1,}|\s[A-ZĆŠĐŽČ][a-zšđžčć]{2,15}|\s[a-zšđžčć]{2,}|\s[\d]{1,}| \')*$/
         const errors = []
         if (!reNameTag.test(name)) {
             errors.push(name)
@@ -648,8 +665,8 @@ $(document).ready(function () {
             removeValidationErrrorMessage('#tagNameErrorMessage', 'text-danger')
         }
 
-        if (heading == 0) {
-            errors.push(heading)
+        if (selectedHeadings.length == 0) {
+            errors.push(selectedHeadings)
             createValidationErrorMessage('#tagHeading', 'text-danger', 'Must choose heading')
         } else {
             removeValidationErrrorMessage('#tagHeading', 'text-danger')
@@ -670,7 +687,7 @@ $(document).ready(function () {
     const printAllTags = (tags, limit) => {
         console.log(limit)
         let ispis = ''
-        let rB = (parseInt(limit) * 5) + 1
+        let rB = (parseInt(limit) * 10) + 1
 
         if (tags.length > 0) {
             tags.forEach(tag => {
@@ -690,7 +707,7 @@ $(document).ready(function () {
                 <td>${tag.name}</td>
                 <td>${prittierDateFormat(tag.created_at)}</td>
                 <td>${tag.updated_at ? prittierDateFormat(tag.updated_at) : '-'}</td>
-                <td><a href="admin.php?page=action-tag&id=${tag.id}" class="btn btn-sm btn-success">Update</a></td>
+                <td><a href="admin.php?page=tag_action&id=${tag.id}" class="btn btn-sm btn-success">Update</a></td>
                 <td><button type="button" class="btn btn-sm btn-danger delete-tag" data-id="${tag.id}">Delete</button></td>
             </tr>
         `
@@ -704,13 +721,14 @@ $(document).ready(function () {
             url: 'models/users/getAll.php',
             dataType: 'json',
             success: function (data) {
-                printAllUsers(data)
+                printAllUsers(data.users, data.limit)
+                printPagination(data.pages, '#userPagination', data.limit, 'user-pagination')
             }
         })
     }
     const printAllUsers = (users, limit) => {
 
-        ispis = '', rb = (parseInt(limit) * 5) + 1
+        ispis = '', rb = (parseInt(limit) * 10) + 1
         if (users.length > 0) {
             users.forEach(user => {
                 ispis += printUser(user, rb)
@@ -823,7 +841,7 @@ $(document).ready(function () {
         const role = $('input[name="userRole"]:checked').val()
         const journalistRole = $('input[name="journalistRole"]:checked').val()
 
-        const reFirstLastName = /^[A-Z][a-z]{3,15}$/
+        const reFirstLastName = /^[A-ZŠĐČĆŽ][a-zšđžčć]{3,15}(\s[A-ZČŠĐĆŽ][a-zčćšđž]{3,15})+$/
         const reEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
         const rePassword = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/
 
@@ -878,7 +896,8 @@ $(document).ready(function () {
             url: 'models/posts/getAll.php',
             dataType: 'json',
             success: function (data) {
-                printAllPost(data)
+                printAllPost(data.posts, data.limit)
+                printPagination(data.pages, '#postPagination', data.limit, '#post-pagination')
             },
             error: function (jqXHR, statusTxt, xhr) { }
         })
@@ -886,7 +905,7 @@ $(document).ready(function () {
     const printAllPost = (posts, limit) => {
 
         let ispis = ''
-        let rb = (5 * limit) + 1
+        let rb = (10 * limit) + 1
 
         if (posts.length > 0) {
             posts.forEach(post => {
@@ -920,7 +939,7 @@ $(document).ready(function () {
         const name = document.querySelector('#postName').value
         const postDesc = CKEDITOR.instances.postDescription.getData()
         const postImage = document.getElementById('postImage').files
-        const postCategory = document.querySelector('#postCategory').value
+        const postCategory = document.querySelector('#postCategory')?.value
         const postHeading = document.querySelector('#postHeading').value
         const tags = $('input[name="postTags"]:checked')
         const selectedTags = []
@@ -985,8 +1004,9 @@ $(document).ready(function () {
         const name = document.querySelector('#postName').value
         const postDesc = CKEDITOR.instances.postDescription.getData()
         const postImage = document.getElementById('postImage').files
-        const postCategory = document.querySelector('#postCategory').value
+        const postCategory = document.querySelector('#postCategory')?.value
         const postHeading = document.querySelector('#postHeading').value
+        console.log(postHeading)
         const tags = $('input[name="postTags"]:checked')
 
         const selectedTags = []
@@ -1016,11 +1036,13 @@ $(document).ready(function () {
                 removeValidationErrrorMessage('#postImageErrorMessage', 'text-danger')
             }
         }
-        if (postCategory == 0) {
-            errors.push(postCategory)
-            createValidationErrorMessage('#postCategoryErrorMessage', 'text-danger', "You must choose category for the post!")
-        } else {
-            removeValidationErrrorMessage('#postCategoryErrorMessage', 'text-danger')
+        if (postCategory !== undefined) {
+            if (postCategory == 0) {
+                errors.push(postCategory)
+                createValidationErrorMessage('#postCategoryErrorMessage', 'text-danger', "You must choose category for the post!")
+            } else {
+                removeValidationErrrorMessage('#postCategoryErrorMessage', 'text-danger')
+            }
         }
         if (postHeading == 0) {
             errors.push(postHeading)
@@ -1028,11 +1050,13 @@ $(document).ready(function () {
         } else {
             removeValidationErrrorMessage('#postHeadingErrorMessage', 'text-danger')
         }
-        if (selectedTags.length == 0) {
-            errors.push(selectedTags)
-            createValidationErrorMessage("#postTagsErrorMessage", 'text-danger', "You must choose at least one tag")
-        } else {
-            removeValidationErrrorMessage('#postTagsErrorMessage', 'text-danger')
+        if (postHeading > 0) {
+            if (selectedTags.length == 0) {
+                errors.push(selectedTags)
+                createValidationErrorMessage("#postTagsErrorMessage", 'text-danger', "You must choose at least one tag")
+            } else {
+                removeValidationErrrorMessage('#postTagsErrorMessage', 'text-danger')
+            }
         }
         return errors
     }
@@ -1142,11 +1166,9 @@ $(document).ready(function () {
         el.classList.remove(cls)
     }
     const printResponseMessages = (statusCode, message, whereToPlace, colors) => {
-        console.log(statusCode)
         const color = colors.split(',')
         const colorYellow = color[0]
         const colorDanger = color[1]
-        console.log(color)
         switch (statusCode) {
             case 404:
                 printMessage(message, whereToPlace, colorDanger)
@@ -1186,14 +1208,16 @@ $(document).ready(function () {
         let ispis = ''
         let lim = 1
 
-        if (limit) {
-            lim += parseInt(limit)
-        }
-        for (let i = 0; i < numOfPages; i++) {
+        if (numOfPages > 1) {
+            if (limit) {
+                lim += parseInt(limit)
+            }
+            for (let i = 0; i < numOfPages; i++) {
 
 
-            ispis += ` <li class="page-item ${lim == (i + 1) ? 'active' : ''}"><a class="page-link ${cls}" href="#" data-limit="${i}">${i + 1}</a></li>`
+                ispis += ` <li class="page-item ${lim == (i + 1) ? 'active' : ''}"><a class="page-link ${cls}" href="#" data-limit="${i}">${i + 1}</a></li>`
 
+            }
         }
         $(whereToPlace).html(ispis)
     }
