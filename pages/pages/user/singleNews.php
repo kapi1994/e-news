@@ -86,8 +86,8 @@
                                                 <?php
                                                 if ($comment->countChild->childComments > 0) :
                                                 ?>
-                                                    <button class="btn btn-primary read-more" data-user="<?= $user_id ?>" type="button" id="btnReadMore<?= $comment->id ?>" data-bs-toggle="collapse" data-bs-target="#comment<?= $comment->id ?>" aria-expanded="false" aria-controls="comment<?= $comment->id ?>" data-comment="<?= $comment->id ?>" id="buttonCollapse<?= $comment->id ?>">
-                                                        Show more
+                                                    <button class="btn btn-primary read-more" data-user="<?= $user_id ?>" type="button" data-bs-toggle="collapse" data-bs-target="#comment<?= $comment->id ?>" aria-expanded="false" aria-controls="comment<?= $comment->id ?>" data-comment="<?= $comment->id ?>" id="buttonCollapse<?= $comment->id ?>">
+                                                        Show
                                                     </button>
                                                 <?php endif; ?>
                                                 <?php
@@ -103,13 +103,6 @@
                                 </div>
 
 
-                                <div class="collapse my-2" id="comment<?= $comment->id ?>">
-
-                                </div>
-
-                                <div class="collapse" id="commentReply<?= $comment->id ?>">
-
-                                </div>
 
 
                             <?php endforeach; ?>
@@ -139,6 +132,15 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+
+
+                                <div class="collapse my-2" id="comment<?= $comment->id ?>">
+
+                                </div>
+
+                                <div class="collapse" id="commentReply<?= $comment->id ?>">
+
                                 </div>
                             <?php endforeach; ?>
                         </div>
