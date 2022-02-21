@@ -37,7 +37,7 @@ $(document).ready(function () {
         const email = document.querySelector("#userEmail").value
         const password = document.querySelector('#userPassword').value
 
-        const reFirstLastName = /^[A-ZŠĐČĆŽ][a-zšđžčć]{3,15}(\s[A-ZČŠĐĆŽ][a-zčćšđž]{3,15})+$/
+        const reFirstLastName = /^[A-ZŠĐČĆŽ][a-zšđžčć]{3,15}(\s[A-ZČŠĐĆŽ][a-zčćšđž]{3,15})?$/
         const reEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
         const rePassword = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/
 

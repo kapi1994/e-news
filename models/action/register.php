@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     define("USER", 3);
     $role = USER;
     $errors = [];
-    $reFirstLastName  = '/^[A-Z][a-z]{3,15}$/';
+    $reFirstLastName  = '/^[A-ZŠĐČĆŽ][a-zšđžčć]{3,15}(\s[A-ZČŠĐĆŽ][a-zčćšđž]{3,15})?$/';
     $rePassword = '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/';
     define('USER_CATEGORY', NULL);
     if (!preg_match($reFirstLastName, $firstName)) {
