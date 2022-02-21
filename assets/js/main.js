@@ -1,7 +1,7 @@
 
 
 $(document).ready(function () {
-    let br = 0
+    let br = true
     $(document).on('click', '#btnComment', function (e) {
         e.preventDefault();
         let post = $(this).data("post")
@@ -16,7 +16,7 @@ $(document).ready(function () {
             dataType: "json",
             success: function (data) {
 
-                getComments('comments_display', data.user)
+                getComments('comments_display')
                 document.querySelector('#comment').value = ""
             },
             error: function (err) {
@@ -26,24 +26,25 @@ $(document).ready(function () {
     })
 
     $(document).on('click', '.read-more', function (e) {
+
         e.preventDefault()
+
+
         let post = $(this).data('post')
         let comment = $(this).data("comment")
         const whereToPlace = `comment${comment}`
         let user = $(this).data("user")
-        console.log(document.querySelector(`#${whereToPlace}`))
-        // console.log
-        br++
-        if (br % 2 != 0) {
-            document.querySelector(`#btnReadMore${comment}`).textContent = "show less"
-            getComments(whereToPlace, comment)
-        } else {
-            document.querySelector(`#btnReadMore${comment}`).textContent = "show more"
-        }
+
+
+        let commentReplyId = document.querySelector(`#commentReply${comment}`)
+
+        commentReplyId.classList.remove('show')
+        getComments(whereToPlace, comment)
+
     })
 
     function getComments(whereToPlace, comment_id) {
-        const comment = comment_id != 0 ? comment_id : 0
+        const comment = comment_id ?? 0
         const post = window.location.href.split("&")[1].split("=")[1]
 
         $.ajax({
@@ -147,11 +148,28 @@ $(document).ready(function () {
 
     }
 
+    $(document).on('click', '.btn-reactions', function (e) {
+        let comment = $(this).data('comment')
+        $.ajax({
+            method: 'get',
+            url: 'models/posts/getReactions.php',
+            data: {
+                comment_id: comment
+            }, dataType: 'json',
+            success: function (data) {
+                printReactions(data, comment)
+            }, error: function (err) {
+                console.log(err)
+            }
+        })
+    })
     $(document).on('click', '.reply-comment', function (e) {
         e.preventDefault()
         let post = $(this).data('post')
         let comment = $(this).data('comment')
         let text = document.querySelector(`#comment_${comment}`).value
+
+
         $.ajax({
             method: 'post',
             url: "models/comments/insertComment.php",
@@ -173,17 +191,20 @@ $(document).ready(function () {
 
     const printComments = (data, whereToPlace) => {
         console.log(`${whereToPlace}`)
+
         let ispis = ''
         data.comments.forEach(comment => {
             ispis += printComment(comment, data.user)
         })
+
         document.querySelector(`#${whereToPlace}`).innerHTML = ispis
     }
 
     const printComment = (comment, user) => {
+
         let ispis = ''
         let user_neg = user == null ? "disabled" : ''
-        console.log(comment)
+
         let user_like = user != null && comment.user_reaction != false && comment.user_id == comment.user_reaction.user_id && comment.user_reaction.likes > 0 ? 'text-success' : 'text-dark'
         let user_disslike = user != null && comment.user_reaction != false && comment.user_id == comment.user_reaction.user_id && comment.user_reaction.disslikes > 0 ? 'text-danger' : 'text-dark'
 
@@ -210,7 +231,7 @@ $(document).ready(function () {
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" id="voteLike${comment.id}" class="bi bi-hand-thumbs-up  ${user_like}" viewBox=" 0 0 16 16">
                                 <path d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a9.84 9.84 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.163 3.163 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16H8c-.605 0-1.07-.081-1.466-.218a4.82 4.82 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z" />
                             </svg>
-                            <big class="ms-3 mt-1" id="countLike${comment.id}">${comment.likes.likesCount}</big>
+                            <span class="ms-3 d-inline-block align-middle" id="countLike${comment.id}">${comment.likes.likesCount}</span>
                         </button>
 
 
@@ -218,7 +239,7 @@ $(document).ready(function () {
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" id="voteDisslike${comment.id}" class="bi bi-hand-thumbs-up ${user_disslike}" viewBox="0 0 16 16">
                                 <path d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a9.84 9.84 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.163 3.163 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16H8c-.605 0-1.07-.081-1.466-.218a4.82 4.82 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z" />
                             </svg>
-                            <big class="ms-3 mt-1" id="countDisslike${comment.id}">${comment.disslikes.disslikesCount}</big>
+                            <span class="ms-3 d-inline-block align-middle" id="countDisslike${comment.id}">${comment.disslikes.disslikesCount}</span>
                         </button>
                     </div>
                 </div>
@@ -226,8 +247,8 @@ $(document).ready(function () {
                 <div class="card-footer">
                 <div class="float-end gap-2">`
         if (comment.countChild.childComments > 0) {
-            ispis += `  <button class="btn btn-primary read-more" data-user="${user.id}" type="button" id="btnReadMore${comment.id}" data-bs-toggle="collapse" data-bs-target="#comment${comment.id}" aria-expanded="false" aria-controls="comment${comment.id}" data-comment="${comment.id}">
-                                Show more
+            ispis += `  <button class="btn btn-primary read-more" data-user="${user}" type="button" id="btnReadMore${comment.id}" data-bs-toggle="collapse" data-bs-target="#comment${comment.id}" aria-expanded="false" aria-controls="comment${comment.id}" data-comment="${comment.id}">
+                                Show
                     </button>`
         }
         if (user != null) {
@@ -259,11 +280,16 @@ $(document).ready(function () {
         return finalDate
     }
     $(document).on('click', '.comment-reply', function (e) {
+
+
         let comment = $(this).data('comment')
         let post = $(this).data('post')
-        // commentReply8
-        console.log(comment)
-        console.log(document.querySelector(`#commentReply${comment}`))
+
+        let readMoreId = document.querySelector(`#comment${comment}`)
+        console.log(readMoreId)
+        readMoreId.classList.remove('show')
+
+
         let ispis = '';
         ispis += `
           
@@ -276,11 +302,39 @@ $(document).ready(function () {
                 </div>
             
         `
+        console.log(document.querySelector(`#commentReply${comment}`))
         document.querySelector(`#commentReply${comment}`).innerHTML = ispis
     })
-    const date = new Date()
-    document.querySelector('#getYear').textContent = date.getFullYear()
 
+    const printReactions = (reactions, comment) => {
+
+        let ispis = ''
+
+        if (reactions.length > 0) {
+            reactions.forEach(reaction => {
+                ispis += printReaction(reaction)
+            })
+        } else {
+            ispis += `<p class='text-center fw-bold'>No reaction at this moment</p>`
+        }
+        ispis += `</tbody></table>`
+        let whereToPlace = `#reactions${comment}`
+
+        document.querySelector(`${whereToPlace}`).innerHTML = ispis
+    }
+    const printReaction = (reaction) => {
+        let reaction_color = reaction.likes > 0 ? 'text-success' : 'text-danger'
+        return `
+            <div class='d-flex justify-content-between'>
+                <p>${reaction.first_name} ${reaction.last_name}</p>
+                <span>
+                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-hand-thumbs-up-fill ${reaction_color}" viewBox="0 0 16 16">
+                    <path d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a9.84 9.84 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.163 3.163 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16H8c-.605 0-1.07-.081-1.466-.218a4.82 4.82 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z"/>
+                    </svg>
+                </span>
+            </div>
+        `
+    }
     $(document).on('click', '#btnContactUs', function (e) {
         e.preventDefault()
         // alert('da')
@@ -295,10 +349,9 @@ $(document).ready(function () {
         let message = document.querySelector('#message').value
 
         let errors = [];
-        console.log(first_name)
-        let reFirstLastName = /^[A-Z][a-z]{3,15}$/
+
+        let reFirstLastName = /^[A-ZŠĐČĆŽ][a-zšđžčć]{3,15}(\s[A-ZČŠĐĆŽ][a-zčćšđž]{3,15})+$/
         let reEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
-        // let reMessage = /^$/
         if (!reFirstLastName.test(first_name)) {
             errors.push(first_name)
             createValidationErrorMessage('#contactFirstNameErrorMessage', 'text-danger', "First name isn't valid")
@@ -374,4 +427,6 @@ $(document).ready(function () {
         `
         $(whereToPlace).html(ispis)
     }
+    const date = new Date()
+    document.querySelector('#getYear').textContent = date.getFullYear()
 })
