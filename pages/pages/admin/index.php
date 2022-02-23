@@ -39,7 +39,7 @@ if (isset($_SESSION['user'])) {
                         </table>
                     </div>
                 </div>
-                <div class="col-lg-3">
+                <div class="col-lg-2 ">
                     <div class="card text-center  text-white mb-3">
                         <!-- numbar of posts -->
                         <div class="card-body">
@@ -51,21 +51,37 @@ if (isset($_SESSION['user'])) {
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3">
-                    <div class="row">
-                        <div class="card text-center  text-white mb-3">
-                            <!-- numbar of posts -->
-                            <div class="card-body">
-                                <h3 class="text-dark fw-bold">Total number of users</h3>
-                                <h4 class="display-4 text-dark" id="totalNumberOfUsers">
-                                    <i class="fas fa-pencil-alt"></i>
-                                </h4>
-                                <a href="admin.php?page=users" class="btn btn-outline-dark btn-sm">View</a>
-                            </div>
+                <div class="col-lg-2 ">
+
+                    <div class="card text-center  text-white mb-3">
+                        <!-- numbar of posts -->
+                        <div class="card-body">
+                            <h3 class="text-dark fw-bold">Total number of users</h3>
+                            <h4 class="display-4 text-dark" id="totalNumberOfUsers">
+                                <i class="fas fa-pencil-alt"></i>
+                            </h4>
+                            <a href="admin.php?page=users" class="btn btn-outline-dark btn-sm">View</a>
                         </div>
+
 
                     </div>
                 </div>
+                <div class="col-lg-2 ">
+
+                    <div class="card text-center  text-white mb-3">
+                        <!-- numbar of posts -->
+                        <div class="card-body">
+                            <h3 class="text-dark fw-bold">Total number of users</h3>
+                            <h4 class="display-4 text-dark" id="loggedUsersForThisDay">
+                                <i class="fas fa-pencil-alt"></i>
+                            </h4>
+
+                        </div>
+                    </div>
+
+
+                </div>
+
             <?php else : ?>
                 <h1 class="my-3">Today tasks</h1>
                 <?php
@@ -74,7 +90,7 @@ if (isset($_SESSION['user'])) {
                 foreach ($tasks as $task) :
                 ?>
                     <div class="alert alert-secondary" role="alert">
-                        <p class="fw-bold float-start"><?= $task->name ?></p>
+                        <p class="float-start"><?= $task->description ?></p>
                     </div>
             <?php
                 endforeach;

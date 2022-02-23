@@ -11,6 +11,7 @@ $(document).ready(function () {
                 newDought('viewsH24', 'H24', data.todayViews)
                 card('totalNumberOfUsers', data.totalUsers.numberOfUsers)
                 card('totalNumberOfPosts', data.totalPosts.numberOfPosts)
+                card('loggedUsersForThisDay', data.todayLogins)
             }
         })
     }
