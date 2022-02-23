@@ -4,7 +4,7 @@
     $last_except_last_one = exceptLastOne($last_one->id);
     ?>
     <div class="row my-3">
-        <div class="col-lg-8">
+        <div class="col col-lg-8">
             <div class="card">
                 <img class="card-img-top" src="assets/images/posts/normal/<?= $last_one->image_path ?>" alt="Card image cap">
                 <div class="card-body">
