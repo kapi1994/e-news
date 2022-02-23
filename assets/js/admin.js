@@ -814,7 +814,7 @@ $(document).ready(function () {
                         first_name: first_name,
                         last_name: last_name,
                         email: email,
-                        role: role,
+                        role_id: role,
                         journalistRole: journalistRole
                     },
                     success: function (data, statusTxt, xhr) {
@@ -841,7 +841,7 @@ $(document).ready(function () {
         const role = $('input[name="userRole"]:checked').val()
         const journalistRole = $('input[name="journalistRole"]:checked').val()
 
-        const reFirstLastName = /^[A-ZŠĐČĆŽ][a-zšđžčć]{3,15}(\s[A-ZČŠĐĆŽ][a-zčćšđž]{3,15})+$/
+        const reFirstLastName = /^[A-ZŠĐČĆŽ][a-zšđžčć]{3,15}(\s[A-ZČŠĐĆŽ][a-zčćšđž]{3,15})?$/
         const reEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
         const rePassword = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/
 
