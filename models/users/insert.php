@@ -3,7 +3,7 @@ header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $journalistRole = isset($_POST['journalistRole']) ? $_POST['journalistRole'] : NULL;
     $errors = [];
-    $reName  = "/^[A-Z][a-z]{3,15}$/";
+    $reName  = "/[A-ZŠĐČĆŽ][a-zšđžčć]{3,15}(\s[A-ZČŠĐĆŽ][a-zčćšđž]{3,15})?$/";
     $rePassword = "/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/";
     if (!preg_match($reName, $_POST['first_name'])) {
         array_push($errors, "First name of user isn't ok");

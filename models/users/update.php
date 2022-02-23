@@ -1,22 +1,20 @@
 <?php
 header("Content-type:application/json");
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // TODO dodati za izmenu passworda
+
     $errors = [];
-    $reName  = "/^[A-Z][a-z]{3,15}$/";
+    $reName  = "/^[A-ZŠĐČĆŽ][a-zšđžčć]{3,15}(\s[A-ZČŠĐĆŽ][a-zčćšđž]{3,15})?$/";
     $rePassword = "/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/";
-    if (!preg_match($reName, $_POST['firstName'])) {
+    if (!preg_match($reName, $_POST['first_name'])) {
         array_push($errors, "First name of user isn't ok");
     }
-    if (!preg_match($reName, $lastName)) {
+    if (!preg_match($reName, $_POST['last_name'])) {
         array_push($errors, "Last name of user isn't ok");
     }
     if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
         array_push($errors, "Your email isn't ok");
     }
-    // if (!preg_match($rePassword, $_POST['password'])) {
-    //     array_push($errors, "Your password isn't ok");
-    // }
+
     if (count($errors) > 0) {
         foreach ($errors as $error) {
             echo json_encode($error);
@@ -25,26 +23,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         require_once '../../config/connection.php';
         require_once '../function.php';
+        $date = date("Y-m-d H:i:s");
         $check = getOneFetchAndCheckData("users", "email", $_POST['email'], "check");
         if ($check > 0) {
             $getData = getOneFetchAndCheckData('users', 'email', $_POST['email'], "fetch");
-            if ($getData->email == $_POST['email'] && $getData->id != $_POST['id']) {
-                echo json_encode("Email is already in use");
-                http_response_code(409);
-            } else {
+            if ($getData->email == $_POST['email'] && $getData->id == $_POST['id']) {
                 try {
-                    updateUser($_POST['firstName'], $_POST['lastName'], $_POST['email'], $_POST['role_id'], $date);
+                    updateUser($_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['role_id'], $date, $_POST['id']);
+                    http_response_code(204);
                 } catch (PDOException $th) {
-                    echo json_encode($th->getMessage());
-                    http_response_code(500);
+                    echo json_decode($th->getMessage());
                 }
             }
         } else {
             try {
-                updateUser($_POST['firstName'], $_POST['lastName'], $_POST['email'], $_POST['role_id'], $date);
+                updateUser($_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['role_id'], $date, $_POST['id']);
+                http_response_code(204);
             } catch (PDOException $th) {
-                echo json_encode($th->getMessage());
-                http_response_code(500);
+                echo json_decode($th->getMessage());
             }
         }
     }

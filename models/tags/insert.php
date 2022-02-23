@@ -2,7 +2,7 @@
 header("Content-type:application/json");
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $name = $_POST['name'];
-    $reName = '/^([A-Z]{1,}|[A-Z][a-z]{2,15}|[\w\d]{1,})([\.\:])?(\s[A-Z]{1,}|\s[A-Z][a-z]{2,15}|\s[a-z]{2,}|\s[\d]{1,}| \')*/';
+    $reName = '/^([A-ZČĆŠĐŽ]{1,}|[A-ZČĆŠĐŽ][a-zšđžčć]{2,15}|[\w\d]{1,})([\.\:])?(\s[A-ZĆŠĐŽČ]{1,}|\s[A-ZĆŠĐŽČ][a-zšđžčć]{2,15}|\s[a-zšđžčć]{2,}|\s[\d]{1,}| \')*$/';
     $errors = [];
     $headings_arr = $_POST['headings'];
 
