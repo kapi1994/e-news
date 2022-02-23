@@ -1,4 +1,5 @@
 <?php
+define("NUMBER_OF_ELEMENTS", 10);
 if (isset($_SESSION['user'])) {
     if ($_SESSION['user']->roleName == "User") {
         header("Location:admin.php?page=status&status=401");
@@ -6,8 +7,9 @@ if (isset($_SESSION['user'])) {
 } else {
     header("Location:admin.php?page=status&status=401");
 }
-$user = isset($_SESSION['user']) ? $_SESSION['user'] : '';
+$user = $_SESSION['user'];
 $posts = postPagination($user);
+
 ?>
 <section>
     <div class="container">
@@ -99,6 +101,7 @@ $posts = postPagination($user);
                         <tbody id="posts">
                             <?php
                             $postsElements = getNumOfPosts('count', $user);
+                            // var_dump($postsElements);
                             if ($postsElements->numberOfPosts  > 0) :
                             ?>
                                 <?php
@@ -128,7 +131,7 @@ $posts = postPagination($user);
                 </div>
                 <?php
                 $postsCount = getNumOfPosts('count', $user);
-                if ($postsCount->numberOfPosts > 5) :
+                if ($postsCount->numberOfPosts > NUMBER_OF_ELEMENTS) :
                 ?>
                     <div class="row mt-3">
                         <div class="col-4 mx-auto">
