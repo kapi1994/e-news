@@ -21,7 +21,7 @@ if (isset($_SESSION['user'])) {
                 <div class="mb-3">
                     <label for="">Description:</label>
                     <textarea name="description" id="description" cols="30" rows="5" class="form-control">
-                        <?= isset($_GET['id']) ? $task->name : '' ?>
+                        <?= isset($_GET['id']) ? $task->description : '' ?>
                     </textarea>
                     <em id="validationErrorTaskDescription"></em>
                 </div>
@@ -37,7 +37,7 @@ if (isset($_SESSION['user'])) {
                         foreach ($users as $user) :
 
                         ?>
-                            <option value="<?= $user->id ?>" <?php if (isset($_GET['id']) && $task->user_Id == $user->id) : ?> selected<?php endif; ?>><?= $user->first_name . ' ' . $user->last_name ?></option>
+                            <option value="<?= $user->id ?>" <?php if (isset($_GET['id']) && $task->user_id == $user->id) : ?> selected<?php endif; ?>><?= $user->first_name . ' ' . $user->last_name ?></option>
                         <?php endforeach; ?>
                     </select>
                     <em id="validationErrorTaskUser"></em>
