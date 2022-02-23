@@ -33,25 +33,71 @@ function updateCategory($name, $date, $id)
     global $conn;
     $queryUpdate = $conn->prepare("UPDATE categories SET name=?, updated_at =? WHERE id=?");
     $queryUpdate->execute([$name, $date, $id]);
-    return $queryUpdate;
+    // return $queryUpdate;
 }
-function insertTag($name, $heading)
+function insertTag($name, $headings)
 {
     global $conn;
-    $queryInsert = $conn->prepare("INSERT INTO tags (name, heading_id) VALUES(?,?)");
-    $queryInsert->execute([$name, $heading]);
-    return $queryInsert;
+    $queryInsert = $conn->prepare("INSERT INTO tags (name) VALUES(?)");
+    $queryInsert->execute([$name]);
+    $lastId = $conn->lastInsertId();
+    insertHeadingTag($lastId, $headings);
+
+    // return $queryInsert;
 }
-function updateTag($name, $date, $heading, $id)
+function insertHeadingTag($tag_id, $headings)
 {
     global $conn;
-    $res = $conn->prepare("UPDATE tags SET name=?,updated_at=?, heading_id =? WHERE id=? ");
-    $res->execute([$name, $date, $heading, $id]);
+    if (count($headings) > 0) {
+        $queryParams = [];
+        $values = [];
+        foreach ($headings as $heading) {
+            $queryParams[] = "(?,?)";
+            $values[] = (int)$heading;
+            $values[] = (int)$tag_id;
+        }
+
+        $heading_tag_insert = $conn->prepare("INSERT INTO heading_tag VALUES" . implode(",", $queryParams));
+        $heading_tag_insert->execute($values);
+    }
+}
+function updateTag($name, $date, $headings_arr, $id)
+{
+    global $conn;
+    $res = $conn->prepare("UPDATE tags SET name=?,updated_at=? WHERE id=? ");
+    $res->execute([$name, $date, $id]);
+    deleteHeadingTag($id);
+    insertHeadingTag($id, $headings_arr);
+}
+function getTagHeadings($heading_id)
+{
+    global $conn;
+    $query = 'SELECT id FROM headings WHERE id IN ';
+    $query .= " (SELECT heading_id FROM heading_tag WHERE tag_id = ?)";
+    $result = $conn->prepare($query);
+    $result->execute([$heading_id]);
+    $data = $result->fetchAll();
+
+    $headingsArr  = [];
+    foreach ($data as $d) {
+        array_push($headingsArr, $d->id);
+    }
+    return $headingsArr;
+}
+function getTagIdNameByHeading($heading_id)
+{
+    global $conn;
+    $query = "SELECT id, name FROM tags WHERE id IN ";
+    $query .= " (SELECT tag_id FROM heading_tag WHERE heading_id = ?)";
+    $q = $conn->prepare($query);
+    $q->execute([$heading_id]);
+    $res = $q->fetchAll();
     return $res;
 }
-
-
-
+function deleteHeadingTag($tag_id)
+{
+    deleteData('heading_tag', 'tag_id', $tag_id);
+}
 
 function insertHeading($name, $categoryId)
 {
@@ -108,22 +154,33 @@ function insertUser($firstName, $lastName, $email, $password, $role, $journalist
     return $res;
 }
 
-function updateUser($firstName, $lastName, $email, $role_id, $date)
+function updateUser($firstName, $lastName, $email, $role_id, $date, $id)
 {
     global $conn;
-    $res = $conn->prepare("UPDATE users SET first_name=?, last_name=?, ");
+    $query = $conn->prepare("UPDATE users SET first_name=?, last_name=?, email =?, role_id =?, updated_at =? WHERE id =?");
+    $query->execute([
+        $firstName, $lastName, $email, $role_id, $date, $id
+    ]);
 }
 
 
 function getComments($postId, $parentComment = 0)
 {
     global $conn;
-    $res = $conn->query("SELECT c.*, u.first_name as firstName, u.last_name as lastName FROM comments c JOIN users u ON c.id_user = u.id WHERE id_post='$postId' AND parent_id ='$parentComment' ORDER BY created_at ASC")->fetchAll();
+    $query  = "SELECT c.*, u.first_name as firstName, u.last_name as lastName
+         FROM comments c JOIN users u ON c.id_user = u.id WHERE c.id_post = $postId AND c.parent_id = $parentComment";
+    $comments = $conn->query($query)->fetchAll();
+    return $comments;
+}
+function getReactionBySingleComment($comment_id)
+{
+    global $conn;
+    $res = $conn->query("SELECT likes, disslikes,first_name, last_name FROM reactions r JOIN users u ON r.user_id = u.id WHERE comment_id = $comment_id ")->fetchAll();
     return $res;
 }
-
-function getCommentsWithReaction($post_id, $user_id, $comment_id = 0)
+function getCommentsWithReaction($post_id, $user_id = '', $comment_id = 0)
 {
+    // return $comment_id;
     $comments = getComments($post_id, $comment_id);
 
     foreach ($comments as $comment) {
@@ -165,8 +222,6 @@ function resizeImage($file, $normal_path, $small_path)
     $new_normal_path = $normal_path . $new_image_name;
     $new_small_path = $small_path . $new_image_name;
     move_uploaded_file($tmp_name, $new_normal_path);
-    // $getImageDimens  new_normalions = getimagesize($new_normal_path);
-    //var_dump($getImageDimensions);
     $getImageDimensions = getimagesize($new_normal_path);
     $w = $getImageDimensions[0];
     $h = $getImageDimensions[1];
@@ -366,7 +421,7 @@ function getSelectedTags($post_id)
 }
 
 // PAGINACIJA
-define("ELEMENTS_OFFSET", 5);
+define("ELEMENTS_OFFSET", 10);
 function numOfData($query)
 {
     global $conn;
@@ -375,7 +430,7 @@ function numOfData($query)
 }
 
 
-function getHeadingWithCategory($limit = 0, $keyword = '', $order = 0)
+function getHeadingWithCategory($user, $limit = 0, $keyword = '', $order = 0)
 {
     global $conn;
     $res = '';
@@ -383,6 +438,9 @@ function getHeadingWithCategory($limit = 0, $keyword = '', $order = 0)
     $orderQuery = ' ORDER BY h.created_at DESC';
     $query = "";
     $baseQuery = "SELECT h.*, c.name as categoryName FROM headings h JOIN categories c ON h.category_id = c.id ";
+    if ($user->roleName == "Journalist") {
+        $query .= " category_id == $user->category_id ";
+    }
     if ($keyword != '') {
         $query = " WHERE h.name LIKE '$keyword'";
         $baseQuery .= $query;
@@ -406,16 +464,26 @@ function getHeadingWithCategory($limit = 0, $keyword = '', $order = 0)
     return $res;
 }
 
-function getNumOfHeadings($action, $keyword = '')
+function getNumOfHeadings($user, $action, $keyword = '')
 {
     global $conn;
     $res = '';
     $query = '';
     $baseQuery = "SELECT COUNT(*) as numOfHeadings FROM headings";
-    if ($keyword != '') {
-        $query = " WHERE name LIKE '$keyword'";
-        $baseQuery = $baseQuery . $query;
+    if ($user->roleName == "Journalist") {
+        $query = " WHERE category_id = $user->category_id";
+        $baseQuery .= $query;
     }
+    if ($keyword != '') {
+        if ($user->roleName == "Journalist") {
+            $query .= " AND name LIKE '$keyword'";
+            $baseQuery .= $query;
+        } else {
+            $query = " WHERE name LIKE '$keyword'";
+            $baseQuery .=  $query;
+        }
+    }
+    // return $baseQuery;
     if ($action == "count") {
         $res = $conn->query($baseQuery)->fetch();
     } else {
@@ -432,19 +500,36 @@ function rowCount($query)
     return $res;
 }
 
+function getIdNameFromHeadingsByCategoryId($category_id)
+{
+    global $conn;
+    $query = $conn->query("SELECT id, name FROM headings WHERE category_id = $category_id")->fetchAll();
+    return $query;
+}
 
-function getAllTags($limit = 0, $keyword = '', $order = 0)
+function getAllTags($user, $limit = 0, $keyword = '', $order = 0)
 {
     global $conn;
     $res = '';
-    $query =  '';
+    // $query =  '';
     $orderQuery = ' ORDER BY created_at DESC';
     $limitQuery = ' LIMIT :limit, :offset';
 
-    $baseQuery = "SELECT * FROM tags";
-    if ($keyword != '') {
-        $query = " WHERE name LIKE '$keyword'";
+    $baseQuery = "SELECT t.* FROM tags t";
+    if ($user->roleName == "Journalist") {
+        $category_id = $user->category_id;
+        $query = "  JOIN heading_tag ht  ON t.id=ht.tag_id JOIN headings h ON ht.heading_id = h.id WHERE h.category_id = $category_id ";
         $baseQuery .= $query;
+    }
+
+    if ($keyword != '') {
+        if ($user->roleName == "Journalist") {
+            $query = " AND t.name LIKE '$keyword'";
+            $baseQuery .= $query;
+        } else {
+            $query = " WHERE t.name LIKE '$keyword'";
+            $baseQuery .= $query;
+        }
     }
     if ($order) {
         if ($order > 0) {
@@ -457,7 +542,8 @@ function getAllTags($limit = 0, $keyword = '', $order = 0)
     $limit  = ((int)$limit) * ELEMENTS_OFFSET;
     $offset = ELEMENTS_OFFSET;
 
-    $baseQuery = $baseQuery . $orderQuery . $limitQuery;
+    $baseQuery .= $orderQuery . $limitQuery;
+    // return $baseQuery;
     $query = $conn->prepare($baseQuery);
     $query->bindValue(":limit", $limit, PDO::PARAM_INT);
     $query->bindValue(":offset", $offset, PDO::PARAM_INT);
@@ -466,14 +552,23 @@ function getAllTags($limit = 0, $keyword = '', $order = 0)
     return $res;
 }
 
-function getNumOfTags($action, $keyword = '')
+function getNumOfTags($user, $action, $keyword = '')
 {
     global $conn;
     $query = '';
-    $baseQuery = "SELECT COUNT(*)  as numOfTags FROM tags";
-    if ($keyword != '') {
-        $query = " WHERE name LIKE '$keyword'";
+    $baseQuery = "SELECT COUNT(*)  as numOfTags FROM tags t";
+    if ($user->roleName == "Journalist") {
+        $category_id = $user->category_id;
+        $query = "  JOIN heading_tag ht  ON t.id=ht.tag_id JOIN headings h ON ht.heading_id = h.id WHERE h.category_id = $category_id ";
         $baseQuery .= $query;
+    }
+    if ($keyword != '') {
+        if ($user->roleName == "Journalist") {
+            $query = " AND t.name LIKE '$keyword'";
+        } else {
+            $query = " WHERE name LIKE '$keyword'";
+            $baseQuery .= $query;
+        }
     }
 
     if ($action == 'count') {
@@ -500,16 +595,18 @@ function    postPagination($user, $limit = 0, $text = "", $order = 0, $categorie
 
     $baseQuery = "SELECT p.*, c.name as categoryName, h.name as headingName FROM posts p JOIN categories c ON p.category_id = c.id JOIN headings h ON p.heading_id = h.id";
     if ($user->roleName == "Journalist") {
-        $query = " WHERE p.user_id = '$user->id'";
-        $baseQuery .= $query;
+        $user_id = $user->id;
+        $query = " WHERE p.user_id = '$user_id'";
+        // $baseQuery .= $query;
     }
 
     if ($text != "") {
         if ($user->roleName == "Journalist") {
             $query .= " AND p.name LIKE '$compareString'";
+            // $baseQuery .= $query;
         } else {
             $query = " WHERE p.name LIKE '$compareString'";
-            $baseQuery .= $query;
+            // $baseQuery .= $query;
         }
     }
 
@@ -517,36 +614,37 @@ function    postPagination($user, $limit = 0, $text = "", $order = 0, $categorie
     if ($categories != "") {
         if ($user->roleName == "Journalist") {
             $query .= " AND p.category_id IN ($categories)";
-            $baseQuery .= $query;
+            // $baseQuery .= $query;
             // return $baseQuery;
         } else {
             if ($text != "") {
                 $query .= " AND p.category_id IN ($categories)";
             } else {
                 $query = " WHERE p.category_id IN ($categories)";
-                $baseQuery .= $query;
+                // $baseQuery .= $query;
             }
         }
+        // $baseQuery .= $query;
     }
 
     if ($headings != "") {
         if ($user->roleName == "Journalist") {
-            $query = " AND p.heading_id IN ('$headings')";
-            $baseQuery .= $query;
+            $query .= " AND p.heading_id IN ('$headings')";
+            // $baseQuery .= $query;
             // return $baseQuery;
         } else {
-            if (($text != "" && $categories != "") || ($text != "" || $categories != "")) {
+            if ($text != "" || $categories != "") {
                 $query .= " AND p.heading_id IN ('$headings')";
+                // $baseQuery .= $query;
             } else {
                 $query = " WHERE p.heading_id IN ('$headings')";
-                $baseQuery .= $query;
+                // $baseQuery .= $query;
             }
         }
     }
 
     if ($order) {
         if ($order == 1) {
-
             $orderQuery = " ORDER BY p.created_at ASC";
         } else {
 
@@ -557,9 +655,9 @@ function    postPagination($user, $limit = 0, $text = "", $order = 0, $categorie
     $limit = ((int)$limit) * ELEMENTS_OFFSET;
     $offset = ELEMENTS_OFFSET;
 
-    $baseQuery = $baseQuery . $orderQuery . $limitQuery;
+    $baseQuery .= $query . $orderQuery . $limitQuery;
 
-
+    // return $baseQuery;
     $query = $conn->prepare($baseQuery);
     $query->bindValue(":limit", $limit, PDO::PARAM_INT);
     $query->bindValue(":offset", $offset, PDO::PARAM_INT);
@@ -567,57 +665,60 @@ function    postPagination($user, $limit = 0, $text = "", $order = 0, $categorie
     $res = $query->fetchAll();
 
     return $res;
+    // return $baseQuery;
 }
 
 function getNumOfPosts($action, $user, $text = "", $categories = '', $headings = '')
 {
     global $conn;
+    $query = "";
     $baseQuery = "SELECT COUNT(*) as numberOfPosts FROM posts";
 
     $compareString = trim("%$text%");
     if ($user->roleName == "Journalist") {
-        $query = " WHERE user_id = '$user->id'";
+        $user_id = $user->id;
+        $query = " WHERE user_id = '$user_id'";
     }
-    // var_dump($user)
     if ($text != "") {
         if ($user->roleName == "Journalist") {
             $query .= " AND name LIKE '$compareString'";
+            // $baseQuery .= $query;
         } else {
             $query = " WHERE name LIKE '$compareString'";
-            $baseQuery .= $query;
+            // $baseQuery .= $query;
         }
     }
 
 
     if ($categories != "") {
+
         if ($user->roleName == "Journalist") {
             $query .= " AND category_id IN ($categories)";
-            $baseQuery .= $query;
         } else {
             if ($text != "") {
                 $query .= " AND category_id IN ($categories)";
             } else {
-                $query = " WHERE category_id IN ($categories)";
-                $baseQuery .= $query;
+                $query .= " WHERE category_id IN ($categories)";
             }
+            // $baseQuery .= $query;
         }
     }
 
     if ($headings != "") {
         if ($user->roleName == "Journalist") {
             $query .= " AND heading_id IN ('$headings')";
-            $baseQuery .= $query;
+            // $baseQuery .= $query;
         } else {
-            if (($text != "" && $categories != "") || ($text != "" || $categories != "")) {
+            if ($text != "" || $categories != "") {
                 $query .= " AND heading_id IN ('$headings')";
             } else {
-                $query = " WHERE heading_id IN ('$headings')";
-                $baseQuery .= $query;
+                $query .= " WHERE heading_id IN ('$headings')";
+                // $baseQuery .= $query;
             }
         }
     }
 
-    // $baseQuery = $baseQuery . $query;
+    $baseQuery .=  $query;
     // return $baseQuery;
     if ($action == 'count') {
         $res = $conn->query($baseQuery)->fetch();
@@ -626,6 +727,7 @@ function getNumOfPosts($action, $user, $text = "", $categories = '', $headings =
         $res = ceil($pages->numberOfPosts / ELEMENTS_OFFSET);
     };
     return $res;
+    // return $baseQuery;
 }
 
 
@@ -685,7 +787,6 @@ function getNumOfUsers($action, $keyword = '', $role_id = 0)
         $baseQuery .= $query;
     }
 
-    // var_dump($baseQuery);
     if ($action == 'count') {
         $res = $conn->query($baseQuery)->fetch();
     } else {
@@ -741,14 +842,15 @@ function cutName($name)
 function loggedInToday($path)
 {
     $counter = 0;
-    $file_users  = fopen("../../data/userLog.txt", "r");
-    $data_users = file("../../data/userLog.txt");
+    $file_users  = fopen($path, "r");
+    $data_users = file($path);
     fclose($file_users);
     foreach ($data_users as $user) {
         $data = explode("\t", $user);
         $action = $data[1];
         $date = date("d m y", strtotime($data[2]));
         $today  = date("d m y");
+
         if ($action == "Login" && $today == $date) {
             $counter++;
         }
@@ -795,20 +897,13 @@ function countPosts()
     $res = $conn->query("SELECT COUNT(*) as numberOfPosts FROM posts")->fetch();
     return $res;
 }
-function getPostTag($action, $value)
-{
-    global $conn;
-    $res = '';
-    if ($action == 'tags') {
-    } else {
-    }
-}
+
 
 
 function insertTasks($name, $user_id)
 {
     global $conn;
-    $query = $conn->prepare("INSERT INTO tasks (name, user_id) VALUE(?,?)");
+    $query = $conn->prepare("INSERT INTO tasks (description, user_id) VALUE(?,?)");
     $query->execute([$name, $user_id]);
     return $query;
 }
@@ -816,17 +911,12 @@ function insertTasks($name, $user_id)
 function updateTask($description, $user_id, $id)
 {
     global $conn;
-    $query = $conn->prepare("UPDATE tasks SET name=?, user_id =? WHERE id=?");
+    $query = $conn->prepare("UPDATE tasks SET description=?, user_id =? WHERE id=?");
     $query->execute([$description, $user_id, $id]);
     return $query;
 }
 
-// function userTasks()
-// {
-//     global $conn;
-//     $res = $conn->query("SELECT t.*, u.first_name, u.last_name FROM tasks t  JOIN users u ON t.user_id = u.id")->fetchAll();
-//     return $res;
-// }
+
 
 function getAllTasks($user_id = '')
 {
@@ -850,7 +940,7 @@ function getUsersWithRoleOfJournalist()
 function getPostsWithoutThis($post_id)
 {
     global $conn;
-    $query = $conn->query("SELECT * FROM posts WHERE id !=  $post_id LIMIT 3")->fetchAll();
+    $query = $conn->query("SELECT * FROM posts WHERE id !=  $post_id  ORDER BY created_at DESC LIMIT 4")->fetchAll();
     return $query;
 }
 
@@ -886,6 +976,12 @@ function countVote($comment_id, $column, $columnName)
     return $res;
 }
 
+function getHeadingsByCategoryId($categoryId)
+{
+    global $conn;
+    $res = $conn->query("SELECT h.name as headingName FROM headings h JOIN categories c ON h.category_id = c.id WHERE c.name = '$categoryId'")->fetchAll();
+    return $res;
+}
 function getHeadingsByCategoryName($categoryName)
 {
     global $conn;
@@ -903,7 +999,7 @@ function rolesWithoutAdmin()
 function getHeadingByCategoryId($id)
 {
     global $conn;
-    $res = $conn->query("SELECT id, name FROM headings WHERE category_id = '$id' ")->fetchAll();
+    $res = $conn->query("SELECT h.*, c.name as categoryName FROM headings h JOIN categories c ON h.category_id = c.id WHERE h.category_id = '$id' ")->fetchAll();
     return $res;
 }
 function getTagsByCategory($category_id)
@@ -913,13 +1009,12 @@ function getTagsByCategory($category_id)
     return $res;
 }
 
-function getTagsByHeading($heading_id)
+function getTagByHeading($category_id)
 {
     global $conn;
-    $res = $conn->query("SELECT id, name FROM tags WHERE heading_id ='$heading_id'")->fetchAll();
+    $res = $conn->query("SELECT id, name FROM headings WHERE category_id ='$category_id' ")->fetchAll();
     return $res;
 }
-
 function accountIsDisabled($user_email)
 {
     $fileU = fopen("../../data/userLog.txt", "r");
@@ -992,7 +1087,6 @@ function sendDissMail($email, $date)
     $user = $conn->prepare("SELECT * FROM users WHERE email=?");
     $user->execute([$email]);
     $userData = $user->fetch();
-    // var_dump($userData);
     $token = md5($userData->email . $date);
     $to = $userData->email;
     $usernameTo = $userData->first_name . " " . $userData->last_name;
@@ -1043,7 +1137,6 @@ function tokenMatch($rowsU, $user_id, $token)
     /*$token = md5($user->email.$date);*/
     foreach ($rowsU as $row) {
         $data = explode("\t", $row);
-        var_dump($data);
         if (($data[0] == $email && $data[1] == "Dissabled account")) {
             // echo $token;
             // echo md5($email . trim($data[2]));
@@ -1052,4 +1145,25 @@ function tokenMatch($rowsU, $user_id, $token)
         }
     }
     return false;
+}
+
+function lastOne()
+{
+    global $conn;
+    $res = $conn->query("SELECT p.id, p.name, p.image_path, p.created_at,c.name as categoryName FROM posts p JOIN categories c ON p.category_id = c.id ORDER BY p.created_at ASC LIMIT 1")->fetch();
+    return $res;
+}
+
+function exceptLastOne($id)
+{
+    global $conn;
+    $res = $conn->query("SELECT p.id, p.name, p.image_path, c.name as categoryName FROM posts p JOIN categories c ON p.category_id
+    = c.id ORDER BY p.created_at ASC LIMIT $id, 4")->fetchAll();
+    return $res;
+}
+function getPostsFilteredByCategory($category_id)
+{
+    global $conn;
+    $res = $conn->query("SELECT p.*, h.name as headingName FROM posts p JOIN headings h ON p.heading_id = h.id WHERE p.category_id = $category_id LIMIT 4")->fetchAll();
+    return $res;
 }
