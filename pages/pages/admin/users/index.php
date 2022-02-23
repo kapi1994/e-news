@@ -85,7 +85,7 @@ if (isset($_SESSION['user'])) {
                 </table>
                 <?php
                 $userPagination = getNumOfUsers('count');
-                if ($userPagination->numberOfUsers > 5) :
+                if ($userPagination->numberOfUsers > 10) :
                 ?>
                     <div class="row mt-3">
                         <div class="col-4 mx-auto">
