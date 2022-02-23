@@ -39,6 +39,7 @@ if (isset($_POST['btnSubmit'])) {
                     header("Location: ../../index.php?page=login");
                 } else {
                     $user = $userData->fetch();
+                    insertActivity('Login', $user->email);
                     // var_dump($user);
                     $_SESSION['user'] = $user;
                     if ($user->roleName == "User") {
