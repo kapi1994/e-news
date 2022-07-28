@@ -1,5 +1,5 @@
 <?php
-define("PASSWORD_EMAIL", "MasterNews247");
+
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -16,7 +16,7 @@ try {
     $mail->Port = 587; // TLS only 
     $mail->SMTPSecure = 'tls';
     $mail->SMTPAuth = true;
-    $mail->Username = 'masternews247@gmail.com'; // email 
+    $mail->Username = ''; // email 
     $mail->Password = PASSWORD_EMAIL; // password 
     $mail->setFrom($from, $usernameFrom); // From email and name 
     $mail->addAddress($to, $usernameTo); // to email and name 
